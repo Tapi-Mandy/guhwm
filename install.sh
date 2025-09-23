@@ -14,7 +14,7 @@ echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
 # xorg
 # default guhwm terminal
 # feh for image viewing and wallpapers
-sudo pacman -S --noconfirm xorg kitty feh dunst
+sudo pacman -S --noconfirm xorg dmenu kitty feh dunst ttf-dejavu ttf-fira-code ttf-jetbrains-mono
 
 set -e
 
@@ -249,7 +249,7 @@ else
 fi
 
 # Build and install dwm
-cd "$HOME/guhwm/dwm" || { echo "dwm directory not found!"; exit 1; }
+cd "$HOME/guhwm" || { echo "dwm directory not found!"; exit 1; }
 echo "Building and installing dwm..."
 make clean
 sudo make install
