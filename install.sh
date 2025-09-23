@@ -171,6 +171,71 @@ for pkg in "${shells[@]}"; do
     fi
 done
 
+echo
+echo "Setting up .xinitrc..."
+
+XINITRC_PATH="$HOME/.xinitrc"
+
+# Ask if we should overwrite an existing .xinitrc
+if [ -f "$XINITRC_PATH" ]; then
+    echo ".xinitrc already exists at $XINITRC_PATH"
+    echo "Do you want to overwrite it with the new one? (y/n)"
+    read -r overwrite_choice
+    if [[ "$overwrite_choice" =~ ^[Yy]$ ]]; then
+        overwrite=true
+    else
+        overwrite=false
+    fi
+else
+    overwrite=true
+fi
+
+# If overwriting is allowed, proceed
+if [ "$overwrite" = true ]; then
+    # Set the wallpaper directory
+    WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
+    
+    # Randomly select a wallpaper from the directory
+    WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.jpeg \) | shuf -n 1)
+
+    # If no wallpaper was found, set a default
+    if [ -z "$WALLPAPER" ]; then
+        WALLPAPER="$HOME/guhwm/Wallpapers/guhwm-default.png"
+    fi
+
+    # Create the .xinitrc file with the random wallpaper logic
+    cat > "$XINITRC_PATH" <<EOF
+#!/bin/sh
+
+# Set a random background image (using feh)
+feh --bg-scale "$WALLPAPER" &
+
+# Continuously update the DWM status bar with date and time
+while :; do
+    xsetroot -name "\$(date +"%a, %b %d %H:%M:%S")"
+    sleep 1
+done &
+
+# Start the notification daemon
+dunst &
+
+# Launch Redshift for eye comfort
+command -v redshift >/dev/null 2>&1 && redshift -O 3500 &
+
+# Set up keyboard layouts and switch between with Ctrl+Space
+# Uncomment the next line if you want layout switching:
+# setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
+
+# This must be the very last line!
+exec dwm
+EOF
+
+    chmod +x "$XINITRC_PATH"
+    echo ".xinitrc written to $XINITRC_PATH"
+else
+    echo "Skipped overwriting .xinitrc"
+fi
+
 echo "Cloning and installing dwm from Tapi-Mandy/guhwm..."
 
 # Clone repo (if it doesn't exist already)
