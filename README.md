@@ -13,11 +13,4 @@
 
 > `sudo pacman -S git`
 > 
-> `git clone https://github.com/Tapi-Mandy/guhwm`
-> 
-> `cd guhwm`
-> 
-> `chmod +x install.sh`
-> 
-> `./install.sh`
-
+> `git clone https://github.com/Tapi-Mandy/guhwm && cd guhwm && chmod +x install.sh && ./install.sh`
