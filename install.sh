@@ -19,7 +19,7 @@ sudo pacman -S --noconfirm xorg kitty feh dunst
 set -e
 
 # ========== 1. AUR HELPER SETUP ==========
-echo "\e[1;31mChoose your preferred AUR helper:\e[0m"
+echo "Choose your preferred AUR helper:"
 select aur_helper in yay paru pikaur; do
     if [[ "$aur_helper" =~ ^(yay|paru|pikaur)$ ]]; then
         echo "Selected AUR helper: $aur_helper"
