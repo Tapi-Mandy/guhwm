@@ -9,7 +9,7 @@
 
 ## Installing *Guh Window Manager*
 
-#### We do not provide a dedicated Arch Linux installation script/guide. Instead, we recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) to set up your base system, and then following the standard build and install instructions for guhwm;
+#### We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) to set up your base system, and then following the standard build and install instructions for guhwm;
 
 - `sudo pacman -S --needed git base-devel`
 
