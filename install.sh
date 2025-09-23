@@ -11,9 +11,10 @@ echo -e "\e[1;31mYou will be prompted to install software for guhwm, the first o
 # Pink (bright magenta)
 echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
 
+# xorg
 # default guhwm terminal
 # feh for image viewing and wallpapers
-sudo pacman -S kitty feh dunst
+sudo pacman -S --noconfirm xorg kitty feh dunst
 
 set -e
 
