@@ -11,7 +11,7 @@
 
 #### We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) to set up your base system, and then following the standard build and install instructions for guhwm;
 
-> `sudo pacman -S --needed git`
+> `sudo pacman -S git`
 > 
 > `git clone https://github.com/Tapi-Mandy/guhwm`
 > 
