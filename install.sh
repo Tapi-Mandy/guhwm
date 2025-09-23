@@ -52,6 +52,7 @@ general_software=(
     vim
     uwufetch
     htop
+    scrot
     redshift
     vesktop-bin
 )
@@ -62,6 +63,7 @@ general_descs=(
     "Vi Improved, a highly configurable, improved version of the vi text editor"
     "A meme system info tool for Linux, based on nyan/uwu trend on r/linuxmasterrace"
     "Interactive process viewer"
+    "Simple command-line screenshot utility for X"
     "Adjusts the color temperature of your screen according to your surroundings"
     "A cross platform electron-based desktop app aiming to give you a snappier Discord experience with Vencord pre-installed"
 )
