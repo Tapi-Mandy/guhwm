@@ -14,18 +14,55 @@ echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
 # Pause for the user to read for 5 seconds
 sleep 5
 
-# X Window System
-# Generic menu for X
-# Default terminal for guhwm
-# Image viewer and wallpaper manager
-# Customizable and lightweight notification-daemon
-# Fonts
-sudo pacman -S --noconfirm xorg dmenu kitty feh dunst clipmenu noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
-
 set -e
 
-# ========== 1. AUR HELPER SETUP ==========
-# Pink (bright magenta)
+# ========== RETRY FUNCTION ==========
+retry_pacman() {
+    local retries=5
+    local count=0
+
+    until sudo pacman -S --noconfirm "$@"; do
+        count=$((count+1))
+        echo "pacman failed (attempt $count/$retries)"
+
+        if [ $count -ge $retries ]; then
+            echo "Giving up after $retries tries."
+            return 1
+        fi
+
+        echo "Updating mirrors with reflector and retrying..."
+        sudo pacman -S --needed --noconfirm reflector
+        sudo reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+        sleep 2
+    done
+}
+
+# ========== RETRY FUNCTION FOR AUR HELPER ==========
+retry_aur() {
+    local retries=5
+    local count=0
+
+    until "$aur_helper" -S --noconfirm "$@"; do
+        count=$((count+1))
+        echo "$aur_helper failed (attempt $count/$retries)"
+
+        if [ $count -ge $retries ]; then
+            echo "Giving up after $retries tries."
+            return 1
+        fi
+
+        echo "Updating mirrors with reflector and retrying..."
+        sudo pacman -S --needed --noconfirm reflector
+        sudo reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+        sleep 2
+    done
+}
+
+# ========== 1. BASE PACKAGES ==========
+# Xorg, dmenu, terminal, fonts, etc.
+retry_pacman xorg dmenu kitty feh dunst clipmenu noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+
+# ========== 2. AUR HELPER SETUP ==========
 echo -e "\e[35mChoose your preferred AUR helper:\e[0m"
 select aur_helper in yay paru pikaur; do
     if [[ "$aur_helper" =~ ^(yay|paru|pikaur)$ ]]; then
@@ -39,7 +76,7 @@ done
 # Install AUR helper if missing
 if ! command -v "$aur_helper" &>/dev/null; then
     echo "$aur_helper not found. Installing..."
-    sudo pacman -S --needed --noconfirm base-devel git
+    retry_pacman base-devel git
 
     tmpdir=$(mktemp -d)
     cd "$tmpdir"
@@ -154,7 +191,7 @@ echo
 echo "Installing general software..."
 for pkg in "${general_software[@]}"; do
     echo "Installing: $pkg"
-    "$aur_helper" -S --noconfirm "$pkg"
+    retry_aur "$pkg"
 done
 
 echo
@@ -165,7 +202,7 @@ for pkg in "${shells[@]}"; do
 
         if ! command -v zsh &>/dev/null; then
             echo "Zsh not found. Installing it first..."
-            "$aur_helper" -S --noconfirm zsh
+            retry_aur zsh
         fi
 
         if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -176,7 +213,7 @@ for pkg in "${shells[@]}"; do
         fi
     else
         echo "Installing: $pkg"
-        "$aur_helper" -S --noconfirm "$pkg"
+        retry_aur "$pkg"
     fi
 done
 
