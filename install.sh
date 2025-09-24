@@ -292,3 +292,11 @@ if [[ "$launch_now" =~ ^[Yy]$ ]]; then
 else
     echo "dwm will automatically start when you reboot!"
 fi
+
+cat >> "$HOME/.bash_profile" << 'EOF'
+
+# Auto-start X on tty1
+if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then
+    exec startx
+fi
+EOF
