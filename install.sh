@@ -5,8 +5,8 @@ echo -e "\e[1;35mThanks for trying guhwm ;3\e[0m"
 
 echo '...'
 
-# Light red (bright red)
-echo -e "\e[1;31mYou will be prompted to install software for guhwm, installing them is optional but recommended by guhwm. Documentation on them is available.\e[0m"
+# Pink (bright magenta)
+echo -e "\e[1;35mYou will be prompted to install software for guhwm, installing them is optional but recommended by guhwm. Documentation on them is available.\e[0m"
 
 # Pink (bright magenta)
 echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
