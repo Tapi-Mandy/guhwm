@@ -9,8 +9,8 @@
 
 ## Installing *Guh Window Manager*
 
-#### We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) to set up your base system, and then following the standard build and install instructions for guhwm;
+#### We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a Xorg or minimal desktop profile to set up your base system, and then following the standard build and install instructions for guhwm;
 
-> `sudo pacman -S git`
-> 
-> `git clone https://github.com/Tapi-Mandy/guhwm && cd guhwm && chmod +x install.sh && ./install.sh`
+### Use this command to install guhwm-1.0
+
+> `sudo pacman -S git && git clone https://github.com/Tapi-Mandy/guhwm && cd guhwm && chmod +x install.sh && ./install.sh`
