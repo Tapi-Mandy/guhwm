@@ -6,20 +6,27 @@ echo -e "\e[1;35mThanks for trying guhwm ;3\e[0m"
 echo '...'
 
 # Light red (bright red)
-echo -e "\e[1;31mYou will be prompted to install software for guhwm, the first ones are absolutely necessary. The following software is optional. Documentation on them is available.\e[0m"
+echo -e "\e[1;31mYou will be prompted to install software for guhwm, installing them is optional but recommended by guhwm. Documentation on them is available.\e[0m"
 
 # Pink (bright magenta)
 echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
 
-# xorg
-# default guhwm terminal
-# feh for image viewing and wallpapers
-sudo pacman -S --noconfirm xorg dmenu kitty feh dunst ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+# Pause for the user to read for 5 seconds
+sleep 5
+
+# X Window System
+# Generic menu for X
+# Default terminal for guhwm
+# Image viewer and wallpaper manager
+# Customizable and lightweight notification-daemon
+# Fonts
+sudo pacman -S --noconfirm xorg dmenu kitty feh dunst noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
 
 set -e
 
 # ========== 1. AUR HELPER SETUP ==========
-echo "Choose your preferred AUR helper:"
+# Pink (bright magenta)
+echo -e "\e[35mChoose your preferred AUR helper:\e[0m"
 select aur_helper in yay paru pikaur; do
     if [[ "$aur_helper" =~ ^(yay|paru|pikaur)$ ]]; then
         echo "Selected AUR helper: $aur_helper"
@@ -47,25 +54,25 @@ fi
 # General software
 general_software=(
     firefox
-    mpv
-    krita
-    vim
-    uwufetch
-    htop
-    scrot
-    redshift
     vesktop-bin
+    uwufetch
+    krita
+    scrot
+    vim
+    htop
+    mpv
+    redshift
 )
 general_descs=(
     "Fast, Private & Safe Web Browser"
-    "Free, open source, and cross-platform media player"
-    "Edit and paint images"
-    "Vi Improved, a highly configurable, improved version of the vi text editor"
-    "A meme system info tool for Linux, based on nyan/uwu trend on r/linuxmasterrace"
-    "Interactive process viewer"
+    "The cutest Discord client mod"
+    "System info tool for Linux, based on nyan/uwu trend on r/linuxmasterrace"
+    "Full-featured free digital painting studio"
     "Simple command-line screenshot utility for X"
+    "Vi Improved, a highly configurable, improved version of the vi text editor"
+    "Interactive process viewer"
+    "Cross-platform media player"
     "Adjusts the color temperature of your screen according to your surroundings"
-    "A cross platform electron-based desktop app aiming to give you a snappier Discord experience with Vencord pre-installed"
 )
 
 # Shells
@@ -76,10 +83,10 @@ shells=(
     ksh
 )
 shell_descs=(
-    "Z Shell"
+    "A very advanced and programmable shell"
     "Open source, community-driven framework for managing your zsh configuration"
     "Smart and user friendly shell intended mostly for interactive use"
-    "Korn shell (classic)"
+    "The Original AT&T Korn Shell"
 )
 
 # ========== 3. REMOVAL FUNCTION ==========
@@ -218,6 +225,27 @@ while :; do
     sleep 1
 done &
 
+# A simple system status script for dwm
+while true; do
+  # Get CPU usage (e.g., from `top` or a more lightweight tool)
+  cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+
+  # Get memory usage
+  mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+
+  # Get disk usage
+  disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
+
+  # Get date and time
+  datetime=$(date +"%a %b %d %R")
+
+  # Use xsetroot to display the information
+  xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime"
+
+  # Wait for 1 second before updating again
+  sleep 1
+done &
+
 # Start the notification daemon
 dunst &
 
@@ -225,7 +253,7 @@ dunst &
 command -v redshift >/dev/null 2>&1 && redshift -O 3500 &
 
 # Set up keyboard layouts and switch between with Ctrl+Space
-# Uncomment the next line if you want layout switching:
+# Uncomment the next line if you want keyboard layouts:
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
 
 # This must be the very last line!
