@@ -218,7 +218,7 @@ for pkg in "${shells[@]}"; do
 done
 
 echo
-echo "Setting up .xinitrc..."
+echo -e "\e[36mSetting up .xinitrc...\e[0m"
 
 XINITRC_PATH="$HOME/.xinitrc"
 
