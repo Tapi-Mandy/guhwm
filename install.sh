@@ -188,14 +188,14 @@ remove_items shells shell_descs "Shells"
 
 # ========== 5. INSTALLATION ==========
 echo
-echo "Installing general software..."
+echo -e "\e[1;35mInstalling general software...\e[0m"
 for pkg in "${general_software[@]}"; do
     echo "Installing: $pkg"
     retry_aur "$pkg"
 done
 
 echo
-echo "Installing shells..."
+echo -e "\e[1;35mInstalling shells...\e[0m"
 for pkg in "${shells[@]}"; do
     if [[ "$pkg" == "oh-my-zsh" ]]; then
         echo "Installing Oh My Zsh..."
@@ -219,9 +219,9 @@ done
 
 echo
 echo "Setting up .xinitrc..."
- 
+
 XINITRC_PATH="$HOME/.xinitrc"
- 
+
 # Ask if we should overwrite an existing .xinitrc
 if [ -f "$XINITRC_PATH" ]; then
     echo ".xinitrc already exists at $XINITRC_PATH"
@@ -235,61 +235,61 @@ if [ -f "$XINITRC_PATH" ]; then
 else
     overwrite=true
 fi
- 
+
 # If overwriting is allowed, proceed
 if [ "$overwrite" = true ]; then
     # Set the wallpaper directory
     WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
- 
+
     # Randomly select a wallpaper from the directory
     WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.jpeg \) | shuf -n 1)
- 
+
     # If no wallpaper was found, set a default
     if [ -z "$WALLPAPER" ]; then
         WALLPAPER="$HOME/guhwm/Wallpapers/guhwm-default.png"
     fi
- 
+
     # Create the .xinitrc file with the random wallpaper logic
     cat > "$XINITRC_PATH" <<EOF
 #!/bin/sh
- 
+
 # Set a random background image (using feh)
 feh --bg-scale "$WALLPAPER" &
- 
+
 # A simple system status script for dwm
 while true; do
   # Get CPU usage
   cpu_usage=\$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - \$1}')
- 
+
   # Get memory usage
   mem_usage=\$(free -h | awk '/^Mem:/ {print \$3 "/" \$2}')
- 
+
   # Get disk usage
   disk_usage=\$(df -h | awk '\$NF=="/"{printf "%s", \$5}')
- 
+
   # Get date and time
   datetime=\$(date +"%a, %b %d, %R")
- 
+
   # Use xsetroot to display the information
   xsetroot -name "\$cpu_usage% CPU | \$mem_usage Mem | \$disk_usage Disk | \$datetime"
- 
+
   sleep 1
 done &
- 
+
 # Start the notification daemon
 dunst &
- 
+
 # Launch Redshift for eye comfort
 command -v redshift >/dev/null 2>&1 && redshift -O 3500 &
- 
+
 # Set up keyboard layouts and switch between with Ctrl+Space
 # Uncomment the next line if you want keyboard layouts:
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
- 
+
 # This must be the very last line!
 exec dwm
 EOF
- 
+
     chmod +x "$XINITRC_PATH"
     echo ".xinitrc written to $XINITRC_PATH"
 else
