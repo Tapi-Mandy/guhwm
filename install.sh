@@ -256,12 +256,6 @@ if [ "$overwrite" = true ]; then
 # Set a random background image (using feh)
 feh --bg-scale "$WALLPAPER" &
  
-# Continuously update the DWM status bar with date and time
-while :; do
-    xsetroot -name "\$(date +"%a, %b %d %H:%M:%S")"
-    sleep 1
-done &
- 
 # A simple system status script for dwm
 while true; do
   # Get CPU usage
@@ -274,7 +268,7 @@ while true; do
   disk_usage=\$(df -h | awk '\$NF=="/"{printf "%s", \$5}')
  
   # Get date and time
-  datetime=\$(date +"%a %b %d %R")
+  datetime=\$(date +"%a, %b %d %R")
  
   # Use xsetroot to display the information
   xsetroot -name "\$cpu_usage% CPU | \$mem_usage Mem | \$disk_usage Disk | \$datetime"
