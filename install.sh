@@ -296,7 +296,7 @@ else
     echo "Skipped overwriting .xinitrc"
 fi
 
-echo "Cloning and installing dwm from Tapi-Mandy/guhwm..."
+echo "Cloning and installing guhwm from Tapi-Mandy/guhwm..."
 
 # Clone repo (if it doesn't exist already)
 if [ ! -d "$HOME/guhwm" ]; then
@@ -307,21 +307,22 @@ else
 fi
 
 # Build and install dwm
-cd "$HOME/guhwm" || { echo "dwm directory not found!"; exit 1; }
-echo "Building and installing dwm..."
+cd "$HOME/guhwm" || { echo "guhwm directory not found!"; exit 1; }
+echo "Building and installing guhwm-1.0..."
 make clean
 sudo make install
 
 echo -e "\e[34mguhwm-1.0 installed successfully!\e[0m"
 echo -e "\e[34mAll done!\e[0m"
-printf "\e[34mDo you want to start guhwm-1.0 now? (y/n): \e[0m"
+echo
+printf "\e[34mDo you want to start guhwm now? (y/n): \e[0m"
 read -r launch_now
 if [[ "$launch_now" =~ ^[Yy]$ ]]; then
-    echo -e "\e[34mLaunching guhwm-1.0...\e[0m"
+    echo -e "\e[34mLaunching guhwm...\e[0m"
     sleep 1
     exec startx
 else
-    echo -e "\e[34mguhwm-1.0 will automatically start when you reboot!\e[0m"
+    echo -e "\e[34mguhwm will automatically start when you reboot!\e[0m"
 fi
 
 cat >> "$HOME/.bash_profile" << 'EOF'
