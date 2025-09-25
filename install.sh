@@ -121,7 +121,7 @@ shells=(
 )
 shell_descs=(
     "A very advanced and programmable shell"
-    "Open source, community-driven framework for managing your zsh configuration"
+    "community-driven framework for managing your zsh configuration"
     "Smart and user friendly shell intended mostly for interactive use"
     "The Original AT&T Korn Shell"
 )
