@@ -66,16 +66,16 @@ retry_pacman xorg dmenu kitty feh dunst clipmenu reflector noto-fonts noto-fonts
 echo -e "\e[35mChoose your preferred AUR helper:\e[0m"
 select aur_helper in yay paru; do
     if [[ "$aur_helper" =~ ^(yay|paru)$ ]]; then
-        echo "Selected AUR helper: $aur_helper"
+        echo -e "\e[36mSelected AUR helper: $aur_helper\e[0m"
         break
     else
-        echo "Invalid choice. Try again."
+        echo -e "\e[31mInvalid choice. Try again.\e[0m"
     fi
 done
 
 # Install AUR helper if missing
 if ! command -v "$aur_helper" &>/dev/null; then
-    echo "$aur_helper not found. Installing..."
+    echo -e "\e[36m$aur_helper not found. Installing...\e[0m"
     retry_pacman base-devel git
 
     tmpdir=$(mktemp -d)
@@ -140,7 +140,7 @@ remove_items() {
         done
 
         echo
-        echo "Enter the numbers to remove (comma-separated), or press Enter to keep all:"
+        echo -e "\e[35mEnter the numbers to remove (comma-separated), or press Enter to keep all:\e[0m"
         read -r input
 
         if [[ -z "$input" ]]; then
@@ -163,7 +163,7 @@ remove_items() {
         done
 
         if ! $valid; then
-            echo "You stupid, >:3 can you not read? It says enter the number, not names.. =TwT="
+            echo -e "\e[31mYou stupid, >:3 can you not read? It says enter the number, not names.. =TwT=\e[0m"
             continue
         fi
 
@@ -190,7 +190,7 @@ remove_items shells shell_descs "Shells"
 echo
 echo -e "\e[1;35mInstalling general software...\e[0m"
 for pkg in "${general_software[@]}"; do
-    echo "Installing: $pkg"
+    echo -e "\e[34mInstalling: $pkg\e[0m"
     retry_aur "$pkg"
 done
 
@@ -198,21 +198,21 @@ echo
 echo -e "\e[1;35mInstalling shells...\e[0m"
 for pkg in "${shells[@]}"; do
     if [[ "$pkg" == "oh-my-zsh" ]]; then
-        echo "Installing Oh My Zsh..."
+        echo -e "\e[36mInstalling Oh My Zsh...\e[0m"
 
         if ! command -v zsh &>/dev/null; then
-            echo "Zsh not found. Installing it first..."
+            echo -e "\e[36mZsh not found. Installing it first...\e[0m"
             retry_aur zsh
         fi
 
         if [ ! -d "$HOME/.oh-my-zsh" ]; then
-            echo "Running Oh My Zsh install script..."
+            echo -e "\e[36mRunning Oh My Zsh install script...\e[0m"
             sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         else
-            echo "Oh My Zsh already installed. Skipping."
+            echo -e "\e[36mOh My Zsh already installed. Skipping.\e[0m"
         fi
     else
-        echo "Installing: $pkg"
+        echo -e "\e[35mInstalling: $pkg\e[0m"
         retry_aur "$pkg"
     fi
 done
@@ -291,38 +291,38 @@ exec dwm
 EOF
 
     chmod +x "$XINITRC_PATH"
-    echo ".xinitrc written to $XINITRC_PATH"
+    echo -e "\e[36m.xinitrc written to $XINITRC_PATH\e[0m"
 else
-    echo "Skipped overwriting .xinitrc"
+    echo -e "\e[36mSkipped overwriting .xinitrc\e[0m"
 fi
 
-echo "Cloning and installing guhwm from Tapi-Mandy/guhwm..."
+echo -e "\e[35mCloning and installing guhwm from Tapi-Mandy/guhwm...\e[0m"
 
 # Clone repo (if it doesn't exist already)
 if [ ! -d "$HOME/guhwm" ]; then
     git clone https://github.com/Tapi-Mandy/guhwm.git "$HOME/guhwm"
 else
-    echo "Repo already cloned, pulling latest changes..."
+    echo -e "\e[35mRepo already cloned, pulling latest changes...\e[0m"
     git -C "$HOME/guhwm" pull
 fi
 
-# Build and install dwm
-cd "$HOME/guhwm" || { echo "guhwm directory not found!"; exit 1; }
-echo "Building and installing guhwm-1.0..."
+# Build and install guhwm
+cd "$HOME/guhwm" || { echo -e "\e[35mguhwm directory not found!\e[0m"; exit 1; }
+echo -e "\e[35mBuilding and installing guhwm-1.0...\e[0m"
 make clean
 sudo make install
 
-echo -e "\e[34mguhwm-1.0 installed successfully!\e[0m"
-echo -e "\e[34mAll done!\e[0m"
+echo -e "\e[35mAll done!\e[0m"
+echo -e "\e[35mguhwm-1.0 installed successfully!\e[0m"
 echo
-printf "\e[34mDo you want to start guhwm now? (y/n): \e[0m"
+printf "\e[35mDo you want to start guhwm now? (y/n): \e[0m"
 read -r launch_now
 if [[ "$launch_now" =~ ^[Yy]$ ]]; then
-    echo -e "\e[34mLaunching guhwm...\e[0m"
+    echo -e "\e[35mLaunching guhwm...\e[0m"
     sleep 1
     exec startx
 else
-    echo -e "\e[34mguhwm will automatically start when you reboot!\e[0m"
+    echo -e "\e[35mguhwm will automatically start when you reboot!\e[0m"
 fi
 
 cat >> "$HOME/.bash_profile" << 'EOF'
