@@ -268,7 +268,7 @@ while true; do
   disk_usage=\$(df -h | awk '\$NF=="/"{printf "%s", \$5}')
  
   # Get date and time
-  datetime=\$(date +"%a, %b %d %R")
+  datetime=\$(date +"%a, %b %d, %R")
  
   # Use xsetroot to display the information
   xsetroot -name "\$cpu_usage% CPU | \$mem_usage Mem | \$disk_usage Disk | \$datetime"
