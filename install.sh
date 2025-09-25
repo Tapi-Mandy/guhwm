@@ -60,12 +60,12 @@ retry_aur() {
 
 # ========== 1. BASE PACKAGES ==========
 # Xorg, dmenu, terminal, fonts, etc.
-retry_pacman xorg dmenu kitty feh dunst clipmenu noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+retry_pacman xorg dmenu kitty feh dunst clipmenu reflector noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
 
 # ========== 2. AUR HELPER SETUP ==========
 echo -e "\e[35mChoose your preferred AUR helper:\e[0m"
-select aur_helper in yay paru pikaur; do
-    if [[ "$aur_helper" =~ ^(yay|paru|pikaur)$ ]]; then
+select aur_helper in yay paru; do
+    if [[ "$aur_helper" =~ ^(yay|paru)$ ]]; then
         echo "Selected AUR helper: $aur_helper"
         break
     else
@@ -312,15 +312,16 @@ echo "Building and installing dwm..."
 make clean
 sudo make install
 
-echo "guhwm installed successfully!"
-echo "All done!"
-read -rp "\e[34mDo you want to start dwm now? (y/n): \e[0m" launch_now
+echo -e "\e[34mguhwm-1.0 installed successfully!\e[0m"
+echo -e "\e[34mAll done!\e[0m"
+printf "\e[34mDo you want to start guhwm-1.0 now? (y/n): \e[0m"
+read -r launch_now
 if [[ "$launch_now" =~ ^[Yy]$ ]]; then
-    echo "Launching dwm..."
+    echo -e "\e[34mLaunching guhwm-1.0...\e[0m"
     sleep 1
     exec startx
 else
-    echo "\e[34mdwm will automatically start when you reboot! \e[0m"
+    echo -e "\e[34mguhwm-1.0 will automatically start when you reboot!\e[0m"
 fi
 
 cat >> "$HOME/.bash_profile" << 'EOF'
