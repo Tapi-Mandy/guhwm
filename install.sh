@@ -1,18 +1,18 @@
 #!/usr/bin/bash
 
 # Pink (bright magenta)
-echo -e "\e[1;35mThanks for trying guhwm ;3\e[0m"
+echo -e "\e[1;35mThank you for trying guhwm! ;3\e[0m"
 
-echo '...'
-
-# Pink (bright magenta)
-echo -e "\e[1;35mYou will be prompted to install software for guhwm, installing them is optional but recommended by guhwm. Documentation on them is available.\e[0m"
+echo
 
 # Pink (bright magenta)
-echo -e "\e[1;35mYou will also be prompted to choose an AUR helper.\e[0m"
+echo -e "\e[1;35mYou'll be prompted to install optional software, which is highly recommended. Documentation is available.\e[0m"
 
-# Pause for the user to read for 5 seconds
-sleep 5
+# Pink (bright magenta)
+echo -e "\e[1;35mNext, you will be prompted to select your preferred AUR helper.\e[0m"
+
+# Pause for the user to read for 6 seconds
+sleep 6
 
 set -e
 
