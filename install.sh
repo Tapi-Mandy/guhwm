@@ -60,7 +60,7 @@ retry_aur() {
 
 # ========== 1. BASE PACKAGES ==========
 # Xorg, dmenu, terminal, fonts, etc.
-retry_pacman xorg dmenu kitty feh dunst clipmenu reflector noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+retry_pacman xorg dmenu kitty feh dunst clipmenu reflector nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
 
 # ========== 2. AUR HELPER SETUP ==========
 echo -e "\e[35mChoose your preferred AUR helper:\e[0m"
