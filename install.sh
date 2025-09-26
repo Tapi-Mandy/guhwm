@@ -8,7 +8,7 @@
 # - Lets the user select and install their preferred AUR helper
 # - Allows removing unwanted packages before installation
 # - Installs general software and shells
-# - Sets the first chosen shell as the default and autostarts startx (not for fish)
+# - Sets the first chosen shell as the default and autostarts startx
 # - Creates/overwrites .xinitrc with many features
 # - Builds and installs guhwm from source
 # - Creates a Kitty config with a preset theme
@@ -256,6 +256,7 @@ for pkg in "${shells[@]}"; do
 done
 
 # ==============================
+<<<<<<< HEAD
 # Default Shell Setup
 # ==============================
 if [ ${#shells[@]} -gt 0 ]; then
@@ -309,6 +310,9 @@ fi
 
 # ==============================
 # .xinitrc Setup
+=======
+# Xinitrc Setup
+>>>>>>> parent of a39831d (Updated install.sh)
 # ==============================
 echo -e "${PINK}Setting up .xinitrc...${RESET}"
 XINITRC_PATH="$HOME/.xinitrc"
@@ -566,9 +570,3 @@ if [[ "$launch_now" =~ ^[Yy]$ ]]; then
 else
     echo -e "${PINK}guhwm will start automatically on reboot.${RESET}"
 fi
-
-# ==============================
-# Log Location
-# ==============================
-echo
-echo -e "${PINK}Logs saved to:${RESET} $LOG_FILE"
