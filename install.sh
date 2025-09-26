@@ -257,6 +257,7 @@ done
 
 # ==============================
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Default Shell Setup
 # ==============================
 if [ ${#shells[@]} -gt 0 ]; then
@@ -311,6 +312,8 @@ fi
 # ==============================
 # .xinitrc Setup
 =======
+=======
+>>>>>>> parent of a39831d (Updated install.sh)
 # Xinitrc Setup
 >>>>>>> parent of a39831d (Updated install.sh)
 # ==============================
