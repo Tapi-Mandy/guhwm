@@ -366,8 +366,6 @@ make clean && sudo make install
 log_status "guhwm" "OK"
 
 # ==============================
-
-# ==============================
 # Kitty Configuration
 # ==============================
 echo -e "${PINK}Setting up Kitty configuration...${RESET}"
@@ -539,14 +537,15 @@ EOF
 log_status "Kitty configuration" "OK"
 echo -e "${PINK}Kitty config written to:${RESET} $KITTY_CONFIG_FILE"
 echo "Kitty config written to: $KITTY_CONFIG_FILE" >> "$LOG_FILE"
+# ==============================
 # Summary
 # ==============================
 echo
 header "="
 echo " Installation Summary"
 header "="
-echo "Succeeded: $SUCCEEDED_COUNT"
-echo "Failed:    $FAILED_COUNT"
+echo " Succeeded: $SUCCEEDED_COUNT"
+echo " Failed:    $FAILED_COUNT"
 if [ "$FAILED_COUNT" -gt 0 ]; then
     for item in "${FAILED_LIST[@]}"; do
         echo "  - $item"
