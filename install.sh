@@ -8,7 +8,7 @@
 # - Lets the user select and install their preferred AUR helper
 # - Allows removing unwanted packages before installation
 # - Installs general software and shells
-# - Sets the first chosen shell as the default and autostarts startx
+# - Sets the first chosen shell as the default and autostarts startx (not for fish)
 # - Creates/overwrites .xinitrc with many features
 # - Builds and installs guhwm from source
 # - Maintains a rotating log system for debugging
@@ -235,6 +235,58 @@ for pkg in "${shells[@]}"; do
 done
 
 # ==============================
+# Default Shell Setup
+# ==============================
+if [ ${#shells[@]} -gt 0 ]; then
+    first_shell="${shells[0]}"
+    case "$first_shell" in
+        zsh|oh-my-zsh) shell_path="/bin/zsh" ;;
+        fish)          shell_path="/usr/bin/fish" ;;
+        ksh)           shell_path="/usr/bin/ksh" ;;
+        *)             shell_path="/bin/bash" ;;
+    esac
+
+    if [[ "$shell_path" != "/bin/bash" ]]; then
+        echo -e "${PINK}Setting default shell to $shell_path...${RESET}"
+        if chsh -s "$shell_path" "$USER"; then
+            log_status "Default shell ($first_shell)" "OK"
+        else
+            log_status "Default shell ($first_shell)" "FAIL"
+        fi
+    else
+        echo -e "${PINK}Keeping default shell as bash.${RESET}"
+    fi
+fi
+
+# ==============================
+# Auto-start X in correct profile (skip for fish)
+# ==============================
+if [[ "$shell_path" != "/usr/bin/fish" ]]; then
+    case "$shell_path" in
+        /bin/bash)      profile_file="$HOME/.bash_profile" ;;
+        /bin/zsh)       profile_file="$HOME/.zprofile" ;;
+        /usr/bin/ksh)   profile_file="$HOME/.profile" ;;
+        *)              profile_file="$HOME/.bash_profile" ;;  # fallback
+    esac
+
+    if ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
+        echo -e "${PINK}Adding startx auto-start to $profile_file...${RESET}"
+        {
+            echo
+            echo "# Auto-start X only on tty1"
+            echo 'if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then'
+            echo '    exec startx'
+            echo 'fi'
+        } >> "$profile_file"
+        log_status "Startx in $profile_file" "OK"
+    else
+        echo -e "${PINK}Startx already present in $profile_file. Skipping.${RESET}"
+    fi
+else
+    echo -e "${PINK}Skipping startx setup for fish (not supported).${RESET}"
+fi
+
+# ==============================
 # Xinitrc Setup
 # ==============================
 echo -e "${PINK}Setting up .xinitrc...${RESET}"
@@ -321,3 +373,9 @@ if [[ "$launch_now" =~ ^[Yy]$ ]]; then
 else
     echo -e "${PINK}guhwm will start automatically on reboot.${RESET}"
 fi
+
+# ==============================
+# Log Location
+# ==============================
+echo
+echo -e "${PINK}Logs saved to:${RESET} $LOG_FILE"
