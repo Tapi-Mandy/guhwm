@@ -11,6 +11,7 @@
 # - Sets the first chosen shell as the default and autostarts startx (not for fish)
 # - Creates/overwrites .xinitrc with many features
 # - Builds and installs guhwm from source
+# - Creates a Kitty config with a preset theme
 # - Maintains a rotating log system for debugging
 # - Provides a final summary of successes and failures
 # - Prompts to launch guhwm immediately after installation
@@ -24,6 +25,26 @@ set -e
 RED="\e[31m"
 PINK="\e[1;35m"
 RESET="\e[0m"
+
+# ==============================
+# Aligned Section Header (fixed width)
+# ==============================
+# Use: header "Section Name"
+header() {
+    local title="$1"
+    local width=45
+    local tlen=${#title}
+    if [ "$tlen" -ge $((width-2)) ]; then
+        printf "== %s ==\n" "$title"
+        return
+    fi
+    local total_pad=$((width - tlen - 2))
+    local left_pad=$((total_pad/2))
+    local right_pad=$((total_pad - left_pad))
+    local left=$(printf '%*s' "$left_pad" '' | tr ' ' '=')
+    local right=$(printf '%*s' "$right_pad" '' | tr ' ' '=')
+    printf "%s %s %s\n" "$left" "$title" "$right"
+}
 
 # ==============================
 # Logging setup
@@ -177,7 +198,7 @@ remove_items() {
     local title=$3
     while true; do
         echo
-        echo "=== $title ==="
+header "$title"
         for i in "${!items[@]}"; do
             printf "%d) %-14s - %s\n" "$i" "${items[$i]}" "${descs[$i]}"
         done
@@ -287,7 +308,7 @@ else
 fi
 
 # ==============================
-# Xinitrc Setup
+# .xinitrc Setup
 # ==============================
 echo -e "${PINK}Setting up .xinitrc...${RESET}"
 XINITRC_PATH="$HOME/.xinitrc"
@@ -345,12 +366,185 @@ make clean && sudo make install
 log_status "guhwm" "OK"
 
 # ==============================
+
+# ==============================
+# Kitty Configuration
+# ==============================
+echo -e "${PINK}Setting up Kitty configuration...${RESET}"
+KITTY_CONFIG_DIR="$HOME/.config/kitty"
+KITTY_CONFIG_FILE="$KITTY_CONFIG_DIR/kitty.conf"
+
+mkdir -p "$KITTY_CONFIG_DIR"
+
+cat > "$KITTY_CONFIG_FILE" << 'EOF'
+# BEGIN_KITTY_THEME
+# Black Metal
+include current-theme.conf
+# END_KITTY_THEME
+font_size 17.0
+enable_audio_bell yes
+scrollback_lines 20000
+scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
+scrollback_pager_history_size 0
+scrollback_fill_enlarged_window no
+repaint_delay 20
+input_delay 2
+sync_to_monitor no
+enable_wayland no
+linux_display_server x11
+wayland_enable_csd no
+background_opacity 0.85
+background_blur 0
+dynamic_background_opacity yes
+dim_opacity 0.75
+dim_inactive yes
+selection_foreground #000000
+selection_background #fffacd
+cursor_shape beam
+cursor_blink_interval 1
+cursor_stop_blinking_after 0
+copy_on_select yes
+paste_actions no-op
+open_url_with default
+url_style curly
+url_prefixes file ftp ftps gemini gopher http https irc ircs kitty mailto news sftp ssh
+detect_urls yes
+mouse_hide_wait 2.0
+touch_scroll_multiplier 1.0
+mouse_map left click ungrab_mouse
+mouse_map shift+left click link
+mouse_map ctrl+left click paste
+mouse_map middle click paste
+mouse_map ctrl+middle click no-op
+mouse_map shift+middle click no-op
+mouse_map right click paste
+mouse_map shift+right click link
+mouse_map ctrl+right click no-op
+mouse_map doubleclick select_word
+mouse_map tripleclick select_line
+mouse_map quadrupleclick select_block
+focus_follows_mouse yes
+pointer_shape_when_grabbed arrow
+resize_debounce_time 0.1
+resize_draw_strategy scale
+resize_in_steps no
+remember_window_size no
+initial_window_width 80c
+initial_window_height 24c
+enabled_layouts *
+window_border_width 2
+draw_minimal_borders yes
+placement_strategy center
+hide_window_decorations yes
+resize_window_margin_width 4
+resize_window_margin_height 4
+window_padding_width 4
+active_border_color #ff69b4
+inactive_border_color #555555
+bell_border_color #ff0000
+inactive_text_alpha 0.75
+active_tab_font_style bold-italic
+inactive_tab_font_style normal
+tab_bar_edge bottom
+tab_bar_margin_width 0
+tab_bar_margin_height 0
+tab_bar_style powerline
+tab_bar_min_tabs 2
+tab_switch_strategy previous
+tab_bar_background #1a1b26
+tab_bar_foreground #c0caf5
+active_tab_foreground #1a1b26
+active_tab_background #7aa2f7
+active_tab_font_color #ffffff
+inactive_tab_foreground #c0caf5
+inactive_tab_background #3b4261
+inactive_tab_font_color #aaaaaa
+tab_separator " "
+tab_activity_symbol none
+tab_title_template {index}: {title}
+tab_title_max_length 20
+close_on_child_death no
+quit_after_last_window_closed no
+hide_tab_bar_if_only_one_tab no
+map ctrl+shift+enter new_window
+map ctrl+shift+t new_tab
+map ctrl+shift+w close_window
+map ctrl+shift+q close_tab
+map ctrl+shift+right next_tab
+map ctrl+shift+left previous_tab
+map ctrl+shift+l next_layout
+map ctrl+shift+h previous_layout
+map ctrl+shift+up increase_font_size
+map ctrl+shift+down decrease_font_size
+map ctrl+shift+backspace restore_font_size
+map ctrl+shift+n reset_terminal
+map ctrl+shift+f search
+map ctrl+shift+v paste
+map ctrl+shift+c copy_to_clipboard
+map ctrl+shift+u input_unicode
+map ctrl+shift+s launch --stdin-source=@screen_scrollback --type=overlay less
+map ctrl+shift+o pass_selection_to_program
+map ctrl+shift+b set_background_opacity
+map ctrl+shift+m toggle_maximized
+map ctrl+shift+f11 toggle_fullscreen
+map ctrl+shift+y toggle_ideographic_space
+map ctrl+shift+d detach_window
+map ctrl+shift+g toggle_grids
+map ctrl+shift+e toggle_tab_bar
+map ctrl+shift+k scroll_line_up
+map ctrl+shift+j scroll_line_down
+map ctrl+shift+page_up scroll_page_up
+map ctrl+shift+page_down scroll_page_down
+map ctrl+shift+home scroll_home
+map ctrl+shift+end scroll_end
+map ctrl+shift+z show_scrollback
+map ctrl+shift+plus new_split
+map ctrl+shift+minus close_split
+map ctrl+shift+period next_split
+map ctrl+shift+comma previous_split
+map ctrl+shift+slash move_window
+map ctrl+shift+backslash detach_tab
+map ctrl+shift+semicolon move_tab
+map ctrl+shift+1 goto_tab 1
+map ctrl+shift+2 goto_tab 2
+map ctrl+shift+3 goto_tab 3
+map ctrl+shift+4 goto_tab 4
+map ctrl+shift+5 goto_tab 5
+map ctrl+shift+6 goto_tab 6
+map ctrl+shift+7 goto_tab 7
+map ctrl+shift+8 goto_tab 8
+map ctrl+shift+9 goto_tab 9
+map ctrl+shift+0 goto_tab 10
+map ctrl+alt+1 goto_tab 11
+map ctrl+alt+2 goto_tab 12
+map ctrl+alt+3 goto_tab 13
+map ctrl+alt+4 goto_tab 14
+map ctrl+alt+5 goto_tab 15
+map ctrl+alt+6 goto_tab 16
+map ctrl+alt+7 goto_tab 17
+map ctrl+alt+8 goto_tab 18
+map ctrl+alt+9 goto_tab 19
+map ctrl+alt+0 goto_tab 20
+map ctrl+shift+p launch --type=overlay
+map ctrl+shift+x launch --type=window
+map ctrl+shift+r launch --type=tab
+map ctrl+shift+i launch --type=overlay --stdin-source=@screen
+map ctrl+shift+o launch --type=overlay --stdin-source=@screen_scrollback
+map ctrl+shift+a launch --type=window --stdin-source=@screen
+map ctrl+shift+z launch --type=window --stdin-source=@screen_scrollback
+map ctrl+shift+b launch --type=tab --stdin-source=@screen
+map ctrl+shift+m launch --type=tab --stdin-source=@screen_scrollback
+EOF
+
+log_status "Kitty configuration" "OK"
+echo -e "${PINK}Kitty config written to:${RESET} $KITTY_CONFIG_FILE"
+echo "Kitty config written to: $KITTY_CONFIG_FILE" >> "$LOG_FILE"
 # Summary
 # ==============================
 echo
-echo "==========================="
+header "="
 echo " Installation Summary"
-echo "==========================="
+header "="
 echo "Succeeded: $SUCCEEDED_COUNT"
 echo "Failed:    $FAILED_COUNT"
 if [ "$FAILED_COUNT" -gt 0 ]; then
@@ -358,7 +552,7 @@ if [ "$FAILED_COUNT" -gt 0 ]; then
         echo "  - $item"
     done
 fi
-echo "==========================="
+header "="
 
 # ==============================
 # Final Launch Prompt
