@@ -17,7 +17,6 @@
 #     • Redshift (recommended 4000K)
 #     • Clipmenu functionality
 #     • Optional keyboard layouts with Ctrl+Space switch
-#     • Padding & tweaks
 # - Builds and installs guhwm from source
 # - Maintains a rotating log system for debugging
 # - Provides a final summary of successes and failures
