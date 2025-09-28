@@ -474,6 +474,7 @@ else
     cd "$HOME/guhwm" || { echo -e "${RED}!! guhwm dir missing${RESET}"; exit 1; }
     make clean && sudo make install
     log_status "guhwm" "OK"
+    cd ~ # return to home after build
 fi
 
 # ==============================
@@ -504,6 +505,7 @@ fi
 # ==============================
 # Final Launch Prompt
 # ==============================
+cd ~ # always return to home before prompting
 header "Launch"
 printf "${PINK}Do you want to start guhwm now? (y/n): ${RESET}"
 read -r launch_now
