@@ -396,21 +396,27 @@ fi
 
 # --- System monitor & datetime --------------------------
 (
+  prev_total=0
+  prev_idle=0
   while true; do
-    read -r cpu a b c rest < /proc/stat
-    prev_total=$((a+b+c))
-    prev_idle=$c
-    sleep 2
-    read -r cpu a b c rest < /proc/stat
-    total=$((a+b+c))
-    idle=$c
+    read -r cpu user nice system idle iowait irq softirq steal guest guest_nice < /proc/stat
+    idle_all=$((idle + iowait))
+    total=$((user + nice + system + idle + iowait + irq + softirq + steal))
     diff_total=$((total - prev_total))
-    diff_idle=$((idle - prev_idle))
-    cpu_usage=$((100 * (diff_total - diff_idle) / diff_total))
+    diff_idle=$((idle_all - prev_idle))
+    if [ $diff_total -gt 0 ]; then
+      cpu_usage=$((100 * (diff_total - diff_idle) / diff_total))
+    else
+      cpu_usage=0
+    fi
+    prev_total=$total
+    prev_idle=$idle_all
+
     mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
     disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
     datetime=$(date +"%a, %b %d, %R")
     xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime"
+    sleep 1
   done
 ) &
 
