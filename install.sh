@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # =====================================================================
-# Guh Window Manager installer for Arch Linux (patched)
+# Guh Window Manager installer for Arch Linux
 # =====================================================================
 
 set -e
@@ -166,7 +166,7 @@ sleep 3
 # Base Packages
 # ==============================
 header "Base Packages"
-retry_pacman xorg dmenu kitty feh dunst clipmenu reflector nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+retry_pacman xorg dmenu kitty feh dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk clipmenu reflector nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
 
 # ==============================
 # AUR Helper
@@ -367,7 +367,7 @@ feh --bg-scale "$WALLPAPER" &
   done
 ) &
 
-# --- Start D-Bus (needed for dunst)----------------------
+# --- Start D-Bus (needed for notification services) -----
 if command -v dbus-launch >/dev/null 2>&1 && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
     eval $(dbus-launch --sh-syntax)
 fi
@@ -396,7 +396,7 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
 
 # --- This must be the last line! ------------------------
-exec dwm
+exec dbus-run-session dwm
 EOF
         chmod +x "$XINITRC_PATH"
         echo -e "${PINK}.xinitrc written.${RESET}"
