@@ -3,6 +3,24 @@
 # =====================================================================
 # Guh Window Manager installer for Arch Linux
 # =====================================================================
+# Features:
+#   * Dry-run mode (--dry-run) to simulate installation without changes
+#   * Color-coded, aligned status output with logging to ~/.guhwm/logs
+#   * Auto-retry with mirror refresh for failed pacman/AUR installs
+#   * AUR helper selection (yay or paru) with bootstrap if missing
+#   * Optional software selection
+#   * Default shell setup (with /etc/shells patch if needed)
+#   * Auto-start X on tty1 in the correct profile
+#   * .xinitrc auto-generated with:
+#       - Smart-default wallpaper system
+#       - CPU/memory/disk/date status bar
+#       - Notification daemon (dunst)
+#       - Redshift for eye comfort
+#       - Clipboard manager (clipmenu)
+#       - Keyboard layout switching support (commented example)
+#   * Builds and installs guhwm from source
+#   * Installation summary (successes/failures) and launch prompt
+# =====================================================================
 
 set -e
 
@@ -30,6 +48,24 @@ show_help() {
     echo
     echo "Logs are saved under: ~/.guhwm/logs/"
     echo "You can review successes, failures, and your final launch choice there."
+    echo
+    echo "Features:"
+    echo "  * Dry-run mode (--dry-run) to simulate installation without changes"
+    echo "  * Color-coded, aligned status output with logging to ~/.guhwm/logs"
+    echo "  * Auto-retry with mirror refresh for failed pacman/AUR installs"
+    echo "  * AUR helper selection (yay or paru) with bootstrap if missing"
+    echo "  * Optional software selection"
+    echo "  * Default shell setup (with /etc/shells patch if needed)"
+    echo "  * Auto-start X on tty1 in the correct profile"
+    echo "  * .xinitrc auto-generated with:"
+    echo "      - Smart-default wallpaper system"
+    echo "      - CPU/memory/disk/date status bar"
+    echo "      - Notification daemon (dunst)"
+    echo "      - Redshift for eye comfort"
+    echo "      - Clipboard manager (clipmenu)"
+    echo "      - Keyboard layout switching support (commented example)"
+    echo "  * Builds and installs guhwm from source"
+    echo "  * Installation summary (successes/failures) and launch prompt"
     echo
 }
 
