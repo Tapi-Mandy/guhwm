@@ -1,22 +1,7 @@
 #!/usr/bin/bash
 
 # =====================================================================
-# Guh Window Manager installer for Arch Linux
-# =====================================================================
-# Features:
-# - Retries pacman and AUR installs with mirror refreshing on failures
-# - Lets the user select and install their preferred AUR helper
-# - Allows removing unwanted packages before installation
-# - Installs general software and shells
-# - Sets the first chosen shell as the default and autostarts startx
-# - Creates/overwrites .xinitrc with many features
-# - Builds and installs guhwm from source
-# - Maintains a rotating log system for debugging
-# - Provides a final summary of successes and failures (also logged)
-# - Prompts to launch guhwm immediately after installation (also logged)
-# - Safety checks: prevents running as root, verifies shell exists in /etc/shells
-# - Dry-run mode (--dry-run) to simulate installation without changes
-# - Help output (--help) describing usage and logfile info
+# Guh Window Manager installer for Arch Linux (patched)
 # =====================================================================
 
 set -e
@@ -93,11 +78,8 @@ LOG_FILE="$LOG_DIR/install_${TIMESTAMP}.log"
 
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-# Rotate logs (keep all, compress old after 5)
-LOGCOUNT=$(ls -1 "$LOG_DIR"/install_*.log 2>/dev/null | wc -l)
-if [ "$LOGCOUNT" -gt 5 ]; then
-    gzip "$LOG_DIR"/install_*.log --force 2>/dev/null || true
-fi
+# Rotate logs (keep 5 latest, compress older ones)
+ls -1t "$LOG_DIR"/install_*.log 2>/dev/null | tail -n +6 | xargs -r gzip --force
 
 FAILED_COUNT=0
 FAILED_LIST=()
@@ -178,7 +160,7 @@ header "Welcome"
 echo -e "${PINK}Thank you for trying guhwm!${RESET}"
 echo -e "${PINK}You'll be prompted to install optional software, which is highly recommended.${RESET}"
 echo -e "${PINK}Next, you will be prompted to select your preferred AUR helper.${RESET}"
-sleep 6
+sleep 3
 
 # ==============================
 # Base Packages
@@ -276,9 +258,9 @@ header "Default Shell Setup"
 if [ ${#shells[@]} -gt 0 ]; then
     first_shell="${shells[0]}"
     case "$first_shell" in
-        zsh|oh-my-zsh) shell_path="/bin/zsh" ;;
-        fish)          shell_path="/usr/bin/fish" ;;
-        ksh)           shell_path="/usr/bin/ksh" ;;
+        zsh|oh-my-zsh) shell_path=$(command -v zsh || echo "/bin/bash") ;;
+        fish)          shell_path=$(command -v fish || echo "/bin/bash") ;;
+        ksh)           shell_path=$(command -v ksh || echo "/bin/bash") ;;
         *)             shell_path="/bin/bash" ;;
     esac
 
@@ -310,10 +292,10 @@ fi
 header "Startx Setup"
 if [[ "$shell_path" != "/usr/bin/fish" ]]; then
     case "$shell_path" in
-        /bin/bash)      profile_file="$HOME/.bash_profile" ;;
-        /bin/zsh)       profile_file="$HOME/.zprofile" ;;
-        /usr/bin/ksh)   profile_file="$HOME/.profile" ;;
-        *)              profile_file="$HOME/.bash_profile" ;;
+        */bash) profile_file="$HOME/.bash_profile" ;;
+        */zsh)  profile_file="$HOME/.zprofile" ;;
+        */ksh)  profile_file="$HOME/.profile" ;;
+        *)      profile_file="$HOME/.bash_profile" ;;
     esac
 
     if ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
@@ -357,7 +339,7 @@ if $overwrite; then
         WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
         WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.jpeg \) | shuf -n 1)
         [ -z "$WALLPAPER" ] && WALLPAPER="$HOME/guhwm/Wallpapers/guhwm-default.png"
-        cat > "$XINITRC_PATH" <<EOF
+        cat > "$XINITRC_PATH" <<'EOF'
 #!/bin/sh
 # ==============================
 # .xinitrc for guhwm
@@ -366,30 +348,49 @@ if $overwrite; then
 feh --bg-scale "$WALLPAPER" &
 
 # --- System monitor & datetime --------------------------
-while true; do
-  cpu_usage=\$(awk -v RS="" '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}' /proc/stat)
-  mem_usage=\$(free -h | awk '/^Mem:/ {print \$3 "/" \$2}')
-  disk_usage=\$(df -h | awk '\$NF=="/"{printf "%s", \$5}')
-  datetime=\$(date +"%a, %b %d, %R")
-  xsetroot -name "\$cpu_usage% CPU | \$mem_usage Mem | \$disk_usage Disk | \$datetime"
-  sleep 1
-done &
+(
+  while true; do
+    read -r cpu a b c rest < /proc/stat
+    prev_total=$((a+b+c))
+    prev_idle=$c
+    sleep 1
+    read -r cpu a b c rest < /proc/stat
+    total=$((a+b+c))
+    idle=$c
+    diff_total=$((total - prev_total))
+    diff_idle=$((idle - prev_idle))
+    cpu_usage=$((100 * (diff_total - diff_idle) / diff_total))
+    mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+    disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
+    datetime=$(date +"%a, %b %d, %R")
+    xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime"
+  done
+) &
 
 # --- Start D-Bus (needed for dunst)----------------------
-if command -v dbus-launch >/dev/null 2>&1 && [ -z "\$DBUS_SESSION_BUS_ADDRESS" ]; then
-    eval \$(dbus-launch --sh-syntax)
+if command -v dbus-launch >/dev/null 2>&1 && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    eval $(dbus-launch --sh-syntax)
 fi
 
 # --- Start the notification daemon ----------------------
 dunst &
 
-# --- Launch Redshift (eye comfort) ----------------------
-command -v redshift >/dev/null 2>&1 && redshift -O 4500 &
+# --- Redshift for Eye Comfort --------------------------
+if command -v redshift >/dev/null 2>&1; then
+  TEMP=4000   # Recommended warm color temperature
+  if redshift -m randr -O $TEMP >/dev/null 2>&1; then
+    redshift -m randr -O $TEMP &
+  elif redshift -m vidmode -O $TEMP >/dev/null 2>&1; then
+    redshift -m vidmode -O $TEMP &
+  else
+    redshift -O $TEMP &
+  fi
+fi
 
-# Start clipboard manager
+# --- Clipboard Manager (Clipmenu) ----------------------
 command -v clipmenud >/dev/null 2>&1 && clipmenud &
 
-# --- Keyboard layouts -----------------------------------
+# --- Keyboard Layout Switching ---------------
 # Uncomment and adjust the next line to enable multiple layouts
 # Example: US English, Bulgarian phonetic, Arabic phonetic
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
