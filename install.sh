@@ -416,7 +416,7 @@ fi
     disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
     datetime=$(date +"%a, %b %d, %R")
     xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime"
-    sleep 1
+    sleep 2
   done
 ) &
 
