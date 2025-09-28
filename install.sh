@@ -265,21 +265,26 @@ if [ ${#shells[@]} -gt 0 ]; then
     esac
 
     if [[ "$shell_path" != "/bin/bash" && "$shell_path" != "/usr/bin/fish" ]]; then
-        if grep -q "$shell_path" /etc/shells; then
+        # If shell path isn't in /etc/shells, add it (minimal patch)
+        if ! grep -q "$shell_path" /etc/shells; then
+            echo -e "${PINK}Adding $shell_path to /etc/shells...${RESET}"
             if $DRY_RUN; then
-                echo -e "${PINK}[DRY-RUN] Would set default shell to:${RESET} $shell_path"
+                echo -e "${PINK}[DRY-RUN] Would add $shell_path to /etc/shells${RESET}"
+            else
+                echo "$shell_path" | sudo tee -a /etc/shells >/dev/null
+            fi
+        fi
+
+        if $DRY_RUN; then
+            echo -e "${PINK}[DRY-RUN] Would set default shell to:${RESET} $shell_path"
+            log_status "Default shell ($first_shell)" "OK"
+        else
+            echo -e "${PINK}Setting default shell to $shell_path...${RESET}"
+            if chsh -s "$shell_path" "$USER"; then
                 log_status "Default shell ($first_shell)" "OK"
             else
-                echo -e "${PINK}Setting default shell to $shell_path...${RESET}"
-                if chsh -s "$shell_path" "$USER"; then
-                    log_status "Default shell ($first_shell)" "OK"
-                else
-                    log_status "Default shell ($first_shell)" "FAIL"
-                fi
+                log_status "Default shell ($first_shell)" "FAIL"
             fi
-        else
-            echo -e "${RED}!! $shell_path not listed in /etc/shells, cannot set as default.${RESET}"
-            log_status "Default shell ($first_shell)" "FAIL"
         fi
     else
         echo -e "${PINK}Keeping default shell as bash or skipping fish.${RESET}"
@@ -336,16 +341,22 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
-        WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.jpeg \) | shuf -n 1)
-        [ -z "$WALLPAPER" ] && WALLPAPER="$HOME/guhwm/Wallpapers/guhwm-default.png"
+        # Smart-default wallpaper logic is now inside .xinitrc (minimal patch)
         cat > "$XINITRC_PATH" <<'EOF'
 #!/bin/sh
 # ==============================
 # .xinitrc for guhwm
 # ==============================
-# --- Set a random background image ----------------------
-feh --bg-scale "$WALLPAPER" &
+# --- Set wallpaper -------------------------------------
+WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
+DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
+
+if [ -f "$DEFAULT_WALLPAPER" ]; then
+    feh --bg-scale "$DEFAULT_WALLPAPER" &
+else
+    ALT_WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.jpeg' \) | head -n 1)
+    [ -n "$ALT_WALLPAPER" ] && feh --bg-scale "$ALT_WALLPAPER" &
+fi
 
 # --- System monitor & datetime --------------------------
 (
@@ -353,7 +364,7 @@ feh --bg-scale "$WALLPAPER" &
     read -r cpu a b c rest < /proc/stat
     prev_total=$((a+b+c))
     prev_idle=$c
-    sleep 1
+    sleep 2
     read -r cpu a b c rest < /proc/stat
     total=$((a+b+c))
     idle=$c
