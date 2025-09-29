@@ -447,7 +447,7 @@ else
     if [ -n "$ALT_WALLPAPER" ]; then
         feh --bg-scale "$ALT_WALLPAPER" &
     else
-        # Fallback: solid dark background if no wallpaper found
+        # Fallback: solid dark background if no wallpaper is found
         xsetroot -solid "#282c34" &
     fi
 fi
