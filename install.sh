@@ -571,7 +571,7 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
     # -------------------------------
     mem_usage=$(free -h | awk '/^Mem:/ {print ($2-$7) "/" $2}')
     disk_usage=$(df -h --output=used,size,target | awk '$3=="/"{print $1 "/" $2}')
-    datetime=$(date +"%a, %b %d, %R")
+    datetime=$(date +"%A, %b %d, %-I:%M %p")
 
     # -------------------------------
     # Salah (if enabled)
