@@ -491,6 +491,69 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
 
+#!/bin/sh
+
+# ============================================
+# ----------- .xinitrc for guhwm -------------
+# ============================================
+
+# =======================================================
+# --- Set a background image ---------------------
+# =======================================================
+WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
+DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
+
+if [ -f "$DEFAULT_WALLPAPER" ]; then
+    feh --bg-scale "$DEFAULT_WALLPAPER" &
+else
+    ALT_WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.jpeg' \) | head -n 1)
+    if [ -n "$ALT_WALLPAPER" ]; then
+        feh --bg-scale "$ALT_WALLPAPER" &
+    else
+        # Fallback: solid dark background if no wallpaper is found
+        xsetroot -solid "#282c34" &
+    fi
+fi
+
+# =======================================================
+# --- Start D-Bus (needed for notification services) ----
+# =======================================================
+if command -v dbus-launch >/dev/null 2>&1 && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    eval $(dbus-launch --sh-syntax)
+fi
+
+# =======================================================
+# --- Start the notification daemon ---------------------
+# =======================================================
+command -v dunst >/dev/null 2>&1 && dunst &
+
+# =======================================================
+# --- Redshift for Eye Comfort --------------------------
+# =======================================================
+if command -v redshift >/dev/null 2>&1; then
+  TEMP=4000   # Recommended warm color temperature
+  if redshift -m randr -O $TEMP >/dev/null 2>&1; then
+    redshift -m randr -O $TEMP &
+  elif redshift -m vidmode -O $TEMP >/dev/null 2>&1; then
+    redshift -m vidmode -O $TEMP &
+  else
+    redshift -O $TEMP &
+  fi
+fi
+
+# =======================================================
+# --- Clipboard Manager (Clipmenu) ----------------------
+# =======================================================
+command -v clipmenud >/dev/null 2>&1 && clipmenud &
+
+# =======================================================
+# --- Keyboard Layout Switching -------------------------
+# =======================================================
+# Uncomment and adjust the next line to enable multiple layouts
+# Example: US English, Bulgarian phonetic, Arabic phonetic
+
+# setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
+
 # =======================================================
 # --- System monitor & datetime -------------------------
 # =======================================================
@@ -523,12 +586,12 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
     datetime=$(date +"%a, %b %d, %R")
 
     # -------------------------------
-    # Salah
+    # Salah (if enabled)
     # -------------------------------
     salah_str=$(cat /tmp/dwm-salah 2>/dev/null || echo "")
 
     # -------------------------------
-    # Final
+    # Final status string
     # -------------------------------
     xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime${salah_str:+ | $salah_str}"
 
@@ -539,7 +602,10 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # =======================================================
 # --- Salah times (optional) ----------------------------
 # =======================================================
-if [ "${ENABLE_SALAH:-0}" -eq 1 ]; then
+# Enable by running: SALAH=1 startx
+ENABLE_SALAH=${SALAH:-0}
+
+if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
     CITY="Sofia"
     COUNTRY="Bulgaria"
@@ -661,19 +727,6 @@ EOF
     done
 ) &
 fi
-
-# =======================================================
-# --- Commandline options -------------------------------
-# =======================================================
-# if you do startx --salah in the commandline, it'd get enabled
-
-ENABLE_SALAH=0 # default: disabled
-
-for arg in "$@"; do
-    case "$arg" in
-        --salah) ENABLE_SALAH=1 ;;
-    esac
-done
 
 # --- This must be the last line! ------------------------
 exec dbus-run-session dwm
