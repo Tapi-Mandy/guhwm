@@ -453,34 +453,6 @@ else
 fi
 
 # =======================================================
-# --- System monitor & datetime -------------------------
-# =======================================================
-(
-  prev_total=0
-  prev_idle=0
-  while true; do
-    read -r cpu user nice system idle iowait irq softirq steal guest guest_nice < /proc/stat
-    idle_all=$((idle + iowait))
-    total=$((user + nice + system + idle + iowait + irq + softirq + steal))
-    diff_total=$((total - prev_total))
-    diff_idle=$((idle_all - prev_idle))
-    if [ $diff_total -gt 0 ]; then
-      cpu_usage=$((100 * (diff_total - diff_idle) / diff_total))
-    else
-      cpu_usage=0
-    fi
-    prev_total=$total
-    prev_idle=$idle_all
-
-    mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
-    disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
-    datetime=$(date +"%a, %b %d, %R")
-    xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime"
-    sleep 2
-  done
-) &
-
-# =======================================================
 # --- Start D-Bus (needed for notification services) ----
 # =======================================================
 if command -v dbus-launch >/dev/null 2>&1 && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
@@ -490,7 +462,7 @@ fi
 # =======================================================
 # --- Start the notification daemon ---------------------
 # =======================================================
-dunst &
+command -v dunst >/dev/null 2>&1 && dunst &
 
 # =======================================================
 # --- Redshift for Eye Comfort --------------------------
@@ -520,179 +492,186 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
 
 # =======================================================
-# --- Salah times daemon (optional, robust) -------------
+# --- System monitor & datetime -------------------------
 # =======================================================
-# Features:
-#   - Downloads & caches monthly prayer times JSON (Aladhan API).
-#   - Falls back to static hardcoded times if offline.
-#   - Updates the dwm bar with the next prayer + time.
-#   - Sends a desktop notification at each prayer time.
-#   - Handles daily rollover and month boundaries.
+(
+  prev_total=0
+  prev_idle=0
 
-ENABLE_SALAH=1 # set to 0 to disable
+  while true; do
+    # -------------------------------
+    # CPU usage (from /proc/stat)
+    # -------------------------------
+    read -r cpu user nice system idle iowait irq softirq steal guest guest_nice < /proc/stat
+    idle_all=$((idle + iowait))
+    total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+    diff_total=$((total - prev_total))
+    diff_idle=$((idle_all - prev_idle))
+    if [ $diff_total -gt 0 ]; then
+      cpu_usage=$((100 * (diff_total - diff_idle) / diff_total))
+    else
+      cpu_usage=0
+    fi
+    prev_total=$total
+    prev_idle=$idle_all
+
+    # -------------------------------
+    # Memory, disk, datetime
+    # -------------------------------
+    mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+    disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
+    datetime=$(date +"%a, %b %d, %R")
+
+    # -------------------------------
+    # Salah
+    # -------------------------------
+    salah_str=$(cat /tmp/dwm-salah 2>/dev/null || echo "")
+
+    # -------------------------------
+    # Final
+    # -------------------------------
+    xsetroot -name "$cpu_usage% CPU | $mem_usage Mem | $disk_usage Disk | $datetime${salah_str:+ | $salah_str}"
+
+    sleep 2
+  done
+) &
+
+# =======================================================
+# --- Salah times (optional) ----------------------------
+# =======================================================
 if [ "${ENABLE_SALAH:-0}" -eq 1 ]; then
 (
-    # Location & calculation method
     CITY="Sofia"
     COUNTRY="Bulgaria"
-    METHOD=2           # Aladhan method ID (2 = Muslim World League)
-
-    # Cache location for prayer time JSONs
+    METHOD=2
     CACHE_DIR="$HOME/.cache/salah"
     mkdir -p "$CACHE_DIR"
 
-    # Hardcoded static emergency fallback times
-    # Used if internet is down and no cache exists
+    # Offline fallback (used if API unreachable)
     OFFLINE_TIMES="Fajr 05:10
 Dhuhr 12:30
 Asr 15:45
 Maghrib 18:20
 Isha 19:45"
 
-    # ===================================================
-    # Sanity check for required tools
-    # ===================================================
-    # If missing, script will still work with reduced features.
-    command -v curl >/dev/null 2>&1 || echo "salah: warning: curl not found; using OFFLINE_TIMES"
-    command -v jq >/dev/null 2>&1 || echo "salah: warning: jq not found; using OFFLINE_TIMES"
-    command -v notify-send >/dev/null 2>&1 || echo "salah: warning: notify-send not found; no desktop notifications"
-    command -v xsetroot >/dev/null 2>&1 || echo "salah: warning: xsetroot not found; bar updates will be skipped"
-
-    # ===================================================
-    # Function: fetch_month_file
-    # Downloads JSON for a given year+month.
-    # Saves it to ~/.cache/salah/YYYY-MM.json
-    # Returns path to cache file if successful.
-    # ===================================================
+    # ====================================================
+    # Fetch and cache a month of times
+    # ====================================================
     fetch_month_file() {
         yr="$1"; mo="$2"
         cache="$CACHE_DIR/$yr-$mo.json"
-
-        # Reuse if already cached
-        if [ -f "$cache" ]; then
-            echo "$cache"
-            return 0
-        fi
-
-        # Download fresh copy
         tmp="$(mktemp)"
-        if curl -fsS --retry 2 --max-time 15 \
-           "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD" \
-           -o "$tmp"; then
-            mv "$tmp" "$cache"
-            echo "$cache"
-            return 0
-        else
-            rm -f "$tmp"
-            return 1
+
+        # Always refresh once per day (force overwrite)
+        if [ ! -f "$cache" ] || [ "$(date -r "$cache" +%Y-%m-%d)" != "$(date +%Y-%m-%d)" ]; then
+            if curl -fsS --retry 2 --max-time 15 \
+               "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD" \
+               -o "$tmp"; then
+                mv "$tmp" "$cache"
+            else
+                rm -f "$tmp"
+            fi
         fi
+
+        [ -f "$cache" ] && echo "$cache"
     }
 
-    # ===================================================
-    # Function: get_times_for_date
-    # Extracts prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha)
-    # from the cached JSON for a given date.
-    # If unavailable, falls back to OFFLINE_TIMES.
-    # ===================================================
+    # ====================================================
+    # Extract prayer times for a given date
+    # ====================================================
     get_times_for_date() {
         target_date="$1"
-
-        # Extract Y-M-D parts
-        year=$(date -d "$target_date" +%Y 2>/dev/null || echo "$target_date" | cut -d- -f1)
-        month=$(date -d "$target_date" +%m 2>/dev/null || echo "$target_date" | cut -d- -f2)
-        daynum=$(date -d "$target_date" +%d 2>/dev/null || echo "$target_date" | cut -d- -f3)
-
-        # Ensure JSON file exists
+        year=$(date -d "$target_date" +%Y)
+        month=$(date -d "$target_date" +%m)
+        daynum=$(date -d "$target_date" +%d)
         cachefile="$(fetch_month_file "$year" "$month")" || cachefile=""
-
-        # Extract prayer times with jq (if available)
         if [ -n "$cachefile" ] && [ -s "$cachefile" ]; then
             jq -r --argjson idx $((10#$daynum-1)) '
 .data[$idx].timings
 | {Fajr, Dhuhr, Asr, Maghrib, Isha}
 | to_entries[]
-| "\(.key) \(.value)"' "$cachefile" 2>/dev/null \
-            | sed -E 's/[[:space:]]+\(.*\)$//' \
+| "\(.key) \(.value)"' "$cachefile" \
             | sed -E 's/ ([0-9]{1,2}:[0-9]{2}).*/ \1/' \
             || return 1
         else
-            # Offline fallback
-            echo "$OFFLINE_TIMES"
-            return 0
+            echo "$OFFLINE_TIMES"; return 0
         fi
     }
 
-    # ===================================================
-    # MAIN LOOP
-    # ===================================================
+    # ====================================================
+    # Main Salah loop: run once per prayer
+    # ====================================================
     while true; do
         now=$(date +%H:%M)
         today=$(date +%Y-%m-%d)
-
-        # Get today’s times (or fallback)
         times=$(get_times_for_date "$today" 2>/dev/null)
         [ -z "$times" ] && times="$OFFLINE_TIMES"
 
+        # -------------------------------
         # Find next upcoming prayer
-        next_prayer=""
-        next_time=""
-
+        # -------------------------------
+        next_prayer=""; next_time=""
         while read -r prayer time; do
-            # sanitize (remove tz offsets, seconds, etc.)
-            time=$(printf "%s" "$time" | sed -E 's/[[:space:]]+\(.*\)$//' | cut -d' ' -f1)
-
-            # skip invalid lines
             case "$time" in
                 [0-9][0-9]:[0-9][0-9]|[0-9]:[0-9][0-9]) ;;
-                *) continue ;;
+                *) continue ;; # skip invalid times
             esac
-
-            # convert to minutes since midnight
             prayer_minutes=$((10#${time%:*} * 60 + 10#${time#*:}))
             now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
-
             if [ "$prayer_minutes" -gt "$now_minutes" ]; then
-                next_prayer=$prayer
-                next_time=$time
-                break
+                next_prayer=$prayer; next_time=$time; break
             fi
         done <<EOF
 $times
 EOF
 
-        # If all prayers today are past --> switch to tomorrow’s Fajr
+        # If no more prayers today → pick tomorrow's Fajr
         if [ -z "$next_prayer" ]; then
             tomorrow=$(date -d tomorrow +%Y-%m-%d)
             ttimes=$(get_times_for_date "$tomorrow" 2>/dev/null)
-
             if [ -n "$ttimes" ]; then
                 next_prayer="Fajr"
                 next_time=$(printf "%s" "$ttimes" | awk '/^Fajr / {print $2; exit}')
             else
-                # fallback
                 next_prayer="Fajr"
                 next_time=$(echo "$OFFLINE_TIMES" | awk '/^Fajr / {print $2; exit}')
             fi
         fi
 
-        # Update dwm bar (shows next prayer + current clock)
-        if command -v xsetroot >/dev/null 2>&1; then
-            xsetroot -name " $next_prayer $next_time | $(date +%H:%M)"
-        fi
+        # -------------------------------
+        # Publish Salah string for sysmon
+        # -------------------------------
+        echo " $next_prayer $next_time" > /tmp/dwm-salah
 
-        # Wait until the prayer time hits --> then send notification
-        while true; do
-            now=$(date +%H:%M)
-            if [ "$now" = "$next_time" ]; then
-                command -v notify-send >/dev/null 2>&1 \
-                    && notify-send "Time for $next_prayer ($next_time)"
-                break
-            fi
-            sleep 20
-        done
+        # -------------------------------
+        # Sleep until prayer time
+        # -------------------------------
+        now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
+        next_minutes=$((10#${next_time%:*} * 60 + 10#${next_time#*:}))
+        sleep_minutes=$((next_minutes - now_minutes))
+        [ $sleep_minutes -lt 1 ] && sleep_minutes=1 # safety net
+
+        sleep $((sleep_minutes * 60))
+
+        # -------------------------------
+        # Notify user at prayer time
+        # -------------------------------
+        command -v notify-send >/dev/null 2>&1 \
+            && notify-send "Time for $next_prayer ($next_time)"
     done
 ) &
 fi
+
+# =======================================================
+# --- Command-line options ------------------------------
+# =======================================================
+ENABLE_SALAH=0 # default: disabled
+
+for arg in "$@"; do
+    case "$arg" in
+        --salah) ENABLE_SALAH=1 ;;
+    esac
+done
 
 # --- This must be the last line! ------------------------
 exec dbus-run-session dwm
