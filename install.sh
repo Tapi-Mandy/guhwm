@@ -352,6 +352,12 @@ for pkg in "${shells[@]}"; do
             if [ ! -d "$HOME/.oh-my-zsh" ]; then
                 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
                 log_status "oh-my-zsh" "OK"
+                # >>> Force theme to agnoster <<<
+                if [ -f "$HOME/.zshrc" ]; then
+                    sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
+                else
+                    echo 'ZSH_THEME="agnoster"' >> "$HOME/.zshrc"
+                fi
             else
                 echo -e "${PINK}Oh My Zsh already installed. Skipping.${RESET}"
             fi
