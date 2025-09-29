@@ -429,9 +429,11 @@ if $overwrite; then
     else
         cat > "$XINITRC_PATH" <<'EOF'
 #!/bin/sh
-# ==============================
+
+# ================================
 # .xinitrc for guhwm
-# ==============================
+# ================================
+
 # --- Set a random background image ----------------------
 WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
 DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
