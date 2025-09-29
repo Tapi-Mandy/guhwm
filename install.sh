@@ -520,7 +520,7 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
 
 # =======================================================
-# --- Salah times daemon (robust, self-updating) --------
+# --- Salah times daemon (optional, robust) -------------
 # =======================================================
 # Features:
 #   - Downloads & caches monthly prayer times JSON (Aladhan API).
