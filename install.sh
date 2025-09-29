@@ -427,71 +427,7 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        cat > "$XINITRC_PATH" <<'EOF'
-#!/bin/sh
-
-# ============================================
-# ----------- .xinitrc for guhwm -------------
-# ============================================
-
-# =======================================================
-# --- Set a background image ---------------------
-# =======================================================
-WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
-DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
-
-if [ -f "$DEFAULT_WALLPAPER" ]; then
-    feh --bg-scale "$DEFAULT_WALLPAPER" &
-else
-    ALT_WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.jpeg' \) | head -n 1)
-    if [ -n "$ALT_WALLPAPER" ]; then
-        feh --bg-scale "$ALT_WALLPAPER" &
-    else
-        # Fallback: solid dark background if no wallpaper is found
-        xsetroot -solid "#282c34" &
-    fi
-fi
-
-# =======================================================
-# --- Start D-Bus (needed for notification services) ----
-# =======================================================
-if command -v dbus-launch >/dev/null 2>&1 && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
-    eval $(dbus-launch --sh-syntax)
-fi
-
-# =======================================================
-# --- Start the notification daemon ---------------------
-# =======================================================
-command -v dunst >/dev/null 2>&1 && dunst &
-
-# =======================================================
-# --- Redshift for Eye Comfort --------------------------
-# =======================================================
-if command -v redshift >/dev/null 2>&1; then
-  TEMP=4000   # Recommended warm color temperature
-  if redshift -m randr -O $TEMP >/dev/null 2>&1; then
-    redshift -m randr -O $TEMP &
-  elif redshift -m vidmode -O $TEMP >/dev/null 2>&1; then
-    redshift -m vidmode -O $TEMP &
-  else
-    redshift -O $TEMP &
-  fi
-fi
-
-# =======================================================
-# --- Clipboard Manager (Clipmenu) ----------------------
-# =======================================================
-command -v clipmenud >/dev/null 2>&1 && clipmenud &
-
-# =======================================================
-# --- Keyboard Layout Switching -------------------------
-# =======================================================
-# Uncomment and adjust the next line to enable multiple layouts
-# Example: US English, Bulgarian phonetic, Arabic phonetic
-
-# setxkbmap -layout "us,bg,ara" -variant ",bas_phonetic,mac-phonetic" -option "grp:ctrl_space_toggle" &
-
-#!/bin/sh
+        cat > "$XINITRC_PATH" <<'EOF'#!/bin/sh
 
 # ============================================
 # ----------- .xinitrc for guhwm -------------
@@ -602,8 +538,8 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # =======================================================
 # --- Salah times (optional) ----------------------------
 # =======================================================
-# Enable by running: SALAH=1 startx
-ENABLE_SALAH=${SALAH:-0}
+# Toggle Salah times here: 1 = enabled, 0 = disabled
+ENABLE_SALAH=0
 
 if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
