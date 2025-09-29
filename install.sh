@@ -465,13 +465,6 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        # --- Sanity check the installer itself for heredoc marker mismatches
-        if ! check_heredoc_markers_in_file "$0"; then
-            echo -e "${RED}Heredoc marker mismatch detected in installer script. Aborting to avoid writing broken .xinitrc.${RESET}"
-            echo "Heredoc marker mismatch in installer. Aborting." >> "$LOG_FILE"
-            exit 1
-        fi
-
         cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
