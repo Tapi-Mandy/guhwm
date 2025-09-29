@@ -9,6 +9,7 @@
 #   * Auto-retry with mirror refresh for failed pacman/AUR installs
 #   * AUR helper selection (yay or paru) with bootstrap if missing
 #   * Optional software selection
+#   * First successfully installed shell becomes the default shell
 #   * Default shell setup (with /etc/shells patch if needed)
 #   * Auto-start X on tty1 in the correct profile
 #   * .xinitrc auto-generated with:
@@ -17,7 +18,7 @@
 #       - Notification daemon (dunst)
 #       - Redshift for eye comfort
 #       - Clipboard manager (clipmenu)
-#       - Keyboard layout switching support (commented example)
+#       - Keyboard layout switching support
 #   * Builds and installs guhwm from source
 #   * Installation summary (successes/failures) and launch prompt
 # =====================================================================
@@ -37,8 +38,9 @@ RESET="\e[0m"
 DRY_RUN=false
 
 show_help() {
+    echo -e "${PINK}=================================${RESET}"
     echo -e "${PINK}Guh Window Manager Installer${RESET}"
-    echo "================================="
+    echo -e "${PINK}=================================${RESET}"
     echo
     echo "Usage: ./install.sh [OPTIONS]"
     echo
@@ -55,6 +57,7 @@ show_help() {
     echo "  * Auto-retry with mirror refresh for failed pacman/AUR installs"
     echo "  * AUR helper selection (yay or paru) with bootstrap if missing"
     echo "  * Optional software selection"
+    echo "  * First successfully installed shell becomes the default shell"
     echo "  * Default shell setup (with /etc/shells patch if needed)"
     echo "  * Auto-start X on tty1 in the correct profile"
     echo "  * .xinitrc auto-generated with:"
@@ -120,6 +123,9 @@ ls -1t "$LOG_DIR"/install_*.log 2>/dev/null | tail -n +6 | xargs -r gzip --force
 FAILED_COUNT=0
 FAILED_LIST=()
 SUCCEEDED_COUNT=0
+
+# Track first successfully installed shell path
+INSTALLED_SHELL_PATH=""
 
 # ==============================
 # Status Logging Function
@@ -193,7 +199,7 @@ retry_aur() {
 # Welcome
 # ==============================
 header "Welcome"
-echo -e "${PINK}Thank you for trying guhwm!${RESET}"
+echo -e "${PINK}Thank you for trying guhwm! ;3${RESET}"
 echo -e "${PINK}You'll be prompted to install optional software, which is highly recommended.${RESET}"
 echo -e "${PINK}Next, you will be prompted to select your preferred AUR helper.${RESET}"
 sleep 3
@@ -203,6 +209,36 @@ sleep 3
 # ==============================
 header "Base Packages"
 retry_pacman xorg dmenu kitty feh dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk clipmenu reflector nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+
+# ==============================
+# Kitty font configuration
+# ==============================
+KITTY_CONF_DIR="$HOME/.config/kitty"
+KITTY_CONF_FILE="$KITTY_CONF_DIR/kitty.conf"
+
+if ! $DRY_RUN; then
+    mkdir -p "$KITTY_CONF_DIR"
+
+    if grep -q "^font_family" "$KITTY_CONF_FILE" 2>/dev/null; then
+        sed -i 's/^font_family.*/font_family JetBrainsMono Nerd Font/' "$KITTY_CONF_FILE"
+    else
+        echo "font_family JetBrainsMono Nerd Font" >> "$KITTY_CONF_FILE"
+    fi
+
+    if grep -q "^font_size" "$KITTY_CONF_FILE" 2>/dev/null; then
+        sed -i 's/^font_size.*/font_size 14.0/' "$KITTY_CONF_FILE"
+    else
+        echo "font_size 14.0" >> "$KITTY_CONF_FILE"
+    fi
+
+    if grep -q "^symbol_map U+E0A0-U+E0A3" "$KITTY_CONF_FILE" 2>/dev/null; then
+        sed -i 's/^symbol_map U+E0A0-U+E0A3.*/symbol_map U+E0A0-U+E0A3 JetBrainsMono Nerd Font/' "$KITTY_CONF_FILE"
+    else
+        echo "symbol_map U+E0A0-U+E0A3 JetBrainsMono Nerd Font" >> "$KITTY_CONF_FILE"
+    fi
+
+    echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with fallback.${RESET}"
+fi
 
 # ==============================
 # AUR Helper
@@ -281,9 +317,22 @@ for pkg in "${shells[@]}"; do
             else
                 echo -e "${PINK}Oh My Zsh already installed. Skipping.${RESET}"
             fi
+            # === if zsh is now present, record it as the first-installed shell ===
+            if [ -z "$INSTALLED_SHELL_PATH" ] && command -v zsh &>/dev/null; then
+                INSTALLED_SHELL_PATH=$(command -v zsh)
+            fi
         fi
     else
-        retry_aur "$pkg"
+        # install the shell package (zsh/fish/ksh) and if successful record first-installed shell
+        if retry_aur "$pkg"; then
+            if [ -z "$INSTALLED_SHELL_PATH" ]; then
+                case "$pkg" in
+                    zsh) INSTALLED_SHELL_PATH=$(command -v zsh) ;;
+                    fish) INSTALLED_SHELL_PATH=$(command -v fish) ;;
+                    ksh) INSTALLED_SHELL_PATH=$(command -v ksh) ;;
+                esac
+            fi
+        fi
     fi
 done
 
@@ -291,55 +340,46 @@ done
 # Default Shell Setup
 # ==============================
 header "Default Shell Setup"
-if [ ${#shells[@]} -gt 0 ]; then
-    first_shell="${shells[0]}"
-    case "$first_shell" in
-        zsh|oh-my-zsh) shell_path=$(command -v zsh || echo "/bin/bash") ;;
-        fish)          shell_path=$(command -v fish || echo "/bin/bash") ;;
-        ksh)           shell_path=$(command -v ksh || echo "/bin/bash") ;;
-        *)             shell_path="/bin/bash" ;;
-    esac
-
-    if [[ "$shell_path" != "/bin/bash" && "$shell_path" != "/usr/bin/fish" ]]; then
-        # If shell path isn't in /etc/shells, add it (minimal patch)
-        if ! grep -q "$shell_path" /etc/shells; then
-            echo -e "${PINK}Adding $shell_path to /etc/shells...${RESET}"
-            if $DRY_RUN; then
-                echo -e "${PINK}[DRY-RUN] Would add $shell_path to /etc/shells${RESET}"
-            else
-                echo "$shell_path" | sudo tee -a /etc/shells >/dev/null
-            fi
-        fi
-
+if [ -n "$INSTALLED_SHELL_PATH" ]; then
+    # Ensure the shell path is in /etc/shells
+    if ! grep -q "$INSTALLED_SHELL_PATH" /etc/shells; then
+        echo -e "${PINK}Adding $INSTALLED_SHELL_PATH to /etc/shells...${RESET}"
         if $DRY_RUN; then
-            echo -e "${PINK}[DRY-RUN] Would set default shell to:${RESET} $shell_path"
-            log_status "Default shell ($first_shell)" "OK"
+            echo -e "${PINK}[DRY-RUN] Would add $INSTALLED_SHELL_PATH to /etc/shells${RESET}"
         else
-            echo -e "${PINK}Setting default shell to $shell_path...${RESET}"
-            if chsh -s "$shell_path" "$USER"; then
-                log_status "Default shell ($first_shell)" "OK"
-            else
-                log_status "Default shell ($first_shell)" "FAIL"
-            fi
+            echo "$INSTALLED_SHELL_PATH" | sudo tee -a /etc/shells >/dev/null
         fi
-    else
-        echo -e "${PINK}Keeping default shell as bash or skipping fish.${RESET}"
     fi
+
+    if $DRY_RUN; then
+        echo -e "${PINK}[DRY-RUN] Would set default shell to:${RESET} $INSTALLED_SHELL_PATH"
+        log_status "Default shell" "OK"
+    else
+        echo -e "${PINK}Setting default shell to $INSTALLED_SHELL_PATH...${RESET}"
+        if chsh -s "$INSTALLED_SHELL_PATH" "$USER"; then
+            log_status "Default shell" "OK"
+        else
+            log_status "Default shell" "FAIL"
+        fi
+    fi
+else
+    echo -e "${PINK}No custom shell installed, keeping bash.${RESET}"
 fi
 
 # ==============================
 # Auto-start X in correct profile
 # ==============================
 header "Startx Setup"
-if [[ "$shell_path" != "/usr/bin/fish" ]]; then
-    case "$shell_path" in
+if [ -n "$INSTALLED_SHELL_PATH" ]; then
+    case "$INSTALLED_SHELL_PATH" in
         */bash) profile_file="$HOME/.bash_profile" ;;
         */zsh)  profile_file="$HOME/.zprofile" ;;
         */ksh)  profile_file="$HOME/.profile" ;;
+        */fish) profile_file="" ;; # skip fish auto-start
         *)      profile_file="$HOME/.bash_profile" ;;
     esac
 
-    if ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
+    if [ -n "$profile_file" ] && ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
         if $DRY_RUN; then
             echo -e "${PINK}[DRY-RUN] Would add startx auto-start to:${RESET} $profile_file"
             log_status "Startx in $profile_file" "OK"
@@ -355,10 +395,10 @@ if [[ "$shell_path" != "/usr/bin/fish" ]]; then
             log_status "Startx in $profile_file" "OK"
         fi
     else
-        echo -e "${PINK}Startx already present in $profile_file. Skipping.${RESET}"
+        echo -e "${PINK}Startx already present or skipped. Skipping.${RESET}"
     fi
 else
-    echo -e "${PINK}Skipping startx setup for fish.${RESET}"
+    echo -e "${PINK}No installed shell, skipping startx setup.${RESET}"
 fi
 
 # ==============================
@@ -368,7 +408,7 @@ header ".xinitrc Setup"
 XINITRC_PATH="$HOME/.xinitrc"
 overwrite=true
 if [ -f "$XINITRC_PATH" ] && ! $DRY_RUN; then
-    echo ".xinitrc already exists. Overwrite? (y/n)"
+    echo -e "${PINK}.xinitrc already exists. Overwrite? (y/n)${RESET}"
     read -r choice
     [[ "$choice" =~ ^[Yy]$ ]] || overwrite=false
 fi
@@ -377,13 +417,12 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        # Smart-default wallpaper logic is now inside .xinitrc (minimal patch)
         cat > "$XINITRC_PATH" <<'EOF'
 #!/bin/sh
 # ==============================
 # .xinitrc for guhwm
 # ==============================
-# --- Set wallpaper -------------------------------------
+# --- Set a random background image ----------------------
 WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
 DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
 
