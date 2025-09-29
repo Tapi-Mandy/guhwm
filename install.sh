@@ -435,7 +435,7 @@ if $overwrite; then
 # ============================================
 
 # =======================================================
-# --- Set a random background image ---------------------
+# --- Set a background image ---------------------
 # =======================================================
 WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
 DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
@@ -663,8 +663,10 @@ EOF
 fi
 
 # =======================================================
-# --- Command-line options ------------------------------
+# --- Commandline options -------------------------------
 # =======================================================
+# if you do startx --salah in the commandline, it'd get enabled
+
 ENABLE_SALAH=0 # default: disabled
 
 for arg in "$@"; do
