@@ -145,6 +145,44 @@ log_status() {
 }
 
 # ==============================
+# Simple heredoc-marker checker
+# ==============================
+# Scans a file for heredoc openers (<<marker or <<'marker' or <<"marker")
+# and counts how many times a closing line with marker appears.
+# If any marker's open count != close count returns non-zero.
+check_heredoc_markers_in_file() {
+    file="${1:-$0}"
+    awk_script="
+{
+  n = index(\$0, \"<<\")
+  if (n) {
+    s = substr(\$0, n+2)
+    gsub(/^[ \\t]+/, \"\", s)
+    # strip optional starting quote
+    if (s ~ /^'/) { s = substr(s,2) }
+    else if (s ~ /^\\\"\") { s = substr(s,2) } # defensive, won't usually match
+    else if (s ~ /^\"/) { s = substr(s,2) }
+    if (match(s, /^([A-Za-z_][A-Za-z0-9_]*)/, a)) {
+      m=a[1]; open[m]++
+    }
+  }
+  if (\$0 ~ /^[A-Za-z_][A-Za-z0-9_]*\$/) close[\$0]++
+}
+END {
+  bad=0
+  for (m in open) {
+    if (open[m] != close[m]) {
+      printf(\"HEREDOC MISMATCH: marker \\\"%s\\\" opens=%d closes=%d\\n\", m, open[m], close[m]) > \"/dev/stderr\"
+      bad=1
+    }
+  }
+  exit bad
+}
+"
+    awk "$awk_script" "$file"
+}
+
+# ==============================
 # Retry Functions
 # ==============================
 retry_pacman() {
@@ -427,6 +465,13 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
+        # --- Sanity check the installer itself for heredoc marker mismatches
+        if ! check_heredoc_markers_in_file "$0"; then
+            echo -e "${RED}Heredoc marker mismatch detected in installer script. Aborting to avoid writing broken .xinitrc.${RESET}"
+            echo "Heredoc marker mismatch in installer. Aborting." >> "$LOG_FILE"
+            exit 1
+        fi
+
         cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
@@ -699,6 +744,16 @@ fi
 exec dbus-run-session dwm
 XINITRC
         chmod +x "$XINITRC_PATH"
+
+        # --- Sanity-check: validate the generated .xinitrc
+        if /bin/sh -n "$XINITRC_PATH"; then
+            echo -e "${PINK}.xinitrc written and syntax-checked OK.${RESET}"
+            echo ".xinitrc syntax check: OK" >> "$LOG_FILE"
+        else
+            echo -e "${RED}Warning: syntax errors detected in generated .xinitrc. Please inspect $XINITRC_PATH${RESET}"
+            echo ".xinitrc syntax check: FAILED" >> "$LOG_FILE"
+        fi
+
         echo -e "${PINK}.xinitrc written.${RESET}"
     fi
 else
