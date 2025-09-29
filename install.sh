@@ -428,13 +428,14 @@ if $overwrite; then
         log_status ".xinitrc" "OK"
     else
         cat > "$XINITRC_PATH" <<'EOF'#!/bin/sh
+#!/bin/sh
 
 # ============================================
 # ----------- .xinitrc for guhwm -------------
 # ============================================
 
 # =======================================================
-# --- Set a background image ---------------------
+# --- Set a background image ----------------------------
 # =======================================================
 WALLPAPER_DIR="$HOME/guhwm/Wallpapers"
 DEFAULT_WALLPAPER="$WALLPAPER_DIR/guhwm-default.png"
@@ -517,8 +518,8 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
     # -------------------------------
     # Memory, disk, datetime
     # -------------------------------
-    mem_usage=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
-    disk_usage=$(df -h | awk '$NF=="/"{printf "%s", $5}')
+    mem_usage=$(free -h | awk '/^Mem:/ {print ($2-$7) "/" $2}')
+    disk_usage=$(df -h --output=used,size,target | awk '$3=="/"{print $1 "/" $2}')
     datetime=$(date +"%a, %b %d, %R")
 
     # -------------------------------
@@ -541,13 +542,38 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # Toggle Salah times here: 1 = enabled, 0 = disabled
 ENABLE_SALAH=0
 
+# METHODS:
+# 1 = University of Islamic Sciences, Karachi, Used in Pakistan etc.
+# 2 = Islamic Society of North America (ISNA). Common in North America.
+# 3 = Muslim World League (MWL). Very popular globally.
+# 4 = Umm Al-Qura University, Makkah. Used for Saudi Arabia’s official times.
+
+# If you want to explore more methods, go to https://api.aladhan.com/v1/methods
+
 if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
-    CITY="Sofia"
-    COUNTRY="Bulgaria"
-    METHOD=2
+    CITY="YOUR CITY"
+    COUNTRY="YOUR COUNTRY"
+    METHOD=3   # 3 = Muslim World League (MWL). Very popular globally.
     CACHE_DIR="$HOME/.cache/salah"
     mkdir -p "$CACHE_DIR"
+
+    # -------------------------------------------------------
+    # Salah offsets (minutes) — tweak these to match mosque
+    # Negative = earlier, Positive = later
+    #
+    # Example (Sofia mosque vs Aladhan):
+    #   Fajr:    Aladhan 05:08, mosque 05:10 --> OFFSET_Fajr=+2
+    #   Dhuhr:   same time --> OFFSET_Dhuhr=0
+    #   Asr:     mosque 3 min earlier --> OFFSET_Asr=-3
+    #   Maghrib: mosque 2 min later --> OFFSET_Maghrib=+2
+    #   Isha:    mosque 5 min later --> OFFSET_Isha=+5
+    # -------------------------------------------------------
+    OFFSET_Fajr=0
+    OFFSET_Dhuhr=0
+    OFFSET_Asr=0
+    OFFSET_Maghrib=0
+    OFFSET_Isha=0
 
     # Offline fallback (used if API unreachable)
     OFFLINE_TIMES="Fajr 05:10
@@ -557,6 +583,30 @@ Maghrib 18:20
 Isha 19:45"
 
     # ====================================================
+    # Adjust a given HH:MM by prayer offset
+    # ====================================================
+    adjust_time() {
+        prayer="$1"; time="$2"
+        hour=${time%:*}
+        min=${time#*:}
+        total=$((10#$hour * 60 + 10#$min))
+
+        case "$prayer" in
+            Fajr)     total=$((total + OFFSET_Fajr)) ;;
+            Dhuhr)    total=$((total + OFFSET_Dhuhr)) ;;
+            Asr)      total=$((total + OFFSET_Asr)) ;;
+            Maghrib)  total=$((total + OFFSET_Maghrib)) ;;
+            Isha)     total=$((total + OFFSET_Isha)) ;;
+        esac
+
+        # wrap around if needed
+        if [ $total -lt 0 ]; then total=$((total + 1440)); fi
+        if [ $total -ge 1440 ]; then total=$((total - 1440)); fi
+
+        printf "%02d:%02d" $((total / 60)) $((total % 60))
+    }
+
+    # ====================================================
     # Fetch and cache a month of times
     # ====================================================
     fetch_month_file() {
@@ -564,7 +614,6 @@ Isha 19:45"
         cache="$CACHE_DIR/$yr-$mo.json"
         tmp="$(mktemp)"
 
-        # Always refresh once per day (force overwrite)
         if [ ! -f "$cache" ] || [ "$(date -r "$cache" +%Y-%m-%d)" != "$(date +%Y-%m-%d)" ]; then
             if curl -fsS --retry 2 --max-time 15 \
                "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD" \
@@ -609,57 +658,40 @@ Isha 19:45"
         times=$(get_times_for_date "$today" 2>/dev/null)
         [ -z "$times" ] && times="$OFFLINE_TIMES"
 
-        # -------------------------------
-        # Find next upcoming prayer
-        # -------------------------------
         next_prayer=""; next_time=""
         while read -r prayer time; do
-            case "$time" in
-                [0-9][0-9]:[0-9][0-9]|[0-9]:[0-9][0-9]) ;;
-                *) continue ;; # skip invalid times
-            esac
-            prayer_minutes=$((10#${time%:*} * 60 + 10#${time#*:}))
+            adj_time=$(adjust_time "$prayer" "$time")
+            prayer_minutes=$((10#${adj_time%:*} * 60 + 10#${adj_time#*:}))
             now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
             if [ "$prayer_minutes" -gt "$now_minutes" ]; then
-                next_prayer=$prayer; next_time=$time; break
+                next_prayer=$prayer
+                next_time=$adj_time
+                break
             fi
         done <<EOF
 $times
 EOF
 
-        # If no more prayers today → pick tomorrow's Fajr
         if [ -z "$next_prayer" ]; then
             tomorrow=$(date -d tomorrow +%Y-%m-%d)
             ttimes=$(get_times_for_date "$tomorrow" 2>/dev/null)
             if [ -n "$ttimes" ]; then
                 next_prayer="Fajr"
-                next_time=$(printf "%s" "$ttimes" | awk '/^Fajr / {print $2; exit}')
+                next_time=$(adjust_time "Fajr" "$(printf "%s" "$ttimes" | awk '/^Fajr / {print $2; exit}')")
             else
                 next_prayer="Fajr"
-                next_time=$(echo "$OFFLINE_TIMES" | awk '/^Fajr / {print $2; exit}')
+                next_time=$(adjust_time "Fajr" "$(echo "$OFFLINE_TIMES" | awk '/^Fajr / {print $2; exit}')")
             fi
         fi
 
-        # -------------------------------
-        # Publish Salah string for sysmon
-        # -------------------------------
         echo " $next_prayer $next_time" > /tmp/dwm-salah
 
-        # -------------------------------
-        # Sleep until prayer time
-        # -------------------------------
         now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
         next_minutes=$((10#${next_time%:*} * 60 + 10#${next_time#*:}))
         sleep_minutes=$((next_minutes - now_minutes))
-        [ $sleep_minutes -lt 1 ] && sleep_minutes=1 # safety net
+        [ $sleep_minutes -lt 1 ] && sleep_minutes=1
 
         sleep $((sleep_minutes * 60))
-
-        # -------------------------------
-        # Notify user at prayer time
-        # -------------------------------
-        command -v notify-send >/dev/null 2>&1 \
-            && notify-send "Time for $next_prayer ($next_time)"
     done
 ) &
 fi
