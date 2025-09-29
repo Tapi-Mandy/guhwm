@@ -552,8 +552,8 @@ ENABLE_SALAH=0
 
 if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
-    CITY="YOUR CITY"
-    COUNTRY="YOUR COUNTRY"
+    CITY="YOUR CITY" # Example: Sofia
+    COUNTRY="YOUR COUNTRY" # Example: Bulgaria
     METHOD=3   # 3 = Muslim World League (MWL). Very popular globally.
     CACHE_DIR="$HOME/.cache/salah"
     mkdir -p "$CACHE_DIR"
