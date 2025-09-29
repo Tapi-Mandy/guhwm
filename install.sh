@@ -208,7 +208,7 @@ sleep 3
 # Base Packages
 # ==============================
 header "Base Packages"
-retry_pacman xorg dmenu kitty feh dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk clipmenu reflector nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono
+retry_pacman xorg reflector dmenu kitty feh dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk clipmenu nano noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
 
 # ==============================
 # Kitty font configuration
@@ -375,7 +375,7 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
         */bash) profile_file="$HOME/.bash_profile" ;;
         */zsh)  profile_file="$HOME/.zprofile" ;;
         */ksh)  profile_file="$HOME/.profile" ;;
-        */fish) profile_file="" ;; # skip fish auto-start
+        */fish) profile_file="$HOME/.config/fish/config.fish" ;;
         *)      profile_file="$HOME/.bash_profile" ;;
     esac
 
@@ -385,12 +385,22 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
             log_status "Startx in $profile_file" "OK"
         else
             echo -e "${PINK}Adding startx auto-start to $profile_file...${RESET}"
+            # create parent directory if needed (safe minimal addition)
+            mkdir -p "$(dirname "$profile_file")"
             {
                 echo
                 echo "# Auto-start X only on tty1"
-                echo 'if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then'
-                echo '    exec startx'
-                echo 'fi'
+                if [[ "$profile_file" == *"config.fish" ]]; then
+                    # fish syntax
+                    echo 'if test -z "$DISPLAY"; and test (tty) = "/dev/tty1"'
+                    echo '    exec startx'
+                    echo 'end'
+                else
+                    # POSIX / bash style
+                    echo 'if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then'
+                    echo '    exec startx'
+                    echo 'fi'
+                fi
             } >> "$profile_file"
             log_status "Startx in $profile_file" "OK"
         fi
@@ -430,7 +440,12 @@ if [ -f "$DEFAULT_WALLPAPER" ]; then
     feh --bg-scale "$DEFAULT_WALLPAPER" &
 else
     ALT_WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.jpeg' \) | head -n 1)
-    [ -n "$ALT_WALLPAPER" ] && feh --bg-scale "$ALT_WALLPAPER" &
+    if [ -n "$ALT_WALLPAPER" ]; then
+        feh --bg-scale "$ALT_WALLPAPER" &
+    else
+        # Fallback: solid dark background if no wallpaper found
+        xsetroot -solid "#282c34" &
+    fi
 fi
 
 # --- System monitor & datetime --------------------------
