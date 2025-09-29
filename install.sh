@@ -427,7 +427,7 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        cat > "$XINITRC_PATH" <<'EOF'#!/bin/sh
+        cat > "$XINITRC_PATH" <<'EOF'
 #!/bin/sh
 
 # ============================================
