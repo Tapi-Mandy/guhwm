@@ -427,7 +427,7 @@ if $overwrite; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
         log_status ".xinitrc" "OK"
     else
-        cat > "$XINITRC_PATH" <<'EOF'
+        cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
 # ============================================
@@ -666,9 +666,9 @@ Isha 19:45"
                 next_time=$adj_time
                 break
             fi
-        done <<EOF
+        done <<PRAYERDATA
 $times
-EOF
+PRAYERDATA
 
         if [ -z "$next_prayer" ]; then
             tomorrow=$(date -d tomorrow +%Y-%m-%d)
@@ -697,7 +697,7 @@ fi
 
 # --- This must be the last line! ------------------------
 exec dbus-run-session dwm
-EOF
+XINITRC
         chmod +x "$XINITRC_PATH"
         echo -e "${PINK}.xinitrc written.${RESET}"
     fi
