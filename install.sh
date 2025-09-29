@@ -543,32 +543,30 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 ENABLE_SALAH=0
 
 # METHODS:
-# 1 = University of Islamic Sciences, Karachi, Used in Pakistan etc.
-# 2 = Islamic Society of North America (ISNA). Common in North America.
-# 3 = Muslim World League (MWL). Very popular globally.
-# 4 = Umm Al-Qura University, Makkah. Used for Saudi Arabia’s official times.
-
-# If you want to explore more methods, go to https://api.aladhan.com/v1/methods
+# 1 = University of Islamic Sciences, Karachi — Used in Pakistan etc.
+# 2 = Islamic Society of North America (ISNA) — Common in North America.
+# 3 = Muslim World League (MWL) — Very popular globally.
+# 4 = Umm Al-Qura University, Makkah — Used for Saudi Arabia’s official times.
+# For more methods: https://api.aladhan.com/v1/methods
 
 if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
-    CITY="YOUR CITY" # Example: Sofia
-    COUNTRY="YOUR COUNTRY" # Example: Bulgaria
-    METHOD=3   # 3 = Muslim World League (MWL). Very popular globally.
+    # ---------------------------------------------------
+    # Location settings (change these!)
+    # ---------------------------------------------------
+    CITY="Sofia"             # Your city
+    COUNTRY="Bulgaria"       # Your country
+    TIMEZONE="Europe/Sofia"  # Your timezone string (must match system tz)
+                             # Run `timedatectl` or `ls /usr/share/zoneinfo`
+                             # Example: Europe/London, America/New_York
+
+    METHOD=3   # Muslim World League (MWL) — Very popular globally.
     CACHE_DIR="$HOME/.cache/salah"
     mkdir -p "$CACHE_DIR"
 
-    # -------------------------------------------------------
-    # Salah offsets (minutes) — tweak these to match mosque
-    # Negative = earlier, Positive = later
-    #
-    # Example (Sofia mosque vs Aladhan):
-    #   Fajr:    Aladhan 05:08, mosque 05:10 --> OFFSET_Fajr=+2
-    #   Dhuhr:   same time --> OFFSET_Dhuhr=0
-    #   Asr:     mosque 3 min earlier --> OFFSET_Asr=-3
-    #   Maghrib: mosque 2 min later --> OFFSET_Maghrib=+2
-    #   Isha:    mosque 5 min later --> OFFSET_Isha=+5
-    # -------------------------------------------------------
+    # ----------------------------------------------------------
+    # Salah offsets (minutes) — tweak these to your local mosque
+    # ----------------------------------------------------------
     OFFSET_Fajr=0
     OFFSET_Dhuhr=0
     OFFSET_Asr=0
@@ -616,7 +614,7 @@ Isha 19:45"
 
         if [ ! -f "$cache" ] || [ "$(date -r "$cache" +%Y-%m-%d)" != "$(date +%Y-%m-%d)" ]; then
             if curl -fsS --retry 2 --max-time 15 \
-               "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD" \
+               "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD&timezonestring=$TIMEZONE" \
                -o "$tmp"; then
                 mv "$tmp" "$cache"
             else
@@ -684,7 +682,8 @@ EOF
             fi
         fi
 
-        echo " $next_prayer $next_time" > /tmp/dwm-salah
+        # (Unicode star and crescent) — Works in monospace fonts
+        echo "☪ $next_prayer $next_time" > /tmp/dwm-salah
 
         now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
         next_minutes=$((10#${next_time%:*} * 60 + 10#${next_time#*:}))
