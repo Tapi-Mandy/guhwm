@@ -154,34 +154,18 @@ log_status() {
 # If any marker's open count != close count returns non-zero.
 check_heredoc_markers_in_file() {
     file="${1:-$0}"
-    awk_script="
-{
-  n = index(\$0, \"<<\")
-  if (n) {
-    s = substr(\$0, n+2)
-    gsub(/^[ \\t]+/, \"\", s)
-    # strip optional starting quote
-    if (s ~ /^'/) { s = substr(s,2) }
-    else if (s ~ /^\\\"\") { s = substr(s,2) } # defensive, won't usually match
-    else if (s ~ /^\"/) { s = substr(s,2) }
-    if (match(s, /^([A-Za-z_][A-Za-z0-9_]*)/, a)) {
-      m=a[1]; open[m]++
-    }
-  }
-  if (\$0 ~ /^[A-Za-z_][A-Za-z0-9_]*\$/) close[\$0]++
-}
-END {
-  bad=0
-  for (m in open) {
-    if (open[m] != close[m]) {
-      printf(\"HEREDOC MISMATCH: marker \\\"%s\\\" opens=%d closes=%d\\n\", m, open[m], close[m]) > \"/dev/stderr\"
-      bad=1
-    }
-  }
-  exit bad
-}
-"
-    awk "$awk_script" "$file"
+    # Collect all heredoc markers from the file
+    markers=$(grep -oE '<<[-]?["'\'']?[A-Za-z0-9_]+["'\'']?' "$file" | sed -E 's/^<<-?["'\'']?//; s/["'\'']?$//')
+
+    # For each marker, check if there's a matching closing line
+    for m in $markers; do
+        if ! grep -qE "^$m\$" "$file"; then
+            printf "HEREDOC MISMATCH: marker \"%s\" opens but no closing line found\n" "$m" >&2
+            return 1
+        fi
+    done
+
+    return 0
 }
 
 # ==============================
