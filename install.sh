@@ -593,38 +593,50 @@ command -v clipmenud >/dev/null 2>&1 && clipmenud &
 # Toggle Salah times here: 1 = enabled, 0 = disabled
 ENABLE_SALAH=0
 
-# METHODS:
-# 1 = University of Islamic Sciences, Karachi — Used in Pakistan etc.
-# 2 = Islamic Society of North America (ISNA) — Common in North America.
-# 3 = Muslim World League (MWL) — Very popular globally.
-# 4 = Umm Al-Qura University, Makkah — Used for Saudi Arabia’s official times.
-# For more methods: https://api.aladhan.com/v1/methods
-
 if [ "$ENABLE_SALAH" -eq 1 ]; then
 (
     # ---------------------------------------------------
-    # Location settings (change these!)
+    # Location settings (Change these!)
     # ---------------------------------------------------
-    CITY="Sofia"             # Your city
-    COUNTRY="Bulgaria"       # Your country
-    TIMEZONE="Europe/Sofia"  # Your timezone string (must match system tz)
-                             # Run `timedatectl` or `ls /usr/share/zoneinfo`
-                             # Example: Europe/London, America/New_York
+    CITY="Sofia"             # Your city name (used by API)
+    COUNTRY="Bulgaria"       # Your country name (used by API)
+    TIMEZONE="Europe/Sofia"  # Must match your system timezone
+                             # Run `timedatectl` or check /usr/share/zoneinfo
+                             # Examples: Europe/London, America/New_York
 
     METHOD=3   # Muslim World League (MWL) — Very popular globally.
+               #
+               # Other popular methods:
+               #   2 = Islamic Society of North America (ISNA)
+               #   4 = Umm al-Qura, Makkah
+               #   5 = Egyptian General Authority of Survey
+               #   14 = Spiritual Administration of Muslims of Russia
+               # API reference: https://api.aladhan.com/v1/methods
+               # Choose the one matching your mosque/local practice.
+
+    # ---------------------------------------------------
+    # Cache settings (API calls are cached daily/monthly)
+    # ---------------------------------------------------
     CACHE_DIR="$HOME/.cache/salah"
     mkdir -p "$CACHE_DIR"
 
     # ----------------------------------------------------------
-    # Salah offsets (minutes) — tweak these to your local mosque
+    # Salah offsets (minutes) — tweak for mosque adjustments
     # ----------------------------------------------------------
+    # Example:
+    #   If your local mosque does Fajr 5 min later, set OFFSET_Fajr=5
+    #   If Isha is called 10 min earlier, set OFFSET_Isha=-10
+    #   Leave as 0 if no adjustment is needed.
     OFFSET_Fajr=0
     OFFSET_Dhuhr=0
     OFFSET_Asr=0
     OFFSET_Maghrib=0
     OFFSET_Isha=0
 
-    # Offline fallback (used if API unreachable)
+    # ---------------------------------------------------
+    # Offline fallback times (used if API unreachable)
+    # ---------------------------------------------------
+    # Always in 24h HH:MM format. These are only used as a backup.
     OFFLINE_TIMES="Fajr 05:10
 Dhuhr 12:30
 Asr 15:45
@@ -632,7 +644,7 @@ Maghrib 18:20
 Isha 19:45"
 
     # ====================================================
-    # Adjust a given HH:MM by prayer offset
+    # Adjust a given HH:MM by prayer offset and format
     # ====================================================
     adjust_time() {
         prayer="$1"; time="$2"
@@ -648,21 +660,27 @@ Isha 19:45"
             Isha)     total=$((total + OFFSET_Isha)) ;;
         esac
 
-        # wrap around if needed
+        # Wrap around if time goes before 00:00 or after 23:59
         if [ $total -lt 0 ]; then total=$((total + 1440)); fi
         if [ $total -ge 1440 ]; then total=$((total - 1440)); fi
 
-        printf "%02d:%02d" $((total / 60)) $((total % 60))
+        hh=$((total / 60))
+        mm=$((total % 60))
+        printf -v raw "%02d:%02d" "$hh" "$mm"
+
+        # Always return in 12h with AM/PM (e.g. 5:49 AM, 7:15 PM)
+        date -d "$raw" +"%-I:%M %p"
     }
 
-    # ====================================================
-    # Fetch and cache a month of times
-    # ====================================================
+    # ---------------------------------------------------
+    # Fetch & cache prayer times from API
+    # ---------------------------------------------------
     fetch_month_file() {
         yr="$1"; mo="$2"
         cache="$CACHE_DIR/$yr-$mo.json"
         tmp="$(mktemp)"
 
+        # Download only if cache is missing or stale
         if [ ! -f "$cache" ] || [ "$(date -r "$cache" +%Y-%m-%d)" != "$(date +%Y-%m-%d)" ]; then
             if curl -fsS --retry 2 --max-time 15 \
                "https://api.aladhan.com/v1/calendarByCity/$yr/$mo?city=$CITY&country=$COUNTRY&method=$METHOD&timezonestring=$TIMEZONE" \
@@ -676,15 +694,16 @@ Isha 19:45"
         [ -f "$cache" ] && echo "$cache"
     }
 
-    # ====================================================
-    # Extract prayer times for a given date
-    # ====================================================
+    # ---------------------------------------------------
+    # Extract times for a specific date (from cache or fallback)
+    # ---------------------------------------------------
     get_times_for_date() {
         target_date="$1"
         year=$(date -d "$target_date" +%Y)
         month=$(date -d "$target_date" +%m)
         daynum=$(date -d "$target_date" +%d)
         cachefile="$(fetch_month_file "$year" "$month")" || cachefile=""
+
         if [ -n "$cachefile" ] && [ -s "$cachefile" ]; then
             jq -r --argjson idx $((10#$daynum-1)) '
 .data[$idx].timings
@@ -699,19 +718,25 @@ Isha 19:45"
     }
 
     # ====================================================
-    # Main Salah loop: run once per prayer
+    # Main Salah loop — writes "☪ NextPrayer HH:MM AM/PM"
     # ====================================================
     while true; do
         now=$(date +%H:%M)
         today=$(date +%Y-%m-%d)
+
+        # Try to fetch today's times, else fallback
         times=$(get_times_for_date "$today" 2>/dev/null)
         [ -z "$times" ] && times="$OFFLINE_TIMES"
 
         next_prayer=""; next_time=""
+
+        # Compare each prayer to current time
         while read -r prayer time; do
             adj_time=$(adjust_time "$prayer" "$time")
-            prayer_minutes=$((10#${adj_time%:*} * 60 + 10#${adj_time#*:}))
+            comp_time=$(date -d "$adj_time" +%H:%M)  # For math comparison
+            prayer_minutes=$((10#${comp_time%:*} * 60 + 10#${comp_time#*:}))
             now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
+
             if [ "$prayer_minutes" -gt "$now_minutes" ]; then
                 next_prayer=$prayer
                 next_time=$adj_time
@@ -721,9 +746,11 @@ Isha 19:45"
 $times
 PRAYERDATA
 
+        # If all prayers passed, fall back to tomorrow's Fajr
         if [ -z "$next_prayer" ]; then
             tomorrow=$(date -d tomorrow +%Y-%m-%d)
             ttimes=$(get_times_for_date "$tomorrow" 2>/dev/null)
+
             if [ -n "$ttimes" ]; then
                 next_prayer="Fajr"
                 next_time=$(adjust_time "Fajr" "$(printf "%s" "$ttimes" | awk '/^Fajr / {print $2; exit}')")
@@ -733,11 +760,13 @@ PRAYERDATA
             fi
         fi
 
-        # (Unicode star and crescent) — Works in monospace fonts
+        # Output for dwm bar (example: "☪ Dhuhr 1:23 PM")
         echo "☪ $next_prayer $next_time" > /tmp/dwm-salah
 
+        # Sleep until next prayer
         now_minutes=$((10#${now%:*} * 60 + 10#${now#*:}))
-        next_minutes=$((10#${next_time%:*} * 60 + 10#${next_time#*:}))
+        comp_time=$(date -d "$next_time" +%H:%M)
+        next_minutes=$((10#${comp_time%:*} * 60 + 10#${comp_time#*:}))
         sleep_minutes=$((next_minutes - now_minutes))
         [ $sleep_minutes -lt 1 ] && sleep_minutes=1
 
