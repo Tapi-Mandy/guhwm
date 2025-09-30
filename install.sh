@@ -19,6 +19,7 @@
 #       - Redshift for eye comfort
 #       - Clipboard manager (clipmenu)
 #       - Keyboard layout switching support
+#       - Salah times with robust configuration for Muslims, disabled by default
 #   * Builds and installs guhwm from source
 #   * Installation summary (successes/failures) and launch prompt
 # =====================================================================
@@ -42,16 +43,16 @@ show_help() {
     echo -e "${PINK}Guh Window Manager Installer${RESET}"
     echo -e "${PINK}=================================${RESET}"
     echo
-    echo "Usage: ./install.sh [OPTIONS]"
+    echo -e "${PINK}Usage: ./install.sh [OPTIONS]${RESET}"
     echo
-    echo "Options:"
+    echo -e "${PINK}Options:${RESET}"
     echo "  --dry-run    Simulate the installation without making changes"
     echo "  --help       Show this help message and exit"
     echo
-    echo "Logs are saved under: ~/.guhwm/logs/"
-    echo "You can review successes, failures, and your final launch choice there."
+    echo -e "${PINK}Logs are saved under: ~/.guhwm/logs/${RESET}"
+    echo -e "${PINK}You can review successes, failures, and your final launch choice there.${RESET}"
     echo
-    echo "Features:"
+    echo -e "${PINK}Features:${RESET}"
     echo "  * Dry-run mode (--dry-run) to simulate installation without changes"
     echo "  * Color-coded, aligned status output with logging to ~/.guhwm/logs"
     echo "  * Auto-retry with mirror refresh for failed pacman/AUR installs"
@@ -67,6 +68,7 @@ show_help() {
     echo "      - Redshift for eye comfort"
     echo "      - Clipboard manager (clipmenu)"
     echo "      - Keyboard layout switching support (commented example)"
+    echo "      - Salah times with robust configuration for Muslims (disabled by default)"
     echo "  * Builds and installs guhwm from source"
     echo "  * Installation summary (successes/failures) and launch prompt"
     echo
