@@ -1,7 +1,13 @@
-# guhwm
-### *Guh Window Manager* is a configuration of [dwm](https://dwm.suckless.org/); designed for Arch Linux.
+# Guh Window Manager
 
-<img width="256" height="256" alt="Arch_guhwm" src="https://github.com/user-attachments/assets/bbc8ed6c-8921-4acf-bc9f-410e783d7010"/>
+<div align="center">
+  <img width="256" height="256" alt="Arch_guhwm" src="https://github.com/user-attachments/assets/bbc8ed6c-8921-4acf-bc9f-410e783d7010"/>
+</div>
+
+<h3 align="center">
+  <i>Guh Window Manager</i> is a configuration of <a href="https://dwm.suckless.org/">dwm</a>; designed for Arch Linux.
+</h3>
+<br>
 
 - guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
 
