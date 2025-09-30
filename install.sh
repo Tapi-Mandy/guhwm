@@ -383,6 +383,7 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
         echo -e "${PINK}Setting default shell to $INSTALLED_SHELL_PATH...${RESET}"
         if chsh -s "$INSTALLED_SHELL_PATH" "$USER"; then
             log_status "Default shell" "OK"
+            export SHELL="$INSTALLED_SHELL_PATH"   # <-- Force update SHELL
         else
             log_status "Default shell" "FAIL"
         fi
