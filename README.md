@@ -26,7 +26,7 @@
 <br>
 <img width="740" height="460" alt="image" src="https://github.com/user-attachments/assets/f9925c6f-a40a-4f35-9d10-9c51f88301a0"/>
 
-> *guhwm with Kitty running asciiquarium and Lynx*
+> *guhwm with Kitty running asciiquarium & Lynx with stallman.org opened*
 <br>
 <img width="740" height="460" alt="image" src="https://github.com/user-attachments/assets/37c51b93-8741-4ea4-924d-b3b08f9d1672"/>
 
