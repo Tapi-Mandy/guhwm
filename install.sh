@@ -147,24 +147,19 @@ log_status() {
 }
 
 # ==============================
-# Simple heredoc-marker checker
+# Safe heredoc-marker checker
 # ==============================
-# Scans a file for heredoc openers (<<marker or <<'marker' or <<"marker")
-# and counts how many times a closing line with marker appears.
-# If any marker's open count != close count returns non-zero.
 check_heredoc_markers_in_file() {
     file="${1:-$0}"
-    # Collect all heredoc markers from the file
-    markers=$(grep -oE '<<[-]?["'\'']?[A-Za-z0-9_]+["'\'']?' "$file" | sed -E 's/^<<-?["'\'']?//; s/["'\'']?$//')
+    markers=$(grep -oE '^[[:space:]]*<<-?[[:space:]]*["'\'']?[A-Za-z0-9_]+["'\'']?' "$file" \
+        | sed -E 's/^[[:space:]]*<<-?[[:space:]]*["'\'']?//; s/["'\'']?$//')
 
-    # For each marker, check if there's a matching closing line
     for m in $markers; do
-        if ! grep -qE "^$m\$" "$file"; then
+        if ! grep -qE "^[[:space:]]*$m\$" "$file"; then
             printf "HEREDOC MISMATCH: marker \"%s\" opens but no closing line found\n" "$m" >&2
             return 1
         fi
     done
-
     return 0
 }
 
