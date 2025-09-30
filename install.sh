@@ -580,8 +580,8 @@ if [ "$ENABLE_SALAH" -eq 1 ]; then
     # ---------------------------------------------------
     # Location settings (Change these!)
     # ---------------------------------------------------
-    CITY="Sofia"             # Your city name (used by API)
-    COUNTRY="Bulgaria"       # Your country name (used by API)
+    CITY="Sofia"             # Your city name (Example: Sofia)
+    COUNTRY="Bulgaria"       # Your country name (Example: Bulgaria)
     TIMEZONE="Europe/Sofia"  # Must match your system timezone
                              # Run `timedatectl` or check /usr/share/zoneinfo
                              # Examples: Europe/London, America/New_York
