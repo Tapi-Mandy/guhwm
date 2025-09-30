@@ -24,7 +24,7 @@
 #   * Installation summary (successes/failures) and launch prompt
 # =====================================================================
 
-set -e
+set -eo pipefail
 
 # ==============================
 # Colors
@@ -249,13 +249,6 @@ if ! $DRY_RUN; then
     else
         echo "font_size 14.0" >> "$KITTY_CONF_FILE"
     fi
-
-    if grep -q "^symbol_map U+E0A0-U+E0A3" "$KITTY_CONF_FILE" 2>/dev/null; then
-        sed -i 's/^symbol_map U+E0A0-U+E0A3.*/symbol_map U+E0A0-U+E0A3 JetBrainsMono Nerd Font/' "$KITTY_CONF_FILE"
-    else
-        echo "symbol_map U+E0A0-U+E0A3 JetBrainsMono Nerd Font" >> "$KITTY_CONF_FILE"
-    fi
-
     echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with fallback.${RESET}"
 fi
 
