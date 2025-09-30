@@ -582,9 +582,9 @@ if [ "$ENABLE_SALAH" -eq 1 ]; then
     # ---------------------------------------------------
     CITY="Sofia"             # Your city name (Example: Sofia)
     COUNTRY="Bulgaria"       # Your country name (Example: Bulgaria)
-    TIMEZONE="Europe/Sofia"  # Must match your system timezone
-                             # Run `timedatectl` or check /usr/share/zoneinfo
-                             # Examples: Europe/London, America/New_York
+    TIMEZONE="Europe/Sofia"  # Examples: Europe/London, America/New_York
+                             # !! Must match your system timezone
+                             # --> Run `timedatectl` or check /usr/share/zoneinfo
 
     METHOD=3   # Muslim World League (MWL) — Very popular globally.
                #
