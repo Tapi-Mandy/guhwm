@@ -3,7 +3,7 @@
 </div>
 
 <h2 align="center">
-  <i>Guh Window Manager</i> is a configuration of <a href="https://dwm.suckless.org/">dwm</a>; designed for Arch Linux.
+  <i>Guh Window Manager</i> is a configuration of <a href="https://dwm.suckless.org/">dwm</a>; for Arch Linux.
 </h2>
 
 - guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
