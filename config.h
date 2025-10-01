@@ -73,7 +73,7 @@ static const Key keys[] = {
     { MODKEY|ShiftMask,             XK_x,      spawn,          {.v = clipmenucmd } },
     /* Keybindings for scrot */
     { 0,                            XK_Print,  spawn,          SHCMD("scrot -s") }, /* Screenshots selected area */
-    { MODKEY|ShiftMask,             XK_Print,  spawn,          SHCMD("scrot") }, /* Screenshots fullscreen */
+    { ShiftMask,                    XK_Print,  spawn,          SHCMD("scrot") }, /* Screenshots fullscreen */
     /* ---------------------------------------------------------- */
     { MODKEY,                       XK_b,      togglebar,      {0} },
     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
