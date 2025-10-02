@@ -220,25 +220,20 @@ retry_pacman xorg reflector kitty feh clipmenu nano dunst libnotify xdg-desktop-
 KITTY_CONF_DIR="$HOME/.config/kitty"
 KITTY_CONF_FILE="$KITTY_CONF_DIR/kitty.conf"
 
-if ! $DRY_RUN; then
-    mkdir -p "$KITTY_CONF_DIR"
+mkdir -p "$KITTY_CONF_DIR"
 
-    if grep -q "^font_family" "$KITTY_CONF_FILE" 2>/dev/null; then
-        sed -i 's/^font_family.*/font_family JetBrainsMono Nerd Font/' "$KITTY_CONF_FILE"
-    else
-        echo "font_family JetBrainsMono Nerd Font" >> "$KITTY_CONF_FILE"
-    fi
-
-    if grep -q "^font_size" "$KITTY_CONF_FILE" 2>/dev/null; then
-        sed -i 's/^font_size.*/font_size 14.0/' "$KITTY_CONF_FILE"
-    else
-        echo "font_size 14.0" >> "$KITTY_CONF_FILE"
-    fi
-    echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with fallback.${RESET}"
+if grep -q "^font_family" "$KITTY_CONF_FILE" 2>/dev/null; then
+    sed -i 's/^font_family.*/font_family JetBrainsMono Nerd Font/' "$KITTY_CONF_FILE"
 else
-    # Dry-run: clearly show what would be created/modified
-    dry_run_action "kitty.conf" "Would create/modify kitty config to set font_family and font_size" "mkdir -p \"$KITTY_CONF_DIR\" && echo 'font_family JetBrainsMono Nerd Font' >> \"$KITTY_CONF_FILE\" && echo 'font_size 14.0' >> \"$KITTY_CONF_FILE\""
+    echo "font_family JetBrainsMono Nerd Font" >> "$KITTY_CONF_FILE"
 fi
+
+if grep -q "^font_size" "$KITTY_CONF_FILE" 2>/dev/null; then
+    sed -i 's/^font_size.*/font_size 14.0/' "$KITTY_CONF_FILE"
+else
+    echo "font_size 14.0" >> "$KITTY_CONF_FILE"
+fi
+echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with fallback.${RESET}"
 
 # ==============================
 # AUR Helper
@@ -254,7 +249,7 @@ select aur_helper in yay paru; do
     fi
 done
 
-if ! command -v "$aur_helper" &>/dev/null && ! $DRY_RUN; then
+if ! command -v "$aur_helper" &>/dev/null; then
     echo -e "${PINK}$aur_helper not found. Installing...${RESET}"
     retry_pacman base-devel git curl
     tmpdir=$(mktemp -d)
@@ -264,9 +259,6 @@ if ! command -v "$aur_helper" &>/dev/null && ! $DRY_RUN; then
     makepkg -si --noconfirm
     cd ~
     rm -rf "$tmpdir"
-elif ! command -v "$aur_helper" &>/dev/null && $DRY_RUN; then
-    # Dry-run: show exact steps we'd perform to bootstrap the AUR helper
-    dry_run_action "aur-helper-bootstrap" "AUR helper ($aur_helper) not found. Would install base-devel, git, curl and build the AUR helper from AUR." "sudo pacman -S --noconfirm base-devel git curl && tmpdir=\$(mktemp -d) && cd \$tmpdir && git clone https://aur.archlinux.org/${aur_helper}.git && cd ${aur_helper} && makepkg -si --noconfirm && cd ~ && rm -rf \$tmpdir"
 fi
 
 # ==============================
@@ -337,36 +329,23 @@ done
 for pkg in "${shells[@]}"; do
     name="${pkg%% -*}"        # strip description
     if [[ "$name" == "oh-my-zsh" ]]; then
-        if ! $DRY_RUN; then
-            echo -e "${PINK}Installing Oh My Zsh...${RESET}"
-            if ! command -v zsh &>/dev/null; then retry_aur zsh; fi
-            if [ ! -d "$HOME/.oh-my-zsh" ]; then
-                sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-                log_status "oh-my-zsh" "OK"
-                # >>> Force theme to agnoster <<<
-                if [ -f "$HOME/.zshrc" ]; then
-                    sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
-                else
-                    echo 'ZSH_THEME="agnoster"' >> "$HOME/.zshrc"
-                fi
+        echo -e "${PINK}Installing Oh My Zsh...${RESET}"
+        if ! command -v zsh &>/dev/null; then retry_aur zsh; fi
+        if [ ! -d "$HOME/.oh-my-zsh" ]; then
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+            log_status "oh-my-zsh" "OK"
+            # >>> Force theme to agnoster <<<
+            if [ -f "$HOME/.zshrc" ]; then
+                sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
             else
-                echo -e "${PINK}Oh My Zsh already installed. Skipping.${RESET}"
-            fi
-            # === Ensure zsh is recorded as the default shell ===
-            if [ -z "$INSTALLED_SHELL_PATH" ] && command -v zsh &>/dev/null; then
-                INSTALLED_SHELL_PATH=$(command -v zsh)
+                echo 'ZSH_THEME="agnoster"' >> "$HOME/.zshrc"
             fi
         else
-            # Dry-run simulation of the Oh My Zsh install flow
-            if ! command -v zsh &>/dev/null; then
-                dry_run_action "zsh" "Would install zsh via AUR helper" "${aur_helper} -S --noconfirm zsh || sudo pacman -S --noconfirm zsh"
-            else
-                echo -e "${PINK}[DRY-RUN] zsh already present on system (simulation: would check before installing).${RESET}"
-            fi
-            dry_run_action "oh-my-zsh" "Would download and run Oh My Zsh installer (unattended) and set ZSH_THEME in ~/.zshrc" "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended && sed -i 's/^ZSH_THEME=.*/ZSH_THEME=\"agnoster\"/' ~/.zshrc || echo 'ZSH_THEME=\"agnoster\"' >> ~/.zshrc"
-            # Simulate setting INSTALLED_SHELL_PATH if zsh would be present
-            INSTALLED_SHELL_PATH="/usr/bin/zsh" # simulated canonical path for summary
-            log_status "oh-my-zsh" "OK"
+            echo -e "${PINK}Oh My Zsh already installed. Skipping.${RESET}"
+        fi
+        # === Ensure zsh is recorded as the default shell ===
+        if [ -z "$INSTALLED_SHELL_PATH" ] && command -v zsh &>/dev/null; then
+            INSTALLED_SHELL_PATH=$(command -v zsh)
         fi
     else
         if retry_aur "$name"; then
@@ -389,24 +368,15 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
     # Ensure the shell path is in /etc/shells
     if ! grep -q "$INSTALLED_SHELL_PATH" /etc/shells; then
         echo -e "${PINK}Adding $INSTALLED_SHELL_PATH to /etc/shells...${RESET}"
-        if $DRY_RUN; then
-            dry_run_action "/etc/shells" "Would append $INSTALLED_SHELL_PATH to /etc/shells (so chsh can set it)" "echo \"$INSTALLED_SHELL_PATH\" | sudo tee -a /etc/shells >/dev/null"
-        else
-            echo "$INSTALLED_SHELL_PATH" | sudo tee -a /etc/shells >/dev/null
-        fi
+        echo "$INSTALLED_SHELL_PATH" | sudo tee -a /etc/shells >/dev/null
     fi
 
-    if $DRY_RUN; then
-        echo -e "${PINK}[DRY-RUN] Would set default shell to:${RESET} $INSTALLED_SHELL_PATH"
+    echo -e "${PINK}Setting default shell to $INSTALLED_SHELL_PATH...${RESET}"
+    if chsh -s "$INSTALLED_SHELL_PATH" "$USER"; then
         log_status "Default shell" "OK"
+        export SHELL="$INSTALLED_SHELL_PATH"   # <-- Force update SHELL
     else
-        echo -e "${PINK}Setting default shell to $INSTALLED_SHELL_PATH...${RESET}"
-        if chsh -s "$INSTALLED_SHELL_PATH" "$USER"; then
-            log_status "Default shell" "OK"
-            export SHELL="$INSTALLED_SHELL_PATH"   # <-- Force update SHELL
-        else
-            log_status "Default shell" "FAIL"
-        fi
+        log_status "Default shell" "FAIL"
     fi
 else
     echo -e "${PINK}No custom shell installed, keeping bash.${RESET}"
@@ -426,30 +396,25 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
     esac
 
     if [ -n "$profile_file" ] && ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
-        if $DRY_RUN; then
-            dry_run_action "startx-auto" "Would add startx auto-start snippet to $profile_file (only on tty1)" "append to $profile_file: if [[ -z \$DISPLAY ]] && [[ \$(tty) == /dev/tty1 ]]; then exec startx; fi"
-            log_status "Startx in $profile_file" "OK"
-        else
-            echo -e "${PINK}Adding startx auto-start to $profile_file...${RESET}"
-            # create parent directory if needed (safe minimal addition)
-            mkdir -p "$(dirname "$profile_file")"
-            {
-                echo
-                echo "# Auto-start X only on tty1"
-                if [[ "$profile_file" == *"config.fish" ]]; then
-                    # fish syntax
-                    echo 'if test -z "$DISPLAY"; and test (tty) = "/dev/tty1"'
-                    echo '    exec startx'
-                    echo 'end'
-                else
-                    # POSIX / bash style
-                    echo 'if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then'
-                    echo '    exec startx'
-                    echo 'fi'
-                fi
-            } >> "$profile_file"
-            log_status "Startx in $profile_file" "OK"
-        fi
+        echo -e "${PINK}Adding startx auto-start to $profile_file...${RESET}"
+        # create parent directory if needed (safe minimal addition)
+        mkdir -p "$(dirname "$profile_file")"
+        {
+            echo
+            echo "# Auto-start X only on tty1"
+            if [[ "$profile_file" == *"config.fish" ]]; then
+                # fish syntax
+                echo 'if test -z "$DISPLAY"; and test (tty) = "/dev/tty1"'
+                echo '    exec startx'
+                echo 'end'
+            else
+                # POSIX / bash style
+                echo 'if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then'
+                echo '    exec startx'
+                echo 'fi'
+            fi
+        } >> "$profile_file"
+        log_status "Startx in $profile_file" "OK"
     else
         echo -e "${PINK}Startx already present or skipped. Skipping.${RESET}"
     fi
@@ -463,25 +428,20 @@ fi
 header ".xinitrc Setup"
 XINITRC_PATH="$HOME/.xinitrc"
 overwrite=true
-if [ -f "$XINITRC_PATH" ] && ! $DRY_RUN; then
+if [ -f "$XINITRC_PATH" ]; then
     echo -e "${PINK}.xinitrc already exists. Overwrite? (y/n)${RESET}"
     read -r choice
     [[ "$choice" =~ ^[Yy]$ ]] || overwrite=false
 fi
 if $overwrite; then
-    if $DRY_RUN; then
-        echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
-        dry_run_action ".xinitrc" "Simulate generating .xinitrc file (full content shown earlier in the installer script)" "cat > \"$XINITRC_PATH\" <<'XINITRC' ... XINITRC && chmod +x \"$XINITRC_PATH\""
-        log_status ".xinitrc" "OK"
-    else
-        # --- Sanity check the installer itself for heredoc marker mismatches
-        if ! check_heredoc_markers_in_file "$0"; then
-            echo -e "${RED}Heredoc marker mismatch detected in installer script. Aborting to avoid writing broken .xinitrc.${RESET}"
-            echo "Heredoc marker mismatch in installer. Aborting." >> "$LOG_FILE"
-            exit 1
-        fi
+    # --- Sanity check the installer itself for heredoc marker mismatches
+    if ! check_heredoc_markers_in_file "$0"; then
+        echo -e "${RED}Heredoc marker mismatch detected in installer script. Aborting to avoid writing broken .xinitrc.${RESET}"
+        echo "Heredoc marker mismatch in installer. Aborting." >> "$LOG_FILE"
+        exit 1
+    fi
 
-        cat > "$XINITRC_PATH" <<'XINITRC'
+    cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
 # ============================================
@@ -802,21 +762,15 @@ fi
 # guhwm Build + Install
 # ==============================
 header "guhwm Build + Install"
-if $DRY_RUN; then
-    # Show the exact sequence we'd run
-    dry_run_action "guhwm-build" "Would clone/pull and run make install for guhwm" "if [ ! -d \"$HOME/guhwm\" ]; then git clone https://github.com/Tapi-Mandy/guhwm.git \"$HOME/guhwm\"; else git -C \"$HOME/guhwm\" pull; fi && cd \"$HOME/guhwm\" && make clean && sudo make install"
-    log_status "guhwm" "OK"
+if [ ! -d "$HOME/guhwm" ]; then
+    git clone https://github.com/Tapi-Mandy/guhwm.git "$HOME/guhwm"
 else
-    if [ ! -d "$HOME/guhwm" ]; then
-        git clone https://github.com/Tapi-Mandy/guhwm.git "$HOME/guhwm"
-    else
-        git -C "$HOME/guhwm" pull
-    fi
-    cd "$HOME/guhwm" || { echo -e "${RED}!! guhwm dir missing${RESET}"; exit 1; }
-    make clean && sudo make install
-    log_status "guhwm" "OK"
-    cd ~ # return to home after build
+    git -C "$HOME/guhwm" pull
 fi
+cd "$HOME/guhwm" || { echo -e "${RED}!! guhwm dir missing${RESET}"; exit 1; }
+make clean && sudo make install
+log_status "guhwm" "OK"
+cd ~ # return to home after build
 
 # ==============================
 # Summary
@@ -851,15 +805,10 @@ header "Launch"
 printf "${PINK}Do you want to start guhwm now? (y/n): ${RESET}"
 read -r launch_now
 if [[ "$launch_now" =~ ^[Yy]$ ]]; then
-    if $DRY_RUN; then
-        echo -e "${PINK}[DRY-RUN] Would run startx now.${RESET}"
-        echo "[DRY-RUN] Would run startx now." >> "$LOG_FILE"
-    else
-        echo -e "${PINK}Starting guhwm...${RESET}"
-        echo "User chose to start guhwm immediately." >> "$LOG_FILE"
-        sleep 1
-        exec startx
-    fi
+    echo -e "${PINK}Starting guhwm...${RESET}"
+    echo "User chose to start guhwm immediately." >> "$LOG_FILE"
+    sleep 1
+    exec startx
 else
     echo -e "${PINK}guhwm will start automatically on reboot.${RESET}"
     echo "User chose not to start guhwm immediately." >> "$LOG_FILE"
