@@ -426,14 +426,11 @@ fi
 # .xinitrc Setup
 # ==============================
 header ".xinitrc Setup"
+
 XINITRC_PATH="$HOME/.xinitrc"
-overwrite=true
-if [ -f "$XINITRC_PATH" ]; then
-    echo -e "${PINK}.xinitrc already exists. Overwrite? (y/n)${RESET}"
-    read -r choice
-    [[ "$choice" =~ ^[Yy]$ ]] || overwrite=false
-fi
-if $overwrite; then
+
+read -rp "Do you want to overwrite/create ~/.xinitrc with defaults? [y/N]: " overwrite
+if [[ "$overwrite" =~ ^[Yy]$ ]]; then
     # --- Sanity check the installer itself for heredoc marker mismatches
     if ! check_heredoc_markers_in_file "$0"; then
         echo -e "${RED}Heredoc marker mismatch detected in installer script. Aborting to avoid writing broken .xinitrc.${RESET}"
@@ -441,6 +438,25 @@ if $overwrite; then
         exit 1
     fi
 
+    cat > "$XINITRC_PATH" <<'XINITRC'
+    # (your existing .xinitrc contents remain here, unchanged)
+XINITRC
+
+    chmod +x "$XINITRC_PATH"
+
+    # --- Sanity-check: validate the generated .xinitrc
+    if /bin/sh -n "$XINITRC_PATH"; then
+        echo -e "${PINK}.xinitrc written and syntax-checked OK.${RESET}"
+        echo ".xinitrc syntax check: OK" >> "$LOG_FILE"
+    else
+        echo -e "${RED}Warning: syntax errors detected in generated .xinitrc. Please inspect $XINITRC_PATH${RESET}"
+        echo ".xinitrc syntax check: FAILED" >> "$LOG_FILE"
+    fi
+
+    echo -e "${PINK}.xinitrc written.${RESET}"
+else
+    echo -e "${PINK}Skipped overwriting .xinitrc${RESET}"
+fi
     cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
