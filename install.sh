@@ -4,7 +4,6 @@
 # Guh Window Manager installer for Arch Linux
 # =====================================================================
 # Features:
-#   * Dry-run mode (--dry-run) to simulate installation without changes
 #   * Color-coded, aligned status output with logging to ~/.guhwm/logs
 #   * Auto-retry with mirror refresh for failed pacman/AUR installs
 #   * AUR helper selection (yay or paru) with bootstrap if missing
@@ -35,11 +34,8 @@ MAGENTA="\033[35m"
 RESET="\e[0m"
 
 # ==============================
-# Help & Dry-run Flags
+# Help Flag
 # ==============================
-DRY_RUN=false
-DRY_RUN_PREFIX="${PINK}[DRY-RUN]${RESET}"
-
 show_help() {
     echo -e "${PINK}=================================${RESET}"
     echo -e "${PINK}Guh Window Manager Installer${RESET}"
@@ -48,14 +44,12 @@ show_help() {
     echo -e "${PINK}Usage: ./install.sh [OPTIONS]${RESET}"
     echo
     echo -e "${PINK}Options:${RESET}"
-    echo "  --dry-run    Simulate the installation without making changes"
     echo "  --help       Show this help message and exit"
     echo
     echo -e "${PINK}Logs are saved under: ~/.guhwm/logs/${RESET}"
     echo -e "${PINK}You can review successes, failures, and your final launch choice there.${RESET}"
     echo
     echo -e "${PINK}Features:${RESET}"
-    echo "  * Dry-run mode (--dry-run) to simulate installation without changes"
     echo "  * Color-coded, aligned status output with logging to ~/.guhwm/logs"
     echo "  * Auto-retry with mirror refresh for failed pacman/AUR installs"
     echo "  * AUR helper selection (yay or paru) with bootstrap if missing"
@@ -79,10 +73,6 @@ show_help() {
 if [[ "$1" == "--help" ]]; then
     show_help
     exit 0
-elif [[ "$1" == "--dry-run" ]]; then
-    DRY_RUN=true
-    echo -e "${PINK}[DRY-RUN] Simulation mode enabled. No changes will be made.${RESET}"
-    echo -e "${PINK}[DRY-RUN] This dry-run will display exact commands that would be executed, and show simulated success/failure outcomes.${RESET}"
 fi
 
 # ==============================
@@ -133,31 +123,6 @@ SUCCEEDED_COUNT=0
 INSTALLED_SHELL_PATH=""
 
 # ==============================
-# Dry-run helper (descriptive)
-# ==============================
-# Use this to consistently print and log what would happen.
-dry_run_action() {
-    # $1 = short label for the action (used for status tracking)
-    # $2 = human-readable description
-    # $3 = the exact command that would be run (single string)
-    local label="$1"
-    local desc="$2"
-    local cmd="$3"
-    # Print clearly to the user in the PINK theme
-    echo -e "${PINK}[DRY-RUN] ACTION:${RESET} $desc"
-    if [ -n "$cmd" ]; then
-        echo -e "${PINK}[DRY-RUN] COMMAND:${RESET} $cmd"
-    fi
-    # Also add a short line to the logfile (so dry-run is traceable)
-    {
-        echo "[DRY-RUN] ACTION: $desc"
-        [ -n "$cmd" ] && echo "[DRY-RUN] CMD: $cmd"
-    } >> "$LOG_FILE"
-    # Mark it as a simulated success for summary purposes
-    log_status "$label" "OK"
-}
-
-# ==============================
 # Status Logging Function
 # ==============================
 log_status() {
@@ -165,24 +130,12 @@ log_status() {
     local status="$2"
     local time=$(date +"%H:%M:%S")
     if [ "$status" = "OK" ]; then
-        if $DRY_RUN; then
-            # Show that it's a simulated OK in dry-run mode
-            printf "[%s] --> %-44s [%bDRY-OK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
-            SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
-        else
-            printf "[%s] --> %-44s [%bOK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
-            SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
-        fi
+        printf "[%s] --> %-44s [%bOK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
+        SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
     else
-        if $DRY_RUN; then
-            printf "[%s] --> %-44s [%bDRY-FAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
-            FAILED_COUNT=$((FAILED_COUNT+1))
-            FAILED_LIST+=("$pkg")
-        else
-            printf "[%s] --> %-44s [%bFAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
-            FAILED_COUNT=$((FAILED_COUNT+1))
-            FAILED_LIST+=("$pkg")
-        fi
+        printf "[%s] --> %-44s [%bFAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
+        FAILED_COUNT=$((FAILED_COUNT+1))
+        FAILED_LIST+=("$pkg")
     fi
 }
 
@@ -209,11 +162,6 @@ check_heredoc_markers_in_file() {
 retry_pacman() {
     local pkg=("$@")
     local pkgstr="${pkg[*]}"
-    if $DRY_RUN; then
-        # Show exact pacman command we would run
-        dry_run_action "$pkgstr" "Simulate: install via pacman (would run as shown)" "sudo pacman -S --noconfirm ${pkg[*]}"
-        return 0
-    fi
     local retries=5
     local count=0
     until sudo pacman -S --noconfirm "${pkg[@]}"; do
@@ -234,11 +182,6 @@ retry_pacman() {
 retry_aur() {
     local pkg=("$@")
     local pkgstr="${pkg[*]}"
-    if $DRY_RUN; then
-        # Show exact AUR helper command we would run
-        dry_run_action "$pkgstr" "Simulate: install via AUR helper (${aur_helper})" "${aur_helper} -S --noconfirm ${pkg[*]}"
-        return 0
-    fi
     local retries=5
     local count=0
     until "$aur_helper" -S --noconfirm "${pkg[@]}"; do
@@ -263,9 +206,6 @@ header "Welcome"
 echo -e "${PINK}Thank you for trying guhwm! ;3${RESET}"
 echo -e "${PINK}You'll be prompted to install optional software, which is highly recommended.${RESET}"
 echo -e "${PINK}Next, you will be prompted to select your preferred AUR helper.${RESET}"
-if $DRY_RUN; then
-    echo -e "${PINK}[DRY-RUN] You will still be prompted for choices (AUR helper, overwriting files, launch). Responses will only affect the simulation.${RESET}"
-fi
 sleep 3
 
 # ==============================
