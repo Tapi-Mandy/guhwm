@@ -247,6 +247,7 @@ echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with 
 # ==============================
 # AUR Helper
 # ==============================
+echo
 header "AUR Helper"
 echo -e "${PINK}Choose your preferred AUR helper:${RESET}"
 select aur_helper in yay paru; do
