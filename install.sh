@@ -448,25 +448,6 @@ if [[ "$overwrite" =~ ^[Yy]$ ]]; then
     fi
 
     cat > "$XINITRC_PATH" <<'XINITRC'
-    # (your existing .xinitrc contents remain here, unchanged)
-XINITRC
-
-    chmod +x "$XINITRC_PATH"
-
-    # --- Sanity-check: validate the generated .xinitrc
-    if /bin/sh -n "$XINITRC_PATH"; then
-        echo -e "${PINK}.xinitrc written and syntax-checked OK.${RESET}"
-        echo ".xinitrc syntax check: OK" >> "$LOG_FILE"
-    else
-        echo -e "${RED}Warning: syntax errors detected in generated .xinitrc. Please inspect $XINITRC_PATH${RESET}"
-        echo ".xinitrc syntax check: FAILED" >> "$LOG_FILE"
-    fi
-
-    echo -e "${PINK}.xinitrc written.${RESET}"
-else
-    echo -e "${PINK}Skipped overwriting .xinitrc${RESET}"
-fi
-    cat > "$XINITRC_PATH" <<'XINITRC'
 #!/bin/sh
 
 # ============================================
@@ -766,19 +747,19 @@ fi
 # --- This must be the last line! ------------------------
 exec dbus-run-session dwm
 XINITRC
-        chmod +x "$XINITRC_PATH"
 
-        # --- Sanity-check: validate the generated .xinitrc
-        if /bin/sh -n "$XINITRC_PATH"; then
-            echo -e "${PINK}.xinitrc written and syntax-checked OK.${RESET}"
-            echo ".xinitrc syntax check: OK" >> "$LOG_FILE"
-        else
-            echo -e "${RED}Warning: syntax errors detected in generated .xinitrc. Please inspect $XINITRC_PATH${RESET}"
-            echo ".xinitrc syntax check: FAILED" >> "$LOG_FILE"
-        fi
+    chmod +x "$XINITRC_PATH"
 
-        echo -e "${PINK}.xinitrc written.${RESET}"
+    # --- Sanity-check: validate the generated .xinitrc
+    if /bin/sh -n "$XINITRC_PATH"; then
+        echo -e "${PINK}.xinitrc written and syntax-checked OK.${RESET}"
+        echo ".xinitrc syntax check: OK" >> "$LOG_FILE"
+    else
+        echo -e "${RED}Warning: syntax errors detected in generated .xinitrc. Please inspect $XINITRC_PATH${RESET}"
+        echo ".xinitrc syntax check: FAILED" >> "$LOG_FILE"
     fi
+
+    echo -e "${PINK}.xinitrc written.${RESET}"
 else
     echo -e "${PINK}Skipped overwriting .xinitrc${RESET}"
 fi
