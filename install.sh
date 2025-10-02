@@ -38,6 +38,7 @@ RESET="\e[0m"
 # Help & Dry-run Flags
 # ==============================
 DRY_RUN=false
+DRY_RUN_PREFIX="${PINK}[DRY-RUN]${RESET}"
 
 show_help() {
     echo -e "${PINK}=================================${RESET}"
@@ -81,6 +82,7 @@ if [[ "$1" == "--help" ]]; then
 elif [[ "$1" == "--dry-run" ]]; then
     DRY_RUN=true
     echo -e "${PINK}[DRY-RUN] Simulation mode enabled. No changes will be made.${RESET}"
+    echo -e "${PINK}[DRY-RUN] This dry-run will display exact commands that would be executed, and show simulated success/failure outcomes.${RESET}"
 fi
 
 # ==============================
@@ -131,6 +133,31 @@ SUCCEEDED_COUNT=0
 INSTALLED_SHELL_PATH=""
 
 # ==============================
+# Dry-run helper (descriptive)
+# ==============================
+# Use this to consistently print and log what would happen.
+dry_run_action() {
+    # $1 = short label for the action (used for status tracking)
+    # $2 = human-readable description
+    # $3 = the exact command that would be run (single string)
+    local label="$1"
+    local desc="$2"
+    local cmd="$3"
+    # Print clearly to the user in the PINK theme
+    echo -e "${PINK}[DRY-RUN] ACTION:${RESET} $desc"
+    if [ -n "$cmd" ]; then
+        echo -e "${PINK}[DRY-RUN] COMMAND:${RESET} $cmd"
+    fi
+    # Also add a short line to the logfile (so dry-run is traceable)
+    {
+        echo "[DRY-RUN] ACTION: $desc"
+        [ -n "$cmd" ] && echo "[DRY-RUN] CMD: $cmd"
+    } >> "$LOG_FILE"
+    # Mark it as a simulated success for summary purposes
+    log_status "$label" "OK"
+}
+
+# ==============================
 # Status Logging Function
 # ==============================
 log_status() {
@@ -138,12 +165,24 @@ log_status() {
     local status="$2"
     local time=$(date +"%H:%M:%S")
     if [ "$status" = "OK" ]; then
-        printf "[%s] --> %-44s [%bOK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
-        SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
+        if $DRY_RUN; then
+            # Show that it's a simulated OK in dry-run mode
+            printf "[%s] --> %-44s [%bDRY-OK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
+            SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
+        else
+            printf "[%s] --> %-44s [%bOK%b]\n" "$time" "$pkg" "$PINK" "$RESET"
+            SUCCEEDED_COUNT=$((SUCCEEDED_COUNT+1))
+        fi
     else
-        printf "[%s] --> %-44s [%bFAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
-        FAILED_COUNT=$((FAILED_COUNT+1))
-        FAILED_LIST+=("$pkg")
+        if $DRY_RUN; then
+            printf "[%s] --> %-44s [%bDRY-FAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
+            FAILED_COUNT=$((FAILED_COUNT+1))
+            FAILED_LIST+=("$pkg")
+        else
+            printf "[%s] --> %-44s [%bFAIL%b]\n" "$time" "$pkg" "$RED" "$RESET"
+            FAILED_COUNT=$((FAILED_COUNT+1))
+            FAILED_LIST+=("$pkg")
+        fi
     fi
 }
 
@@ -168,51 +207,53 @@ check_heredoc_markers_in_file() {
 # Retry Functions
 # ==============================
 retry_pacman() {
-    local pkg="$*"
+    local pkg=("$@")
+    local pkgstr="${pkg[*]}"
     if $DRY_RUN; then
-        echo -e "${PINK}[DRY-RUN] Would install via pacman:${RESET} $pkg"
-        log_status "$pkg" "OK"
+        # Show exact pacman command we would run
+        dry_run_action "$pkgstr" "Simulate: install via pacman (would run as shown)" "sudo pacman -S --noconfirm ${pkg[*]}"
         return 0
     fi
     local retries=5
     local count=0
-    until sudo pacman -S --noconfirm "$@"; do
+    until sudo pacman -S --noconfirm "${pkg[@]}"; do
         count=$((count+1))
-        echo -e "${RED}!! pacman failed on $pkg (attempt $count/$retries)${RESET}"
+        echo -e "${RED}!! pacman failed on ${pkgstr} (attempt $count/$retries)${RESET}"
         if [ $count -ge $retries ]; then
-            log_status "$pkg" "FAIL"
+            log_status "$pkgstr" "FAIL"
             return 1
         fi
-        echo -e "${RED}!! Retrying $pkg...${RESET}"
+        echo -e "${RED}!! Retrying ${pkgstr}... refreshing mirrors${RESET}"
         sudo pacman -S --needed --noconfirm reflector
         sudo reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
         sleep 2
     done
-    log_status "$pkg" "OK"
+    log_status "$pkgstr" "OK"
 }
 
 retry_aur() {
-    local pkg="$*"
+    local pkg=("$@")
+    local pkgstr="${pkg[*]}"
     if $DRY_RUN; then
-        echo -e "${PINK}[DRY-RUN] Would install via $aur_helper:${RESET} $pkg"
-        log_status "$pkg" "OK"
+        # Show exact AUR helper command we would run
+        dry_run_action "$pkgstr" "Simulate: install via AUR helper (${aur_helper})" "${aur_helper} -S --noconfirm ${pkg[*]}"
         return 0
     fi
     local retries=5
     local count=0
-    until "$aur_helper" -S --noconfirm "$@"; do
+    until "$aur_helper" -S --noconfirm "${pkg[@]}"; do
         count=$((count+1))
-        echo -e "${RED}!! $aur_helper failed on $pkg (attempt $count/$retries)${RESET}"
+        echo -e "${RED}!! $aur_helper failed on ${pkgstr} (attempt $count/$retries)${RESET}"
         if [ $count -ge $retries ]; then
-            log_status "$pkg" "FAIL"
+            log_status "$pkgstr" "FAIL"
             return 1
         fi
-        echo -e "${RED}!! Retrying $pkg...${RESET}"
+        echo -e "${RED}!! Retrying ${pkgstr}... refreshing mirrors${RESET}"
         sudo pacman -S --needed --noconfirm reflector
         sudo reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
         sleep 2
     done
-    log_status "$pkg" "OK"
+    log_status "$pkgstr" "OK"
 }
 
 # ==============================
@@ -222,6 +263,9 @@ header "Welcome"
 echo -e "${PINK}Thank you for trying guhwm! ;3${RESET}"
 echo -e "${PINK}You'll be prompted to install optional software, which is highly recommended.${RESET}"
 echo -e "${PINK}Next, you will be prompted to select your preferred AUR helper.${RESET}"
+if $DRY_RUN; then
+    echo -e "${PINK}[DRY-RUN] You will still be prompted for choices (AUR helper, overwriting files, launch). Responses will only affect the simulation.${RESET}"
+fi
 sleep 3
 
 # ==============================
@@ -251,6 +295,9 @@ if ! $DRY_RUN; then
         echo "font_size 14.0" >> "$KITTY_CONF_FILE"
     fi
     echo -e "${PINK}Kitty font configured: JetBrainsMono Nerd Font, size 14.0, with fallback.${RESET}"
+else
+    # Dry-run: clearly show what would be created/modified
+    dry_run_action "kitty.conf" "Would create/modify kitty config to set font_family and font_size" "mkdir -p \"$KITTY_CONF_DIR\" && echo 'font_family JetBrainsMono Nerd Font' >> \"$KITTY_CONF_FILE\" && echo 'font_size 14.0' >> \"$KITTY_CONF_FILE\""
 fi
 
 # ==============================
@@ -277,6 +324,9 @@ if ! command -v "$aur_helper" &>/dev/null && ! $DRY_RUN; then
     makepkg -si --noconfirm
     cd ~
     rm -rf "$tmpdir"
+elif ! command -v "$aur_helper" &>/dev/null && $DRY_RUN; then
+    # Dry-run: show exact steps we'd perform to bootstrap the AUR helper
+    dry_run_action "aur-helper-bootstrap" "AUR helper ($aur_helper) not found. Would install base-devel, git, curl and build the AUR helper from AUR." "sudo pacman -S --noconfirm base-devel git curl && tmpdir=\$(mktemp -d) && cd \$tmpdir && git clone https://aur.archlinux.org/${aur_helper}.git && cd ${aur_helper} && makepkg -si --noconfirm && cd ~ && rm -rf \$tmpdir"
 fi
 
 # ==============================
@@ -363,6 +413,17 @@ for pkg in "${shells[@]}"; do
             if [ -z "$INSTALLED_SHELL_PATH" ] && command -v zsh &>/dev/null; then
                 INSTALLED_SHELL_PATH=$(command -v zsh)
             fi
+        else
+            # Dry-run simulation of the Oh My Zsh install flow
+            if ! command -v zsh &>/dev/null; then
+                dry_run_action "zsh" "Would install zsh via AUR helper" "${aur_helper} -S --noconfirm zsh || sudo pacman -S --noconfirm zsh"
+            else
+                echo -e "${PINK}[DRY-RUN] zsh already present on system (simulation: would check before installing).${RESET}"
+            fi
+            dry_run_action "oh-my-zsh" "Would download and run Oh My Zsh installer (unattended) and set ZSH_THEME in ~/.zshrc" "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended && sed -i 's/^ZSH_THEME=.*/ZSH_THEME=\"agnoster\"/' ~/.zshrc || echo 'ZSH_THEME=\"agnoster\"' >> ~/.zshrc"
+            # Simulate setting INSTALLED_SHELL_PATH if zsh would be present
+            INSTALLED_SHELL_PATH="/usr/bin/zsh" # simulated canonical path for summary
+            log_status "oh-my-zsh" "OK"
         fi
     else
         if retry_aur "$name"; then
@@ -386,7 +447,7 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
     if ! grep -q "$INSTALLED_SHELL_PATH" /etc/shells; then
         echo -e "${PINK}Adding $INSTALLED_SHELL_PATH to /etc/shells...${RESET}"
         if $DRY_RUN; then
-            echo -e "${PINK}[DRY-RUN] Would add $INSTALLED_SHELL_PATH to /etc/shells${RESET}"
+            dry_run_action "/etc/shells" "Would append $INSTALLED_SHELL_PATH to /etc/shells (so chsh can set it)" "echo \"$INSTALLED_SHELL_PATH\" | sudo tee -a /etc/shells >/dev/null"
         else
             echo "$INSTALLED_SHELL_PATH" | sudo tee -a /etc/shells >/dev/null
         fi
@@ -423,7 +484,7 @@ if [ -n "$INSTALLED_SHELL_PATH" ]; then
 
     if [ -n "$profile_file" ] && ! grep -q "exec startx" "$profile_file" 2>/dev/null; then
         if $DRY_RUN; then
-            echo -e "${PINK}[DRY-RUN] Would add startx auto-start to:${RESET} $profile_file"
+            dry_run_action "startx-auto" "Would add startx auto-start snippet to $profile_file (only on tty1)" "append to $profile_file: if [[ -z \$DISPLAY ]] && [[ \$(tty) == /dev/tty1 ]]; then exec startx; fi"
             log_status "Startx in $profile_file" "OK"
         else
             echo -e "${PINK}Adding startx auto-start to $profile_file...${RESET}"
@@ -467,6 +528,7 @@ fi
 if $overwrite; then
     if $DRY_RUN; then
         echo -e "${PINK}[DRY-RUN] Would write .xinitrc to:${RESET} $XINITRC_PATH"
+        dry_run_action ".xinitrc" "Simulate generating .xinitrc file (full content shown earlier in the installer script)" "cat > \"$XINITRC_PATH\" <<'XINITRC' ... XINITRC && chmod +x \"$XINITRC_PATH\""
         log_status ".xinitrc" "OK"
     else
         # --- Sanity check the installer itself for heredoc marker mismatches
@@ -798,7 +860,8 @@ fi
 # ==============================
 header "guhwm Build + Install"
 if $DRY_RUN; then
-    echo -e "${PINK}[DRY-RUN] Would build and install guhwm from source.${RESET}"
+    # Show the exact sequence we'd run
+    dry_run_action "guhwm-build" "Would clone/pull and run make install for guhwm" "if [ ! -d \"$HOME/guhwm\" ]; then git clone https://github.com/Tapi-Mandy/guhwm.git \"$HOME/guhwm\"; else git -C \"$HOME/guhwm\" pull; fi && cd \"$HOME/guhwm\" && make clean && sudo make install"
     log_status "guhwm" "OK"
 else
     if [ ! -d "$HOME/guhwm" ]; then
