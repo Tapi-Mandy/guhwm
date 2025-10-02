@@ -31,6 +31,7 @@ set -eo pipefail
 # ==============================
 RED="\e[31m"
 PINK="\e[1;35m"
+MAGENTA="\033[35m"
 RESET="\e[0m"
 
 # ==============================
@@ -281,8 +282,25 @@ fi
 # ==============================
 # Software Lists
 # ==============================
-general_software=(firefox vesktop-bin uwufetch krita scrot vim htop mpv redshift)
-shells=(zsh oh-my-zsh fish ksh)
+general_software=(
+    "firefox - Fast, Private & Safe Web Browser"
+    "vesktop-bin - The cutest Discord client"
+    "uwufetch - Cute system info tool for Linux"
+    "krita - Full-featured free digital painting studio by KDE"
+    "scrot - Simple command-line screenshot utility for X"
+    "vim - Vi IMproved, a highly configurable, improved version of Vi"
+    "yazi - Blazing fast terminal file manager written in Rust"
+    "htop - Interactive system resource monitor"
+    "mpv - Lightweight media player"
+    "redshift - Adjusts the color temperature of your screen"
+)
+
+shells=(
+    "zsh - Z-Shell, a very advanced and programmable shell"
+    "oh-my-zsh - Community-driven framework for managing your zsh configuration"
+    "fish - User-friendly shell intended mostly for interactive use"
+    "ksh - KornShell, a classic Unix shell"
+)
 
 # ==============================
 # Removal Menu
@@ -294,7 +312,9 @@ remove_items() {
         echo
         header "$title"
         for i in "${!items[@]}"; do
-            printf "%d) %s\n" "$i" "${items[$i]}"
+            name="${items[$i]%% -*}"   # package name
+            desc="${items[$i]#*- }"   # description
+            printf "${MAGENTA}%d)${RESET} %s - ${MAGENTA}%s${RESET}\n" "$i" "$name" "$desc"
         done
         echo
         echo -e "${PINK}Enter numbers to remove (comma-separated), or press Enter to keep all:${RESET}"
@@ -317,9 +337,13 @@ remove_items shells "Shells"
 # Install Software
 # ==============================
 header "Installing Software"
-for pkg in "${general_software[@]}"; do retry_aur "$pkg"; done
+for pkg in "${general_software[@]}"; do
+    retry_aur "${pkg%% -*}"   # strip description
+done
+
 for pkg in "${shells[@]}"; do
-    if [[ "$pkg" == "oh-my-zsh" ]]; then
+    name="${pkg%% -*}"        # strip description
+    if [[ "$name" == "oh-my-zsh" ]]; then
         if ! $DRY_RUN; then
             echo -e "${PINK}Installing Oh My Zsh...${RESET}"
             if ! command -v zsh &>/dev/null; then retry_aur zsh; fi
@@ -341,10 +365,9 @@ for pkg in "${shells[@]}"; do
             fi
         fi
     else
-        # install the shell package (zsh/fish/ksh) and if successful record first-installed shell
-        if retry_aur "$pkg"; then
+        if retry_aur "$name"; then
             if [ -z "$INSTALLED_SHELL_PATH" ]; then
-                case "$pkg" in
+                case "$name" in
                     zsh) INSTALLED_SHELL_PATH=$(command -v zsh) ;;
                     fish) INSTALLED_SHELL_PATH=$(command -v fish) ;;
                     ksh) INSTALLED_SHELL_PATH=$(command -v ksh) ;;
