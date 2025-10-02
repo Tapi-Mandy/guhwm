@@ -333,6 +333,8 @@ fi
 # Software Lists
 # ==============================
 general_software=(
+    "dmenu - Dynamic menu for X, originally designed for dwm"
+    "rofi - Application launcher, window switcher, dmenu replacement and more"
     "firefox - Fast, Private & Safe Web Browser"
     "vesktop-bin - The cutest Discord client"
     "uwufetch - Cute system info tool for Linux"
@@ -343,6 +345,7 @@ general_software=(
     "htop - Interactive system resource monitor"
     "mpv - Lightweight media player"
     "redshift - Adjusts the color temperature of your screen"
+    "flatpak - Linux application sandboxing and distribution framework"
 )
 
 shells=(
