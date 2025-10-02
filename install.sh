@@ -103,16 +103,25 @@ header() {
 }
 
 # ==============================
-# Logging setup
+# Logging Setup
 # ==============================
+
 LOG_DIR="$HOME/.guhwm/logs"
-mkdir -p "$LOG_DIR"
-TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-LOG_FILE="$LOG_DIR/install_${TIMESTAMP}.log"
+LOG_FILE="$LOG_DIR/install_$(date +%Y%m%d_%H%M%S).log"
 
-exec > >(tee -a "$LOG_FILE") 2>&1
+# Make sure logging directory exists
+if ! mkdir -p "$LOG_DIR"; then
+    echo "ERROR: Failed to create log directory: $LOG_DIR"
+    exit 1
+fi
 
-# Rotate logs (keep 5 latest, compress older ones)
+# Create the log file
+if ! touch "$LOG_FILE"; then
+    echo "ERROR: Failed to create log file: $LOG_FILE"
+    exit 1
+fi
+
+# Rotate old logs (keep last 5 uncompressed, compress older ones)
 ls -1t "$LOG_DIR"/install_*.log 2>/dev/null | tail -n +6 | xargs -r gzip --force
 
 FAILED_COUNT=0
