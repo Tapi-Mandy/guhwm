@@ -228,7 +228,7 @@ sleep 3
 # Base Packages
 # ==============================
 header "Base Packages"
-retry_pacman xorg reflector dmenu kitty feh clipmenu nano dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk jq alsa-utils noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
+retry_pacman xorg reflector kitty feh clipmenu nano dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk p7zip jq alsa-utils noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
 
 # ==============================
 # Kitty font configuration
