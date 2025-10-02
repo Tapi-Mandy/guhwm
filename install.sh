@@ -211,6 +211,7 @@ retry_aur() {
 # ==============================
 # Welcome
 # ==============================
+echo
 header "Welcome"
 echo -e "${PINK}Thank you for trying guhwm! ;3${RESET}"
 echo -e "${PINK}You'll be prompted to install optional software, which is highly recommended.${RESET}"
@@ -220,6 +221,7 @@ sleep 3
 # ==============================
 # Base Packages
 # ==============================
+echo
 header "Base Packages"
 retry_pacman xorg reflector kitty feh clipmenu nano dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk p7zip jq alsa-utils noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
 
@@ -274,6 +276,7 @@ fi
 # ==============================
 # Software Lists
 # ==============================
+echo
 general_software=(
     "dmenu - Dynamic menu for X, originally designed for dwm"
     "rofi - Application launcher, window switcher, dmenu replacement and more"
@@ -331,6 +334,7 @@ remove_items shells "Shells"
 # ==============================
 # Install Software
 # ==============================
+echo
 header "Installing Software"
 for pkg in "${general_software[@]}"; do
     retry_aur "${pkg%% -*}"   # strip description
@@ -373,6 +377,7 @@ done
 # ==============================
 # Default Shell Setup
 # ==============================
+echo
 header "Default Shell Setup"
 if [ -n "$INSTALLED_SHELL_PATH" ]; then
     # Ensure the shell path is in /etc/shells
@@ -395,6 +400,7 @@ fi
 # ==============================
 # Auto-start X in correct profile
 # ==============================
+echo
 header "Startx Setup"
 if [ -n "$INSTALLED_SHELL_PATH" ]; then
     case "$INSTALLED_SHELL_PATH" in
@@ -435,6 +441,7 @@ fi
 # ==============================
 # .xinitrc Setup
 # ==============================
+echo
 header ".xinitrc Setup"
 
 XINITRC_PATH="$HOME/.xinitrc"
@@ -782,6 +789,7 @@ cd ~ # return to home after build
 # ==============================
 # Summary
 # ==============================
+echo
 header "Summary"
 echo "Succeeded: $SUCCEEDED_COUNT"
 echo "Failed:    $FAILED_COUNT"
@@ -807,6 +815,7 @@ fi
 # ==============================
 # Final Launch Prompt
 # ==============================
+echo
 cd ~ # always return to home before prompting
 header "Launch"
 printf "${PINK}Do you want to start guhwm now? (y/n): ${RESET}"
