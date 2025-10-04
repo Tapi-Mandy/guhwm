@@ -12,7 +12,7 @@ static const char dmenufont[]       = "monospace:size=13";
 /* ================== THEME SELECTOR ==================
 Uncomment ONE theme */
 
-#define THEME_MIDNIGHT-ROSE /* DEFAULT */
+#define THEME_MIDNIGHT_ROSE /* DEFAULT */
 // #define THEME_MONOCHROME
 // #define THEME_NORD
 // #define THEME_DRACULA
@@ -87,7 +87,7 @@ static const char col_border[] = "#3e4451";  /* window border (steel gray) */
 static const char col_accent[] = "#61afef";  /* accent (bright sky blue) */
 static const char col_fgsel[]  = "#ffffff";  /* foreground (white for selected win) */
 
-/* ---- Fallback (MIDNIGHT-ROSE) ---- */
+/* ---- Fallback (MIDNIGHT ROSE) ---- */
 #else
 static const char col_bg[]     = "#282828";
 static const char col_fg[]     = "#d4be98";
@@ -98,7 +98,7 @@ static const char col_fgsel[]  = "#eeeeee";
 
 /* ================== NOTES ==================
 - To change theme, just swap which #define THEME_* is uncommented above.
-- Recompile dwm after switching.
+- Recompile guhwm after switching.
 
 - If you want to experiment with other accent colors:
 
@@ -114,7 +114,8 @@ static const char col_fgsel[]  = "#eeeeee";
  // "#f1fa8c";  /* pastel yellow */
 
 /* ---- Example usage ----
-static const char col_accent[] = "#dc143c";  // Crimson Red */
+static const char col_accent[] = "#dc143c"; (Crimson Red)
+*/
 
 /* fg = text color, bg = bar/window background, border = window border */
 static const char *colors[][3] = {
@@ -163,8 +164,28 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *roficmd[]     = { "rofi", "-show", "drun", NULL }; /* if rofi is installed */
+static const char *dmenucmd[] = { 
+    "dmenu_run", 
+    "-m", dmenumon, 
+    "-fn", dmenufont, 
+    "-nb", col_bg,      /* background */
+    "-nf", col_fg,      /* normal text */
+    "-sb", col_accent,  /* selected background (accent) */
+    "-sf", col_fgsel,   /* selected text */
+    NULL 
+};
+static const char *roficmd[] = { 
+    "rofi", 
+    "-show", "drun",
+    "-theme-str", "* { background: " col_bg "; }",
+    "-theme-str", "* { foreground: " col_fg "; }",
+    "-theme-str", "window { background-color: " col_bg "; }",
+    "-theme-str", "mainbox { background-color: " col_bg "; }",
+    "-theme-str", "listview { background-color: " col_bg "; }",
+    "-theme-str", "element { background-color: " col_bg "; foreground: " col_fg "; }",
+    "-theme-str", "element selected { background-color: " col_accent "; foreground: " col_fgsel "; }",
+    NULL 
+};
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *clipmenucmd[] = { "clipmenu", NULL };
 
