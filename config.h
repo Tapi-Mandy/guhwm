@@ -1,19 +1,126 @@
-/* appearance */
+/* ================== APPEARANCE ================== */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+
+/* Fonts */
 static const char *fonts[]          = { "monospace:size=13" };
 static const char dmenufont[]       = "monospace:size=13";
-static const char col_gray1[]       = "#282828";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#d4be98";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#d3869b";
-static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+
+
+/* ================== THEME SELECTOR ==================
+Uncomment ONE theme */
+
+#define THEME_MIDNIGHT-ROSE /* DEFAULT */
+// #define THEME_MONOCHROME
+// #define THEME_NORD
+// #define THEME_DRACULA
+// #define THEME_SOLARIZED
+// #define THEME_ONEDARK
+
+/* ------------------     THEMES    ------------------ */
+
+/* ================== MIDNIGHT ROSE ==================
+   Dark, moody background with a warm rose accent.
+   Great if you like a balance between gruvbox-dark and rose highlights. */
+
+#if defined(THEME_MIDNIGHT_ROSE)
+static const char col_bg[]     = "#282828";  /* background (very dark gray) */
+static const char col_fg[]     = "#d4be98";  /* normal foreground (beige/soft white text) */
+static const char col_border[] = "#444444";  /* window border (medium gray) */
+static const char col_accent[] = "#d3869b";  /* accent (rose pink/purple for highlights) */
+static const char col_fgsel[]  = "#eeeeee";  /* foreground (text on selected window/bar) */
+
+/* ================== MONOCHROME ==================
+   Soft grayscale palette.
+   Minimal, neutral, and easy on the eyes. */
+
+#elif defined(THEME_MONOCHROME)
+static const char col_bg[]     = "#1e1e1e";  /* dark gray background */
+static const char col_fg[]     = "#dcdcdc";  /* light gray foreground */
+static const char col_border[] = "#3c3c3c";  /* medium-dark gray for borders */
+static const char col_accent[] = "#aaaaaa";  /* mid-gray accent */
+static const char col_fgsel[]  = "#ffffff";  /* bright white for selected fg */
+
+/* ================== NORD ==================
+   Cold, calm theme inspired by Arctic tones.
+   Lots of blue and gray, easy on the eyes. */
+
+#elif defined(THEME_NORD)
+static const char col_bg[]     = "#2e3440";  /* background (dark blue-gray) */
+static const char col_fg[]     = "#d8dee9";  /* normal foreground (light icy gray text) */
+static const char col_border[] = "#3b4252";  /* window border (slate gray) */
+static const char col_accent[] = "#88c0d0";  /* accent (icy cyan) */
+static const char col_fgsel[]  = "#eceff4";  /* foreground (brighter white for selected win) */
+
+/* ================== DRACULA ==================
+   Popular dark theme with neon accents.
+   Purple is the main highlight color. */
+
+#elif defined(THEME_DRACULA)
+static const char col_bg[]     = "#282a36";  /* background (almost black with a hint of blue) */
+static const char col_fg[]     = "#f8f8f2";  /* normal foreground (off-white text) */
+static const char col_border[] = "#44475a";  /* window border (muted grayish blue) */
+static const char col_accent[] = "#bd93f9";  /* accent (neon purple) */
+static const char col_fgsel[]  = "#ffffff";  /* foreground (pure white for selected win) */
+
+/* ================== SOLARIZED DARK ==================
+   Classic theme, softer contrast.
+   Uses a teal-blue accent with earthy backgrounds. */
+
+#elif defined(THEME_SOLARIZED)
+static const char col_bg[]     = "#002b36";  /* background (deep cyan/blue) */
+static const char col_fg[]     = "#839496";  /* normal foreground (muted gray-cyan text) */
+static const char col_border[] = "#073642";  /* window border (dark teal) */
+static const char col_accent[] = "#268bd2";  /* accent (sky blue) */
+static const char col_fgsel[]  = "#fdf6e3";  /* foreground (cream white for selected win) */
+
+/* ================== ONE DARK ==================
+   From Atom/VSCode.
+   Neutral dark background with colorful accents. */
+
+#elif defined(THEME_ONEDARK)
+static const char col_bg[]     = "#282c34";  /* background (dark neutral gray) */
+static const char col_fg[]     = "#abb2bf";  /* normal foreground (grayish white text) */
+static const char col_border[] = "#3e4451";  /* window border (steel gray) */
+static const char col_accent[] = "#61afef";  /* accent (bright sky blue) */
+static const char col_fgsel[]  = "#ffffff";  /* foreground (white for selected win) */
+
+/* ---- Fallback (MIDNIGHT-ROSE) ---- */
+#else
+static const char col_bg[]     = "#282828";
+static const char col_fg[]     = "#d4be98";
+static const char col_border[] = "#444444";
+static const char col_accent[] = "#d3869b";
+static const char col_fgsel[]  = "#eeeeee";
+#endif
+
+/* ================== NOTES ==================
+- To change theme, just swap which #define THEME_* is uncommented above.
+- Recompile dwm after switching.
+
+- If you want to experiment with other accent colors:
+
+ // "#dc143c";  /* crimson red */
+ // "#8ec07c";  /* mint green */
+ // "#fe8019";  /* bright orange */
+ // "#689d6a";  /* dark green */
+ // "#d65d0e";  /* deep orange */
+ // "#b8a1e3";  /* lavender/purple */
+ // "#8be9fd";  /* cyan/light blue */
+ // "#ff79c6";  /* neon pink */
+ // "#50fa7b";  /* bright green */
+ // "#f1fa8c";  /* pastel yellow */
+
+/* ---- Example usage ----
+static const char col_accent[] = "#dc143c";  // Crimson Red */
+
+/* fg = text color, bg = bar/window background, border = window border */
+static const char *colors[][3] = {
+	/*               fg        bg        border   */
+	[SchemeNorm] = { col_fg,   col_bg,   col_border },
+	[SchemeSel]  = { col_fgsel,col_accent,col_accent },
 };
 
 /* tagging */
