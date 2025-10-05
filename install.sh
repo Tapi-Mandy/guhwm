@@ -223,7 +223,7 @@ sleep 3
 # ==============================
 echo
 header "Base Packages"
-retry_pacman xorg reflector kitty feh clipmenu nano dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk p7zip jq alsa-utils noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
+retry_pacman xorg reflector kitty feh clipmenu dunst libnotify xdg-desktop-portal xdg-desktop-portal-gtk p7zip jq alsa-utils noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu ttf-fira-code ttf-jetbrains-mono ttf-jetbrains-mono-nerd
 
 # ==============================
 # Kitty font configuration
@@ -286,6 +286,7 @@ general_software=(
     "krita - Full-featured free digital painting studio by KDE"
     "scrot - Simple command-line screenshot utility for X"
     "vim - Vi IMproved, a highly configurable, improved version of Vi"
+    "nano - Small and friendly text editor, inspired by Pico"
     "yazi - Blazing fast terminal file manager written in Rust"
     "htop - Interactive system resource monitor"
     "mpv - Lightweight media player"
