@@ -119,7 +119,7 @@ static const char col_accent[] = "#dc143c"; (Crimson Red)
 
 /* fg = text color, bg = bar/window background, border = window border */
 static const char *colors[][3] = {
-	/*               fg        bg        border   */
+	/* fg        bg        border   */
 	[SchemeNorm] = { col_fg,   col_bg,   col_border },
 	[SchemeSel]  = { col_fgsel,col_accent,col_accent },
 };
@@ -174,18 +174,7 @@ static const char *dmenucmd[] = {
     "-sf", col_fgsel,   /* selected text */
     NULL 
 };
-static const char *roficmd[] = { 
-    "rofi", 
-    "-show", "drun",
-    "-theme-str", "* { background: " col_bg "; }",
-    "-theme-str", "* { foreground: " col_fg "; }",
-    "-theme-str", "window { background-color: " col_bg "; }",
-    "-theme-str", "mainbox { background-color: " col_bg "; }",
-    "-theme-str", "listview { background-color: " col_bg "; }",
-    "-theme-str", "element { background-color: " col_bg "; foreground: " col_fg "; }",
-    "-theme-str", "element selected { background-color: " col_accent "; foreground: " col_fgsel "; }",
-    NULL 
-};
+static const char *roficmd[] = { "rofi_run.sh", NULL }; /* CORRECTED: Calls the wrapper script */
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *clipmenucmd[] = { "clipmenu", NULL };
 
