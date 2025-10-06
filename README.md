@@ -1,13 +1,14 @@
 <div align="center">
 <img width="461" height="491" alt="guhwmhehe" src="https://github.com/user-attachments/assets/463dbf66-8daa-48df-b414-cc223e65eea3"/>
+
 </div>
 <h1 align="center">
   <i>Guh Window Manager</i> is a configuration of <a href="https://dwm.suckless.org/">dwm</a>; for Arch Linux.
 </h1>
 
-#### ‣ guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
+#### **-->** guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
 
-#### ‣ guhwm leverages dwm for its simplicity and long-term reliability to create a stable and efficient workflow.
+#### **-->** guhwm leverages dwm for its simplicity and long-term reliability to create a stable and efficient workflow.
 
 ## Installing *Guh Window Manager*
 
