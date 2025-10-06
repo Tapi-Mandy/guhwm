@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="276" height="276" alt="Arch_guhwm" src="https://github.com/user-attachments/assets/bbc8ed6c-8921-4acf-bc9f-410e783d7010"/>
+  <img width="510" height="542" alt="guhwmhehe" src="https://github.com/user-attachments/assets/9b5c6964-0341-4145-8cab-3da2380039fd"/>
 </div>
 
 <h1 align="center">
