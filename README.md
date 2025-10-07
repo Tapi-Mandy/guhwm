@@ -1,6 +1,5 @@
 <div align="center">
-<img width="461" height="491" alt="guhwmhehe" src="https://github.com/user-attachments/assets/463dbf66-8daa-48df-b414-cc223e65eea3"/>
-
+<img width="526" height="528" alt="guhwmhehe" src="https://github.com/user-attachments/assets/caf072a4-f220-42a7-a3fd-43d572cf694b"/>
 </div>
 <h1 align="center">
   <i>Guh Window Manager</i> is a configuration of <a href="https://dwm.suckless.org/">dwm</a>; for Arch Linux.
