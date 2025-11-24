@@ -13,7 +13,7 @@ static const int vertpad            = 10;       /* vertical padding of bar */
  * To make the bar longer, decrease this number.
  * 0 = Full screen width. Higher numbers = Shorter bar (more padding).
  */
-static const int sidepad            = 1;        /* horizontal padding of bar */
+static const int sidepad            = 10;        /* horizontal padding of bar */
 
 /* Increased font size from 9 to 11 */
 static const char *fonts[] = {"CaskaydiaMonoNerdFont-Bold:size=11:style:Bold"};
