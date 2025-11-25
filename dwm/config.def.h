@@ -15,9 +15,7 @@ static const int vertpad            = 10;       /* vertical padding of bar */
  */
 static const int sidepad            = 10;        /* horizontal padding of bar */
 
-/* Increased font size from 9 to 11 */
-static const char *fonts[] = {"CaskaydiaMonoNerdFont-Bold:size=11:style:Bold"};
-/* Renamed dmenufont to rofifont and increased size */
+static const char *fonts[] = {"CaskaydiaMonoNerdFont-Bold:size=10:style:Bold"};
 static const char rofifont[] = "CaskaydiaMonoNerdFont-Bold:size=12";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
