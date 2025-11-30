@@ -64,18 +64,5 @@ static const char unknown_str[] = "n/a";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 static const struct arg args[] = {
-    /* function format          argument */
-    {run_command, " %s ", "date +%H:%M"},
-    {run_command, " %s             ", "date +'%b %d'"},
-    {battery_state, " %s  ", "BAT1"},
-    {battery_perc, "   %s% |", "BAT1"},
-    {run_command, "   %s% |", "light -G | awk '{print int($1)}'"},
-    {run_command, "   %s% |", "pamixer --get-volume"},
-   // {cpu_perc, "  %s% /", NULL},
-   // {temp, "  %s󰔄 |", "/sys/class/thermal/thermal_zone3/temp"},
-   // {ram_used, "   %s |", NULL},
-    {disk_perc, "   %s% |", "/home"},
-    {wifi_essid, "   %s ", "wlp2s0"},
-   // {keymap, "   %s  ", NULL},
-
+    { run_command, "%s", "~/.config/slstatus/slstatus.sh" },
 };
