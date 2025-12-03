@@ -63,6 +63,12 @@ static const char unknown_str[] = "n/n/n/n";
  * wifi_essid          WiFi ESSID                      interface name (wlan0)
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
+
+/* interval between updates (in ms) */
+/* Set this to 1000 (1 second) or 500. 200 is too fast for a script. */
+const unsigned int interval = 1000;
+
 static const struct arg args[] = {
+    /* %s interprets the command using shell, so ~ expands to /home/youruser */
     { run_command, "%s", "~/.config/guhwm/slstatus/slstatus.sh" },
 };
