@@ -4,7 +4,7 @@
 #                SETTINGS                  #
 ############################################
 # Switch ON/OFF Salah times
-ENABLE_SALAH=1
+ENABLE_SALAH=0
 
 # Update interval for the main status loop
 INTERVAL=1
