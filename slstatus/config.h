@@ -69,6 +69,5 @@ static const char unknown_str[] = "n/n/n/n";
 const unsigned int interval = 1000;
 
 static const struct arg args[] = {
-    /* %s interprets the command using shell, so ~ expands to /home/youruser */
     { run_command, "%s", "~/.config/guhwm/slstatus/slstatus.sh" },
 };
