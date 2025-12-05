@@ -1,0 +1,17 @@
+[
+  {
+    "directory": "/home/tapi/guhwm/dwm",
+    "command": "cc -std=c99 -pedantic -Wall -Wno-deprecated-declarations -Os -I/usr/X11R6/include -I/usr/include/freetype2 -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700L -DVERSION=\"6.5\" -DXINERAMA -c dwm.c -o dwm.o",
+    "file": "dwm.c"
+  },
+  {
+    "directory": "/home/tapi/guhwm/dwm",
+    "command": "cc -std=c99 -pedantic -Wall -Wno-deprecated-declarations -Os -I/usr/X11R6/include -I/usr/include/freetype2 -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700L -DVERSION=\"6.5\" -DXINERAMA -c drw.c -o drw.o",
+    "file": "drw.c"
+  },
+  {
+    "directory": "/home/tapi/guhwm/dwm",
+    "command": "cc -std=c99 -pedantic -Wall -Wno-deprecated-declarations -Os -I/usr/X11R6/include -I/usr/include/freetype2 -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700L -DVERSION=\"6.5\" -DXINERAMA -c util.c -o util.o",
+    "file": "util.c"
+  }
+]

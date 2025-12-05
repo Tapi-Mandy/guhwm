@@ -1,14 +1,16 @@
 CompileFlags:
   Add:
     - -I.
+    - -I/usr/include/freetype2
+    - -I/usr/X11R6/include
     - -DVERSION="6.5"
     - -D_DEFAULT_SOURCE
     - -D_BSD_SOURCE
     - -D_XOPEN_SOURCE=700L
     - -DXINERAMA
-  Compiler: gcc
+    - -Wno-everything
 
 Diagnostics:
-  Suppress:
-    - "unknown_type"
-    - "undeclared_identifier"
+  UnusedIncludes: None
+  ClangTidy:
+    Remove: '*'
