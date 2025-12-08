@@ -1,0 +1,87 @@
+@import "../../.cache/wal/colors-waybar.css";
+/* @define-color main alpha(@color0, 0.7); */
+@define-color main @color0;
+* {
+
+    font-family: "JetBrainsMono Nerd Font";
+    font-weight: 700;
+    font-size: 14px;
+    min-height: 0;
+    border: none;
+    border-radius: 10px;
+}
+
+window#waybar {
+    background-color: @main;
+    color: #b8b8b8;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); */
+    /* margin: 5px 10px; */
+    
+}
+
+#custom-logo {
+    background-color: #d08770;
+    color: #1a1a1a;
+    padding: 0 8px;
+    font-weight: bold;
+}
+
+#workspaces {
+    /* color: @color6; */
+    background-color: transparent;
+    margin-left: 0px;
+}
+
+#workspaces button {
+    padding: 0 6px;
+    background-color: transparent;
+    color: @color6;
+    border-radius: 0;
+    min-width: 12px;
+}
+
+#workspaces button.active {
+    background-color: @color6;
+    color: @color0;
+    /* font-weight: 900; */
+}
+#workspaces button:first-child {
+   border-radius: 10px 0 0 10px;
+   margin-left: 0;
+}
+#window {
+  margin-left: 10px;
+  color: @color6;
+}
+/* #workspaces button:hover { */
+/*     background-color: transparent; */
+/*     color: @color6; */
+/* } */
+
+#custom-separator1,
+#custom-separator2 {
+    color: @color6;
+    padding: 0 6px;
+}
+
+#custom-suckless {
+    color: @color6;
+    padding: 0 4px;
+}
+#tray {
+    background-color: transparent;
+    padding: 0 8px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+#clock {
+    color: @color6;
+    padding: 0 8px 0 4px;
+}

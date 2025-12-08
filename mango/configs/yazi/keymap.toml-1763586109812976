@@ -1,0 +1,11 @@
+[[manager.prepend_keymap]]
+on = ["i"]
+run = 'shell "$sxiv \"$0\"" --block --confirm'
+
+[[manager.prepend_keymap]]
+on = ["v"]
+run = 'shell "$mpv \"$0\"" --block --confirm'
+
+[[manager.prepend_keymap]]
+on = ["w"]
+run = 'shell "$HOME/.config/hypr/scripts/set_wal.sh \"$0\"" --block --confirm'
