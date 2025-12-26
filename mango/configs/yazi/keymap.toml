@@ -1,0 +1,4 @@
+[[mgr.prepend_keymap]]
+on = ["w"]
+run = 'shell "$HOME/bin/set_wal.sh \"$0\"" --block --confirm'
+
