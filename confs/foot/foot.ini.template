@@ -1,3 +1,4 @@
+# guhwm foot configuration template
 term=xterm-256color
 title=foot
 
@@ -38,6 +39,7 @@ foreground={foreground.strip}
 selection-background={color2.strip}
 selection-foreground={foreground.strip}
 
+# Regular colors (0-7)
 regular0={color0.strip}
 regular1={color1.strip}
 regular2={color2.strip}
@@ -47,6 +49,7 @@ regular5={color5.strip}
 regular6={color6.strip}
 regular7={color7.strip}
 
+# Bright colors (8-15)
 bright0={color8.strip}
 bright1={color9.strip}
 bright2={color10.strip}
