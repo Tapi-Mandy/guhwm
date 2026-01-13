@@ -33,28 +33,28 @@ delete-prev-word=Control+BackSpace
 
 [colors]
 alpha=0.7
-background={{background}}
-foreground={{foreground}}
-selection-background={{regular2}}
-selection-foreground={{foreground}}
+background={background.strip}
+foreground={foreground.strip}
+selection-background={color2.strip}
+selection-foreground={foreground.strip}
 
-regular0={{regular0}}
-regular1={{regular1}}
-regular2={{regular2}}
-regular3={{regular3}}
-regular4={{regular4}}
-regular5={{regular5}}
-regular6={{regular6}}
-regular7={{regular7}}
+regular0={color0.strip}
+regular1={color1.strip}
+regular2={color2.strip}
+regular3={color3.strip}
+regular4={color4.strip}
+regular5={color5.strip}
+regular6={color6.strip}
+regular7={color7.strip}
 
-bright0={{bright0}}
-bright1={{bright1}}
-bright2={{bright2}}
-bright3={{bright3}}
-bright4={{bright4}}
-bright5={{bright5}}
-bright6={{bright6}}
-bright7={{bright7}}
+bright0={color8.strip}
+bright1={color9.strip}
+bright2={color10.strip}
+bright3={color11.strip}
+bright4={color12.strip}
+bright5={color13.strip}
+bright6={color14.strip}
+bright7={color15.strip}
 
 [text-bindings]
 \x03=Control+Shift+c
