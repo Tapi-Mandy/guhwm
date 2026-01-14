@@ -1,0 +1,42 @@
+# matugen configuration for guhwm
+# Material You color generation and theming
+
+[config]
+# Automatically reload applications after generating colors
+reload_apps = true
+
+# Color scheme mode: "dark" or "light"
+# This determines the tone mapping for Material You colors
+mode = "dark"
+
+# Prefix for custom keywords (if using custom JSON imports)
+# prefix = "custom"
+
+[config.reload_apps_list]
+# Enable automatic Waybar reload after color generation
+# Sends SIGUSR2 signal to waybar process
+waybar = true
+
+# Template definitions
+# Templates use {{variable}} syntax for color interpolation
+# Available color formats: hex, hex_stripped, rgb, rgba, hsl, hsla
+# Available color roles: primary, on_primary, surface, on_surface, etc.
+
+[templates.waybar]
+# Waybar CSS color definitions template
+# Input: template file with Material You variables
+# Output: rendered CSS file with actual color values
+input_path = '~/.config/matugen/templates/waybar.css'
+output_path = '~/.cache/matugen/colors-waybar.css'
+
+[templates.foot]
+# Foot terminal emulator color configuration template
+# Input: foot.ini template with color variables
+# Output: complete foot.ini with Material You colors
+input_path = '~/.config/matugen/templates/foot.ini'
+output_path = '~/.cache/matugen/foot.ini'
+
+# Optional: GTK theme colors
+# [templates.gtk]
+# input_path = '~/.config/matugen/templates/colors-gtk.css'
+# output_path = '~/.cache/matugen/colors-gtk.css'
