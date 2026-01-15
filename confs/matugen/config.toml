@@ -23,9 +23,10 @@ fallback_color = "#ffbf9b"
 caching = true
 
 # Set the wallpaper when running matugen
-# This will be handled by theme-reveal.sh on first boot
+# This is disabled since wallpaper is handled by swww separately
 [config.wallpaper]
-set = false  # Disabled - wallpaper is set by swww separately
+set = false
+command = "swww img"  # Required field even when set = false
 
 # Waybar template with post-hook to reload after generation
 [templates.waybar]
