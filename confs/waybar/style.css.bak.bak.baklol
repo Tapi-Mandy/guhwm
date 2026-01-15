@@ -1,0 +1,104 @@
+@import "waybar.css";
+
+/* Aliases for sanity */
+@define-color bar_bg @surface_container;
+@define-color bar_fg @on_surface;
+@define-color accent @primary;
+@define-color accent_fg @on_primary;
+@define-color focus_bg @primary_container;
+@define-color focus_fg @on_primary_container;
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-weight: 700;
+    font-size: 14px;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+}
+
+/* 🧱 BAR */
+window#waybar {
+    background-color: alpha(@bar_bg, 0.94);
+    color: @bar_fg;
+    border-radius: 14px;
+    padding: 2px;
+}
+
+/* 🚀 LOGO / LAUNCHER */
+#custom-logo {
+    background-color: @accent;
+    color: @accent_fg;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+
+/* 🧭 TAGS / WORKSPACES */
+#tags {
+    background-color: transparent;
+    margin-left: 2px;
+}
+
+#tags button {
+    padding: 0 8px;
+    margin: 2px 0;
+    background-color: transparent;
+    color: @on_surface_variant;
+    border-radius: 8px;
+    transition: all 150ms ease;
+}
+
+/* Focused = expressive container */
+#tags button.focused {
+    background-color: @focus_bg;
+    color: @focus_fg;
+}
+
+/* Hover = subtle lift */
+#tags button:hover {
+    background-color: alpha(@secondary_container, 0.6);
+    color: @on_secondary_container;
+}
+
+#tags button:first-child {
+    border-radius: 10px 4px 4px 10px;
+}
+
+/* 🪟 WINDOW TITLE */
+#window {
+    margin-left: 10px;
+    color: @primary;
+}
+
+/* ➖ SEPARATORS */
+#custom-separator1,
+#custom-separator2 {
+    color: @outline;
+    padding: 0 6px;
+}
+
+/* 🧩 CUSTOM MODULE */
+#custom-suckless {
+    color: @tertiary;
+    padding: 0 6px;
+}
+
+/* 🔔 TRAY */
+#tray {
+    background-color: alpha(@surface_variant, 0.6);
+    padding: 0 8px;
+    border-radius: 10px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+/* ⏰ CLOCK */
+#clock {
+    background-color: alpha(@tertiary_container, 0.55);
+    color: @on_tertiary_container;
+    padding: 0 10px;
+    border-radius: 10px;
+    margin-left: 4px;
+}

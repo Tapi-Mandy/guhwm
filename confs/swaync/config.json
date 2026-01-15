@@ -7,15 +7,17 @@
     "layer-shell": true,
     "cssPriority": "user",
     "control-center-width": 350,
-    "control-center-margin-top": 8,
+    "control-center-margin-top": 12,
     "control-center-margin-bottom": 8,
-    "control-center-margin-right": 0,
+    "control-center-margin-right": 16,
     "control-center-margin-left": 8,
+    "notification-window-margin-top": 12,
+    "notification-window-margin-right": 16,
     "notification-2fa-action": true,
     "notification-inline-replies": true,
     "notification-window-width": 350,
     "notification-icon-size": 60,
-    "notification-body-image-height":  180,
+    "notification-body-image-height": 180,
     "notification-body-image-width": 180,
     "timeout": 5,
     "timeout-low": 6,
@@ -42,10 +44,9 @@
             "button-text": "󰆴"
         },
         "label": {
-            "max-lines":1,
+            "max-lines": 1,
             "text": "Notification Center!"
         },
-
         "mpris": {
             "image-size": 80,
             "image-radius": 0
@@ -68,55 +69,36 @@
                     "command": "pactl set-source-mute @DEFAULT_SOURCE@ toggle",
                     "type": "toggle"
                 },
-
                 {
                     "label": "",
-                    "command": "foot nmtui"
+                    "command": "nm-connection-editor"
                 },
                 {
                     "label": "",
                     "command": "blueman-manager"
                 },
                 {
-                    "label":"󰤄",
-                    "command": "swaync-client -d",
-                    "type":"toggle"
-                },
-
-                {
-                    "label": "󰀟",
-                    "command": "gnome-network-displays"
-                },
-
-                {
-                    "label": "󰈙",
-                    "command": "foot bash -i -c 'Docs'"
+                    "label": "󰤄",
+                    "command": "pkill gammastep",
+                    "type": "toggle"
                 },
                 {
                     "label": "",
-                    "command": "foot bash -i -c 'Settings'"
-                    
-                },
-                {
-                    "label": "",
-                    "command": "foot bash -i -c 'tasks'"
-
+                    "command": "wtype -M alt -M shift c -m shift -m alt"
                 },
                 {
                     "label": "",
-                    "command": "hyprlock"
+                    "command": "sudo suspend"
                 },
                 {
-                    "label":"",
+                    "label": "",
                     "command": "sudo reboot"
                 },
                 {
-                    "label":"",
+                    "label": "",
                     "command": "sudo poweroff"
                 }
-
             ]
         }
     }
 }
-

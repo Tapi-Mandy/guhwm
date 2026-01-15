@@ -1,39 +1,18 @@
-# matugen configuration for guhwm
-# Material You color generation and theming
-
 [config]
-# Color scheme mode: "dark" or "light" (if supported by your version)
-# mode = "dark"
+version_check = false
 
-# Fallback color if image doesn't provide a good source color
-fallback_color = "#ffbf9b"
+[templates.gtk3]
+input_path = '~/.config/matugen/templates/gtk-3.0/gtk.css'
+output_path = '~/.config/gtk-3.0/gtk.css'
 
-# Enable caching for faster repeated color generation
-caching = true
+[templates.gtk4]
+input_path = '~/.config/matugen/templates/gtk-4.0/gtk.css'
+output_path = '~/.config/gtk-4.0/gtk.css'
 
-# Set the wallpaper when running matugen
-# This is disabled since wallpaper is handled by swww separately
-[config.wallpaper]
-set = false
-command = "swww img"  # Required field even when set = false
-
-# Waybar template with post-hook to reload after generation
 [templates.waybar]
 input_path = '~/.config/matugen/templates/waybar.css'
-output_path = '~/.config/waybar/colors.css'
+output_path = '~/.config/waybar/waybar.css'
 
-# Reload waybar after colors are generated (only if running)
-post_hook = 'pgrep -x waybar >/dev/null && pkill -SIGUSR2 waybar || true'
-
-# Foot terminal template
-[templates.foot]
-input_path = '~/.config/matugen/templates/foot.ini'
-output_path = '~/.config/foot/foot.ini'
-
-# Reload foot terminals after colors are generated (only if running)
-post_hook = 'pgrep -x foot >/dev/null && pkill -SIGUSR1 foot || true'
-
-# Optional: GTK theme colors
-# [templates.gtk]
-# input_path = '~/.config/matugen/templates/colors-gtk.css'
-# output_path = '~/.cache/matugen/colors-gtk.css'
+[templates.swaync]
+input_path = '~/.config/matugen/templates/swaync.css'
+output_path = '~/.config/swaync/swaync.css'

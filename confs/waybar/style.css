@@ -1,99 +1,95 @@
-@import "colors.css";
+@import "waybar.css";
 
-/* @define-color main alpha(@color0, 0.7); */
-@define-color main @color0;
+/* =========================
+   Pixel Material 3 Waybar
+   ========================= */
+
+@define-color bg            @surface_container;
+@define-color bg_high       @surface_container_high;
+@define-color fg            @on_surface;
+@define-color fg_muted      @on_surface_variant;
+
+@define-color accent        @primary;
+@define-color accent_fg     @on_primary;
+@define-color accent_cont   @primary_container;
+@define-color accent_cont_fg @on_primary_container;
+
+@define-color outline       @outline;
 
 * {
-
     font-family: "JetBrainsMono Nerd Font";
     font-weight: 700;
     font-size: 14px;
-    min-height: 0;
     border: none;
-    border-radius: 0px;
+    min-height: 0;
 }
+
+/* ===== BAR ===== */
 
 window#waybar {
-    background-color: alpha(@main, 0.99);
-    color: #b8b8b8;
-    border-radius: 10px;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); */
-    /* margin: 5px 10px; */
-
+    background-color: alpha(@bg, 0.95);
+    color: @fg;
+    border-radius: 16px;
+    padding: 4px 6px;
 }
+
+/* ===== LOGO ===== */
 
 #custom-logo {
-    background-color: #d08770;
-    color: #1a1a1a;
-    padding: 0 8px;
-    font-weight: bold;
+    background-color: @accent;
+    color: @accent_fg;
+    padding: 0 12px;
+    border-radius: 12px;
 }
 
-#tags {
-    /* color: @color6; */
-    background-color: transparent;
-    margin-left: 0px;
-    border-radius: 4px;
-}
+/* ===== WORKSPACES ===== */
 
 #tags button {
-    padding: 0 6px;
-    background-color: transparent;
-    color: @color6;
-    border-radius: 0;
-    min-width: 12px;
+    background: transparent;
+    color: @fg_muted;
+    padding: 0 10px;
+    border-radius: 10px;
+    transition: all 160ms ease;
+}
+
+#tags button:hover {
+    background: alpha(@accent_cont, 0.4);
+    color: @accent_cont_fg;
 }
 
 #tags button.focused {
-    background-color: @color6;
-    color: @color0;
-    /* font-weight: 900; */
+    background: @accent_cont;
+    color: @accent_cont_fg;
 }
 
-#tags button:first-child {
-    border-radius: 10px 0 0 10px;
-    margin-left: 0;
-}
-
-/* #tags { */
-/*   background-color: transparent; */
-/* } */
+/* ===== WINDOW TITLE ===== */
 
 #window {
     margin-left: 10px;
-    color: @color6;
+    color: @accent;
 }
 
-/* #workspaces button:hover { */
-/*     background-color: transparent; */
-/*     color: @color6; */
-/* } */
+/* ===== SEPARATORS ===== */
 
 #custom-separator1,
 #custom-separator2 {
-    color: @color6;
+    color: @outline;
     padding: 0 6px;
 }
 
-#custom-suckless {
-    color: @color6;
-    padding: 0 4px;
-}
+/* ===== TRAY ===== */
 
 #tray {
-    background-color: transparent;
-    padding: 0 8px;
+    background: alpha(@bg_high, 0.6);
+    padding: 0 10px;
+    border-radius: 12px;
 }
 
-#tray>.passive {
-    -gtk-icon-effect: dim;
-}
-
-#tray>.needs-attention {
-    -gtk-icon-effect: highlight;
-}
+/* ===== CLOCK ===== */
 
 #clock {
-    color: @color6;
-    padding: 0 8px 0 4px;
+    background: alpha(@accent_cont, 0.7);
+    color: @accent_cont_fg;
+    padding: 0 12px;
+    border-radius: 12px;
 }
