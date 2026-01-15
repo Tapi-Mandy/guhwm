@@ -1,4 +1,4 @@
-@import "../.cache/matugen/colors-waybar.css";
+@import "../../.cache/matugen/colors-waybar.css";
 /* @define-color main alpha(@color0, 0.7); */
 @define-color main @color0;
 

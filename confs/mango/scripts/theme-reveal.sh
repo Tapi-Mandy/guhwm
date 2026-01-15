@@ -74,13 +74,14 @@ if command -v notify-send >/dev/null 2>&1; then
 fi
 
 # ============================================================================
-# Create flag file so this never runs again
+# Create flag file so this only runs once per session
+# On next reboot, flag is deleted and script will run again
 # ============================================================================
 mkdir -p "$(dirname "$FLAG_FILE")"
 touch "$FLAG_FILE"
 
-# Optional: Could also reload waybar/swaync here if needed
-# pkill -SIGUSR2 waybar 2>/dev/null
-# swaync-client -rs 2>/dev/null
+# Note: The flag file prevents multiple runs in same session
+# If you want it to never run again, keep the flag file permanent
+# Current behavior: runs once on first boot after installation
 
 exit 0

@@ -33,18 +33,16 @@ command = "swww img"  # Required field even when set = false
 input_path = '~/.config/matugen/templates/waybar.css'
 output_path = '~/.cache/matugen/colors-waybar.css'
 
-# Reload waybar after colors are generated
-# pkill sends SIGUSR2 signal which tells waybar to reload its CSS
-post_hook = 'pkill -SIGUSR2 waybar 2>/dev/null'
+# Reload waybar after colors are generated (only if running)
+post_hook = 'pgrep -x waybar >/dev/null && pkill -SIGUSR2 waybar || true'
 
 # Foot terminal template
 [templates.foot]
 input_path = '~/.config/matugen/templates/foot.ini'
 output_path = '~/.cache/matugen/foot.ini'
 
-# Reload foot terminals after colors are generated
-# pkill sends SIGUSR1 signal which tells foot to reload config
-post_hook = 'pkill -SIGUSR1 foot 2>/dev/null'
+# Reload foot terminals after colors are generated (only if running)
+post_hook = 'pgrep -x foot >/dev/null && pkill -SIGUSR1 foot || true'
 
 # Optional: GTK theme colors
 # [templates.gtk]
