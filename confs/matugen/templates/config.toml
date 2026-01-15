@@ -16,25 +16,34 @@ mode = "dark"
 # Enable automatic Waybar reload after color generation
 # Sends SIGUSR2 signal to waybar process
 waybar = true
+# Fallback color if image doesn't provide a good source color
+fallback_color = "#ffbf9b"
 
-# Template definitions
-# Templates use {{variable}} syntax for color interpolation
-# Available color formats: hex, hex_stripped, rgb, rgba, hsl, hsla
-# Available color roles: primary, on_primary, surface, on_surface, etc.
+# Enable caching for faster repeated color generation
+caching = true
 
+# Set the wallpaper when running matugen
+# This will be handled by theme-reveal.sh on first boot
+[config.wallpaper]
+set = false  # Disabled - wallpaper is set by swww separately
+
+# Waybar template with post-hook to reload after generation
 [templates.waybar]
-# Waybar CSS color definitions template
-# Input: template file with Material You variables
-# Output: rendered CSS file with actual color values
 input_path = '~/.config/matugen/templates/waybar.css'
 output_path = '~/.cache/matugen/colors-waybar.css'
 
+# Reload waybar after colors are generated
+# pkill sends SIGUSR2 signal which tells waybar to reload its CSS
+post_hook = 'pkill -SIGUSR2 waybar 2>/dev/null'
+
+# Foot terminal template
 [templates.foot]
-# Foot terminal emulator color configuration template
-# Input: foot.ini template with color variables
-# Output: complete foot.ini with Material You colors
 input_path = '~/.config/matugen/templates/foot.ini'
 output_path = '~/.cache/matugen/foot.ini'
+
+# Reload foot terminals after colors are generated
+# pkill sends SIGUSR1 signal which tells foot to reload config
+post_hook = 'pkill -SIGUSR1 foot 2>/dev/null'
 
 # Optional: GTK theme colors
 # [templates.gtk]
