@@ -29,7 +29,14 @@ fi
 # ============================================================================
 # Wait for system to settle (swww daemon needs to be fully initialized)
 # ============================================================================
-sleep 1.5
+echo "Initializing theme reveal..." >> ~/.cache/theme-reveal.log
+sleep 3.0
+
+# Ensure swww-daemon is running
+if ! swww query >/dev/null 2>&1; then
+    swww-daemon --format xrgb &
+    sleep 2.0
+fi
 
 # ============================================================================
 # Show initialization notification
@@ -37,9 +44,6 @@ sleep 1.5
 if command -v notify-send >/dev/null 2>&1; then
     notify-send "🎨 guhwm" "Applying Material You theme..." -t 2000 2>/dev/null
 fi
-
-# Small delay for dramatic effect
-sleep 0.5
 
 # ============================================================================
 # Apply wallpaper with DRAMATIC transition effect

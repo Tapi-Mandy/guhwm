@@ -2,20 +2,9 @@
 # Material You color generation and theming
 
 [config]
-# Automatically reload applications after generating colors
-reload_apps = true
+# Color scheme mode: "dark" or "light" (if supported by your version)
+# mode = "dark"
 
-# Color scheme mode: "dark" or "light"
-# This determines the tone mapping for Material You colors
-mode = "dark"
-
-# Prefix for custom keywords (if using custom JSON imports)
-# prefix = "custom"
-
-[config.reload_apps_list]
-# Enable automatic Waybar reload after color generation
-# Sends SIGUSR2 signal to waybar process
-waybar = true
 # Fallback color if image doesn't provide a good source color
 fallback_color = "#ffbf9b"
 
@@ -31,7 +20,7 @@ command = "swww img"  # Required field even when set = false
 # Waybar template with post-hook to reload after generation
 [templates.waybar]
 input_path = '~/.config/matugen/templates/waybar.css'
-output_path = '~/.cache/matugen/colors-waybar.css'
+output_path = '~/.config/waybar/colors.css'
 
 # Reload waybar after colors are generated (only if running)
 post_hook = 'pgrep -x waybar >/dev/null && pkill -SIGUSR2 waybar || true'
@@ -39,7 +28,7 @@ post_hook = 'pgrep -x waybar >/dev/null && pkill -SIGUSR2 waybar || true'
 # Foot terminal template
 [templates.foot]
 input_path = '~/.config/matugen/templates/foot.ini'
-output_path = '~/.cache/matugen/foot.ini'
+output_path = '~/.config/foot/foot.ini'
 
 # Reload foot terminals after colors are generated (only if running)
 post_hook = 'pgrep -x foot >/dev/null && pkill -SIGUSR1 foot || true'
