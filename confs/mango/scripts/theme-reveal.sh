@@ -29,11 +29,12 @@ fi
 # ============================================================================
 # Wait for system to settle (swww daemon needs to be fully initialized)
 # ============================================================================
-echo "Initializing theme reveal..." >> ~/.cache/theme-reveal.log
-sleep 3.0
+echo "Initializing theme reveal sequence..." >> ~/.cache/theme-reveal.log
+sleep 4.0 # Increased wait for VM stability
 
-# Ensure swww-daemon is running
+# Ensure swww-daemon is running and responsive
 if ! swww query >/dev/null 2>&1; then
+    echo "swww-daemon not responding, attempting to start..." >> ~/.cache/theme-reveal.log
     swww-daemon --format xrgb &
     sleep 2.0
 fi
