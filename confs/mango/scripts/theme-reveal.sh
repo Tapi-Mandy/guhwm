@@ -49,17 +49,21 @@ WALLPAPER="$HOME/.cache/matugen/wallpaper.jpg"
 if [[ -f "$WALLPAPER" ]] && command -v swww >/dev/null 2>&1; then
     # Use 'grow' transition for a cinematic reveal effect
     # The wallpaper appears to grow from the center of the screen
-    swww img "$WALLPAPER" \
+    if swww img "$WALLPAPER" \
         --transition-type grow \
         --transition-duration 3 \
         --transition-fps 60 \
         --transition-pos 0.5,0.5 \
-        2>/dev/null
-    
-    # Wait for transition to complete before showing success notification
-    sleep 3.2
+        2>&1; then
+        
+        # Wait for transition to complete before showing success notification
+        sleep 3.2
+    else
+        echo "ERROR: swww failed to apply wallpaper" >> ~/.cache/theme-reveal.log
+        notify-send "⚠️ Wallpaper Error" "Failed to apply wallpaper" -t 3000 2>/dev/null
+    fi
 else
-    echo "Warning: Wallpaper not found or swww not available"
+    echo "Warning: Wallpaper not found or swww not available" >> ~/.cache/theme-reveal.log
 fi
 
 # ============================================================================
