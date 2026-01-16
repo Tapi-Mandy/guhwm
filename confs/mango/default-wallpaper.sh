@@ -6,7 +6,7 @@
 WALLPAPER="$HOME/Wallpapers/guhwm - Default.jpg"
 SCRIPT_PATH="$(realpath "$0")"
 MANGO_CONFIG="$HOME/.config/mango/config.conf"
-GUHWIZARD_DIR="$HOME/.config/guhwizard"
+GUHWIZARD_DIR="$HOME/guhwizard"
 
 # Ensure swww daemon is running
 if ! pgrep -x swww-daemon >/dev/null; then
@@ -14,8 +14,8 @@ if ! pgrep -x swww-daemon >/dev/null; then
     sleep 1
 fi
 
-# Wait 5 seconds so user can appreciate the transition
-sleep 5
+# Wait 2.5 seconds so user can appreciate the transition
+sleep 2.5
 
 # Set wallpaper with a smooth transition
 swww img "$WALLPAPER" \
