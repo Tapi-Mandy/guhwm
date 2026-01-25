@@ -87,16 +87,16 @@
                     "command": "wtype -M alt -M shift c -m shift -m alt"
                 },
                 {
-                    "label": "",
-                    "command": "sudo suspend"
+                    "label": "",
+                    "command": "loginctl suspend"
                 },
                 {
-                    "label": "",
-                    "command": "sudo reboot"
+                    "label": "",
+                    "command": "loginctl reboot"
                 },
                 {
-                    "label": "",
-                    "command": "sudo poweroff"
+                    "label": "",
+                    "command": "loginctl poweroff"
                 }
             ]
         }
