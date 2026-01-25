@@ -75,7 +75,7 @@
                 },
                 {
                     "label": "",
-                    "command": "blueman-manager"
+                    "command": "bluetui"
                 },
                 {
                     "label": "󰤄",
