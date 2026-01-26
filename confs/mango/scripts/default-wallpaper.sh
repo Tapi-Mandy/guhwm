@@ -10,7 +10,7 @@ WALLPAPER="$HOME/Wallpapers/guhwm - Default.jpg"
 SCRIPT_PATH="$(realpath "$0")"
 MANGO_CONFIG="$HOME/.config/mango/config.conf"
 SCRIPT_CONF="$HOME/.config/mango/scripts/default-wallpaper.sh"
-GUHWIZARD_DIR="$HOME/guhwizard"
+GUHWIZARD_DIR="$HOME/guhshateverywhere/guhwizard"
 
 MAX_DAEMON_WAIT=10  # Maximum seconds to wait for swww-daemon
 
@@ -67,17 +67,15 @@ if [ -f "$MANGO_CONFIG" ]; then
     # Create backup
     cp "$MANGO_CONFIG" "$MANGO_CONFIG.bak"
     
-    # Remove the exact lines using line-specific patterns
-    sed -i '/^# default-wallpaper\.sh (deletes itself after execution)$/d' "$MANGO_CONFIG"
-    sed -i '/^exec-once = \[ -x "\$HOME\/\.config\/mango\/default-wallpaper\.sh" \] && "\$HOME\/\.config\/mango\/default-wallpaper\.sh" &$/d' "$MANGO_CONFIG"
-    sed -i '/^# Restore the last wallpaper (only runs if default-wallpaper\.sh is gone)$/d' "$MANGO_CONFIG"
-    sed -i '/^exec-once = sleep 0\.5 && \[ ! -x "\$HOME\/\.config\/mango\/default-wallpaper\.sh" \] && swww restore &$/d' "$MANGO_CONFIG"
+    # Remove any lines containing default-wallpaper.sh
+    sed -i '/default-wallpaper\.sh/d' "$MANGO_CONFIG"
     
-    # Add simple swww restore if not present
-    if ! grep -q "swww restore" "$MANGO_CONFIG"; then
-        sed -i '/^exec-once = swww-daemon &$/a \\nexec-once = sleep 1 \&\& swww restore \&' "$MANGO_CONFIG"
-        echo "[default-wallpaper] Added swww restore to config"
-    fi
+    # Remove any existing swww restore lines to avoid duplicates
+    sed -i '/swww restore/d' "$MANGO_CONFIG"
+    
+    # Add simple swww restore after swww-daemon
+    sed -i '/swww-daemon/a exec-once = sleep 1 \&\& swww restore \&' "$MANGO_CONFIG"
+    echo "[default-wallpaper] Added swww restore to config"
     
     # Remove backup if successful
     rm -f "$MANGO_CONFIG.bak"

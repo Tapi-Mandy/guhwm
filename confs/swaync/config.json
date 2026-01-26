@@ -75,11 +75,11 @@
                 },
                 {
                     "label": "",
-                    "command": "bluetui"
+                    "command": "blueman-manager"
                 },
                 {
                     "label": "󰤄",
-                    "command": "pkill gammastep",
+                    "command": "~/.config/mango/scripts/nightlight-toggle.sh",
                     "type": "toggle"
                 },
                 {
