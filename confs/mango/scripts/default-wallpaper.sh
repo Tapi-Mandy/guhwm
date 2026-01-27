@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # --- Configuration ---
-WALLPAPER="$HOME/Wallpapers/guhwm - Default.jpg"
+WALLPAPER="$HOME/Wallpapers/guhwm - Default.png"
 SCRIPT_PATH="$(realpath "$0")"
 MANGO_CONFIG="$HOME/.config/mango/config.conf"
 SCRIPT_CONF="$HOME/.config/mango/scripts/default-wallpaper.sh"
