@@ -10,7 +10,7 @@ WALLPAPER="$HOME/Wallpapers/guhwm - Default.png"
 SCRIPT_PATH="$(realpath "$0")"
 MANGO_CONFIG="$HOME/.config/mango/config.conf"
 SCRIPT_CONF="$HOME/.config/mango/scripts/default-wallpaper.sh"
-GUHWIZARD_DIR="$HOME/guhshateverywhere/guhwizard"
+GUHWIZARD_DIR="$HOME/guhwizard"
 
 MAX_DAEMON_WAIT=10  # Maximum seconds to wait for swww-daemon
 
