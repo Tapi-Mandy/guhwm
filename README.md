@@ -13,10 +13,11 @@
 > [!IMPORTANT]
 > The installer is currently being rewritten as a standalone project. Consequently, **guhwm** cannot be installed until the new tool is ready. You can follow the progress at the [guhwizard repository](https://github.com/Tapi-Mandy/guhwizard/).
 ### Use this command to install guhwm
-> [!TIP]
-> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a 'minimal' desktop profile to set up your base system, and then installing guhwm
 
 > ~~`sudo pacman -S git && git clone https://github.com/Tapi-Mandy/guhwm && cd guhwm && chmod +x install.sh && ./install.sh`~~
+
+> [!TIP]
+> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a 'minimal' desktop profile to set up your base system, and then installing guhwm
 
 ## Screenshots
 > [!WARNING]
