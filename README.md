@@ -2,7 +2,7 @@
 <img width="526" height="528" alt="guhwmhehe" src="https://github.com/user-attachments/assets/caf072a4-f220-42a7-a3fd-43d572cf694b"/>
 </div>
 <h1 align="center">
-  <i>Guh Window Manager</i> is based on <a href="https://dwm.suckless.org/">dwm</a>; designed for Arch Linux.
+  <i>Guh Window Manager</i> is based on <a href="https://mangowc.vercel.app/">mangowc</a>; designed for Arch Linux.
 </h1>
 
 #### **-->** guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
