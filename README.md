@@ -5,16 +5,16 @@
   <i>Guh Window Manager</i> is based on <a href="https://mangowc.vercel.app/">mangowc</a>; designed for Arch Linux.
 </h1>
 
-#### **-->** guhwm offers straightforward documentation for itself and for dwm-6.6 and additional software used, empowering novices and seasoned users with a tiling window manager environment they understand and control.
+#### **-->** guhwm leverages mangowc for its simplicity and reliability to create a stable, efficient and gorgeous workflow.
 
-#### **-->** guhwm leverages dwm for its simplicity and long-term reliability to create a stable and efficient workflow.
+#### **-->** guhwm will offer straightforward documentation for itself and for mangowc and additional software used, empowering novices and seasoned users with a tiling window manager environmemt they understand and control.
 
 ## Installing *Guh Window Manager*
 > [!IMPORTANT]
 > The installer is currently being rewritten as a standalone project. Consequently, **guhwm** cannot be installed until the new tool is ready. You can follow the progress at the [guhwizard repository](https://github.com/Tapi-Mandy/guhwizard/).
-### Use this command to install guhwm-1.0
+### Use this command to install guhwm
 > [!TIP]
-> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a Xorg or minimal desktop profile to set up your base system, and then installing guhwm
+> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a 'minimal' desktop profile to set up your base system, and then installing guhwm
 
 > ~~`sudo pacman -S git && git clone https://github.com/Tapi-Mandy/guhwm && cd guhwm && chmod +x install.sh && ./install.sh`~~
 
