@@ -1,0 +1,615 @@
+#!/usr/bin/env bash
+
+# --- Curl-Ready Mode ---
+# Detect if running via pipe (curl ... | bash) and redirect stdin from /dev/tty
+if [[ ! -t 0 ]]; then
+    exec < /dev/tty
+fi
+
+# --- Colors & Style ---
+YLW=$'\033[1;33m' # Yellow: Primary
+WHT=$'\033[0;37m' # White
+GRA=$'\033[1;30m' # Gray
+ORA=$'\033[0;33m' # Orange
+RED=$'\033[0;31m' # Red
+GRN=$'\033[0;32m' # Green
+MAG=$'\033[1;35m' # Magenta
+PUR=$'\033[0;35m' # Purple
+CYN=$'\033[0;36m' # Cyan
+BLU=$'\033[1;34m' # Blue
+NC=$'\033[0m'     # No Color
+
+# --- Prevent Root Execution ---
+if [[ $EUID -eq 0 ]]; then
+    echo -e "${RED}[!] ERROR: Do not run this script as root.${NC}"
+    echo -e "${RED}==> AUR helpers cannot be built as root. Please log in as a normal user with sudo privileges.${NC}"
+    exit 1
+fi
+
+# --- Sudo Check ---
+if ! sudo -v; then
+    echo -e "${RED}[!] Please ensure you have sudo privileges before running this script.${NC}"
+    exit 1
+fi
+
+# Keep-alive: update existing sudo time stamp if set
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+SUDO_PID=$!
+
+# --- Logging ---
+mkdir -p "$HOME/.cache"
+LOG_FILE="$HOME/.cache/guhwizard.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "[$(date)]"
+
+# --- Temp Directory Setup ---
+TEMP_DIR=$(mktemp -d -t guhwizard.XXXXXX)
+trap 'kill $SUDO_PID 2>/dev/null; rm -rf "$TEMP_DIR"' EXIT
+
+# --- Network Connectivity Check ---
+check_connection() {
+    echo -e "${GRA}--> Checking network connectivity...${NC}"
+    
+    # 1. Check general internet
+    if ! curl -Is --connect-timeout 5 https://www.google.com > /dev/null; then
+        echo -e "${RED}[!] No internet connection.${NC}"
+        return 1
+    fi
+
+    # 2. Check AUR specifically
+    if ! curl -Is --connect-timeout 5 https://aur.archlinux.org > /dev/null; then
+        echo -e "${RED}[!] Internet is fine, but AUR is currently unreachable.${NC}"
+        return 1
+    fi
+}
+
+check_connection || exit 1
+echo -e "${GRN}[OK] Network and AUR are available.${NC}"
+
+# --- Consolidated User Group Setup ---
+setup_user_groups() {
+    local groups="seat,video,audio,render,dbus"
+    echo -e "${GRA}--> Adding $USER to groups: $groups${NC}"
+    sudo usermod -aG "$groups" "$USER" 2>/dev/null || true
+}
+
+# --- AUR Helper Detection ---
+detect_aur() {
+    if command -v yay >/dev/null 2>&1; then
+        AUR_HELPER="yay"; AUR_CLR=$CYN
+    elif command -v paru >/dev/null 2>&1; then
+        AUR_HELPER="paru"; AUR_CLR=$PUR
+    elif command -v aurman >/dev/null 2>&1; then
+        AUR_HELPER="aurman"; AUR_CLR=$YLW
+    elif command -v pikaur >/dev/null 2>&1; then
+        AUR_HELPER="pikaur"; AUR_CLR=$BLU
+    elif command -v trizen >/dev/null 2>&1; then
+        AUR_HELPER="trizen"; AUR_CLR=$GRN
+    fi
+}
+
+# --- Smart Installer ---
+smart_install() {
+    local pkgs=("$@")
+    local repo_pkgs_found=()
+    local repo_pkgs_to_install=()
+    local aur_pkgs=()
+
+    # 1. Get a list of which requested packages actually exist in official repositories
+    mapfile -t repo_pkgs_found < <(pacman -Slq | grep -Fxf <(printf "%s\n" "${pkgs[@]}"))
+    
+    for pkg in "${pkgs[@]}"; do
+        # Skip 'oh-my-zsh' here because it is handled by the official curl installer
+        [[ "$pkg" == "oh-my-zsh" ]] && continue
+
+        local found=false
+        for r_pkg in "${repo_pkgs_found[@]}"; do
+            if [[ "$pkg" == "$r_pkg" ]]; then
+                found=true
+                repo_pkgs_to_install+=("$pkg")
+                break
+            fi
+        done
+        
+        # If not found in repo, assume it is an AUR package
+        if [[ "$found" == false ]]; then
+            aur_pkgs+=("$pkg")
+        fi
+    done
+
+    # 2. Install from Official Repositories
+    if [[ ${#repo_pkgs_to_install[@]} -gt 0 ]]; then
+        echo -e "${GRA}--> Installing from official repositories...${NC}"
+        sudo pacman -S --needed --noconfirm "${repo_pkgs_to_install[@]}"
+    fi
+
+    # 3. Install from AUR
+    if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
+        if [[ -n "$AUR_HELPER" ]]; then
+            echo -e "${GRA}--> Installing from AUR: ${aur_pkgs[*]}${NC}"
+            "$AUR_HELPER" -S --needed --noconfirm "${aur_pkgs[@]}"
+        else
+            echo -e "${RED}[!] AUR helper not found. Skipping AUR packages: ${aur_pkgs[*]}${NC}"
+        fi
+    fi
+}
+
+# --- Visuals ---
+print_banner() {
+    clear
+    echo -e "${YLW}"
+    cat << "EOF"
+  ________      .__       __      __.__                         .___
+ /  _____/ __ __|  |__   /  \    /  \__|____________ _______  __| _/
+/   \  ___|  |  \  |  \  \   \/\/   /  \___   /\__  \_  __ \/ __ | 
+\    \_\  \  |  /   Y  \  \        /|  |/    /  / __ \|  | \/ /_/ | 
+ \______  /____/|___|  /   \__/\  / |__/_____ \(____  /__|  \____ | 
+        \/           \/         \/           \/     \/           \/ 
+EOF
+    echo -e "${NC}"
+    echo -e "${YLW}Thank you for trying guhwm! :3${NC}"
+    if [[ -n "$AUR_HELPER" ]]; then
+        echo -e "${YLW}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
+    fi
+    echo ""
+}
+
+# --- Systemd Service Helper ---
+enable_service() {
+    local service=$1
+    echo -e "${GRA}--> Enabling service: $service...${NC}"
+
+    setup_user_groups
+
+    if [[ "$service" == "ly" ]]; then
+        echo -e "${GRA}--> Deconflicting Display Managers...${NC}"
+        sudo systemctl disable sddm gdm lightdm > /dev/null 2>&1
+        sudo rm -f /etc/systemd/system/display-manager.service
+        sudo systemctl mask getty@tty2.service > /dev/null 2>&1
+    fi
+
+    sudo systemctl daemon-reload
+    local unit_to_enable="$service"
+    if ! systemctl list-unit-files "${service}.service" >/dev/null 2>&1; then
+        if systemctl list-unit-files "${service}@.service" >/dev/null 2>&1; then
+            unit_to_enable="${service}@tty2"
+            echo -e "${GRA}--> Template unit detected. Using $unit_to_enable...${NC}"
+        fi
+    fi
+
+    sleep 1
+    if sudo systemctl enable --force "$unit_to_enable"; then
+        echo -e "${GRN}[SUCCESS] $unit_to_enable enabled.${NC}"
+        # Start dbus immediately so other services can use it
+        if [[ "$service" == "dbus" ]]; then
+            sudo systemctl start dbus 2>/dev/null || true
+            sleep 1
+        fi
+    else
+        echo -e "${RED}[ERROR] Systemd could not enable $unit_to_enable${NC}"
+        read -rp "${YLW}==> Press Enter to continue...${NC}"
+    fi
+    sleep 2
+}
+
+# --- Menu Helper Function ---
+prompt_selection() {
+    print_banner
+    local title=$1
+    local mode=$2
+    shift 2
+    local options=("$@")
+    local count=$((${#options[@]} / 4))
+    
+    echo -e "${YLW}==> $title${NC}"
+    for ((i=0; i<count; i++)); do
+        local clr="${options[i*4]}"
+        local name="${options[i*4+1]}"
+        local desc="${options[i*4+3]}"
+        echo -e "$((i+1))) ${clr}${name}${GRA} -- ${WHT}${desc}${NC}"
+    done
+    
+    echo -e "0) None/Skip"
+    
+    if [[ "$mode" == "multi" ]]; then
+        read -rp "Enter numbers (e.g., 1 2 3 or 1,2,3): " choice
+        choice="${choice//,/ }"
+    else
+        read -rp "Select: " choice
+    fi
+
+    if [[ "$choice" == "0" || -z "$choice" ]]; then 
+        LAST_SELECTION=""
+        return 1
+    fi
+
+    local pkgs_to_install=()
+    for idx in $choice; do
+        if [[ "$idx" =~ ^[0-9]+$ ]]; then
+            if [[ $idx -gt 0 && $idx -le $count ]]; then
+                local pkg_idx=$(( (idx-1) * 4 + 2 ))
+                pkgs_to_install+=("${options[pkg_idx]}")
+                LAST_SELECTION="${options[pkg_idx]}"
+
+                if [[ "$mode" == "single" ]]; then
+                    break
+                fi
+            else
+                echo -e "${RED}[!] Choice $idx is out of range. Skipping...${NC}"
+            fi
+        else
+            echo -e "${ORA}[!] '$idx' is not a valid number. Skipping...${NC}"
+        fi
+    done
+
+    if [[ ${#pkgs_to_install[@]} -eq 0 ]]; then
+        LAST_SELECTION=""
+        return 1
+    fi
+
+    if [[ "$title" != "AUR Helpers" ]]; then
+        # Check if Ly was selected and if it needs Zig to build
+        for pkg in "${pkgs_to_install[@]}"; do
+            if [[ "$pkg" == "ly" ]]; then
+                if ! pacman -Si ly >/dev/null 2>&1; then
+                    echo -e "${GRA}--> Ly not in repos. Pre-installing Zig for AUR build...${NC}"
+                    sudo pacman -S --needed --noconfirm zig
+                    hash -r
+                fi
+            fi
+        done
+        smart_install "${pkgs_to_install[@]}"
+    fi
+    return 0
+}
+
+setup_aur_helper() {
+    echo -e "${GRA}--> Syncing package databases...${NC}"
+    sudo pacman -Syu --noconfirm
+
+    if [[ -n "$AUR_HELPER" ]]; then
+        return 0
+    fi
+
+    prompt_selection "AUR Helpers" "single" \
+        "$CYN" "yay" "yay-bin" "Yet Another Yogurt, fast and feature-rich (Go)" \
+        "$PUR" "paru" "paru-bin" "Feature-packed helper and pacman wrapper (Rust)" \
+        "$YLW" "aurman" "aurman" "Known for its security and syntax similarities to pacman" \
+        "$BLU" "pikaur" "pikaur" "AUR helper with minimal dependencies" \
+        "$GRN" "trizen" "trizen" "Lightweight AUR helper written in Perl"
+
+    if [[ -n "$LAST_SELECTION" ]]; then
+        AUR_HELPER_PKG="$LAST_SELECTION"
+        case "$LAST_SELECTION" in
+            yay-bin)   AUR_HELPER="yay" ;;
+            paru-bin)  AUR_HELPER="paru" ;;
+            *)         AUR_HELPER="$LAST_SELECTION" ;;
+        esac
+        case "$AUR_HELPER" in
+            yay)    AUR_CLR=$CYN ;;
+            paru)   AUR_CLR=$PUR ;;
+            aurman) AUR_CLR=$YLW ;;
+            pikaur) AUR_CLR=$BLU ;;
+            trizen) AUR_CLR=$GRN ;;
+        esac
+        unset LAST_SELECTION
+    else
+        echo -e "${RED}[ERROR] An AUR helper is required.${NC}"; exit 1
+    fi
+    
+    cd "$TEMP_DIR" || exit
+    if ! git clone "https://aur.archlinux.org/${AUR_HELPER_PKG}.git"; then
+        echo -e "${RED}[!] Failed to clone AUR helper repository.${NC}"
+        exit 1
+    fi
+    cd "${AUR_HELPER_PKG}" || exit 1
+    if ! makepkg -si --noconfirm; then
+        echo -e "${RED}[!] Failed to build AUR helper. Please try manually.${NC}"
+        exit 1
+    fi
+    cd ~ || exit
+    hash -r
+    detect_aur
+    echo -e
+    read -rp "${YLW}==> $AUR_HELPER is ready. Press Enter to continue...${NC}"
+}
+
+install_base() {
+    print_banner
+    echo -e "${YLW}==> Installing Base System Packages...${NC}"
+
+    BASE_PKGS=(
+        # --- Wayland & WM Core ---
+        "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"
+        "libdrm" "pixman" "libdisplay-info" "libliftoff" "seatd"
+        "hwdata" "xorg-xwayland" "wtype" "wl-clipboard" "mangowc-git"
+
+        # --- System Utilities ---
+        "git" "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
+        "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
+        "polkit-gnome" "impala"
+        "blueman" "bluez" "bluez-utils" "bluetui"
+
+        # --- UI Components ---
+        "waybar" "rofi" "swaync" "libnotify" "gammastep"
+
+        # --- Audio Stack ---
+        "alsa-utils" "pipewire" "pipewire-pulse" "wireplumber"
+
+        # --- Fonts ---
+        "noto-fonts" "noto-fonts-cjk" "noto-fonts-emoji"
+        "ttf-jetbrains-mono-nerd" "cantarell-fonts"
+    )
+
+    smart_install "${BASE_PKGS[@]}"
+
+    # Initialize standard user directories
+    xdg-user-dirs-update
+
+    # Essential: Ensure user is in groups for Wayland/Hardware access
+    setup_user_groups
+
+    echo -e
+    read -rp "${YLW}==> Base packages are installed. Press Enter to continue...${NC}"
+    
+    enable_service "seatd"
+
+    echo -e "${GRA}--> Enabling PipeWire user services...${NC}"
+    systemctl --user enable pipewire pipewire-pulse wireplumber > /dev/null 2>&1
+
+    # Enable bluetooth service
+    echo -e "${GRA}--> Enabling bluetooth service...${NC}"
+    enable_service bluetooth
+    sleep 2
+}
+
+install_custom_repos() {
+    print_banner
+    echo -e "${YLW}==> Setting up guhwm configurations and guhwall...${NC}"
+
+    # 1. Clone guhwm
+    if ! git clone https://github.com/Tapi-Mandy/guhwm.git "$TEMP_DIR/guhwm"; then
+        echo -e "${RED}[!] Failed to clone guhwm repository.${NC}"
+        exit 1
+    fi
+    
+    # 2. Copy all configs
+    if [ -d "$TEMP_DIR/guhwm/confs" ]; then
+        echo -e "${GRA}--> Deploying configuration files...${NC}"
+        cp -r "$TEMP_DIR/guhwm/confs/"* ~/.config/
+    fi
+
+    # 3. Copy wallpapers
+    mkdir -p ~/Wallpapers
+    cp -r "$TEMP_DIR/guhwm/Wallpapers/"* ~/Wallpapers/
+
+    # 4. Make default-wallpaper.sh executable and run it
+    if [ -f "$HOME/.config/mango/scripts/default-wallpaper.sh" ]; then
+        chmod +x "$HOME/.config/mango/scripts/default-wallpaper.sh"
+        echo -e "${GRA}--> Setting default wallpaper...${NC}"
+        bash "$HOME/.config/mango/scripts/default-wallpaper.sh" 2>/dev/null || echo -e "${YLW}[!] Wallpaper script executed (may need WM running)${NC}"
+    fi
+
+    # 5. Make nightlight toggle script executable
+    if [ -f "$HOME/.config/mango/scripts/nightlight-toggle.sh" ]; then
+        chmod +x "$HOME/.config/mango/scripts/nightlight-toggle.sh"
+        echo -e "${GRA}--> Nightlight toggle ready.${NC}"
+    fi
+
+    # 6. Install guhwall
+    mkdir -p "$TEMP_DIR/guhwall"
+    if ! curl -L https://github.com/Tapi-Mandy/guhwall/tarball/main | tar -xz -C "$TEMP_DIR/guhwall" --strip-components=1; then
+        echo -e "${RED}[!] Failed to download guhwall.${NC}"
+        exit 1
+    fi
+    (cd "$TEMP_DIR/guhwall" && bash ./install.sh)
+
+    # 7. Install guhShot (Screenshot utility - mandatory)
+    echo -e "${GRA}--> Installing guhShot screenshot utility...${NC}"
+    if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
+        (cd "$TEMP_DIR/guhShot" && bash ./install.sh)
+        echo -e "${GRN}[SUCCESS] guhShot installed.${NC}"
+    else
+        echo -e "${RED}[!] Failed to clone guhShot repository.${NC}"
+        exit 1
+    fi
+
+    echo -e
+    read -rp "${YLW}==> Configurations, guhwall & guhShot are installed. Press Enter to continue...${NC}"
+}
+
+optional_software() {
+    print_banner
+
+    # SHELLS
+    prompt_selection "Shells" "single" \
+        "$GRA" "Bash" "bash" "GNU Bourne Again Shell" \
+        "$RED" "Fish" "fish" "Friendly Interactive Shell" \
+        "$ORA" "Zsh" "zsh" "Z Shell" \
+        "$MAG" "Oh-My-Zsh" "oh-my-zsh" "Community-driven framework for Zsh"
+
+    if [[ -n "$LAST_SELECTION" ]]; then
+        TARGET_SHELL="bash"
+        [[ "$LAST_SELECTION" == "fish" ]] && TARGET_SHELL="fish"
+        [[ "$LAST_SELECTION" == "zsh" || "$LAST_SELECTION" == "oh-my-zsh" ]] && TARGET_SHELL="zsh"
+
+        if [[ "$LAST_SELECTION" == "oh-my-zsh" ]]; then
+            echo -e "${MAG}--> Running official Oh-My-Zsh installer...${NC}"
+            sudo pacman -S --needed --noconfirm zsh
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+            [ -f "$HOME/.zshrc" ] && sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
+        fi
+
+        # Change shell after installation
+        hash -r
+        SHELL_PATH=$(command -v "$TARGET_SHELL" 2>/dev/null)
+        if [[ -n "$SHELL_PATH" ]]; then
+            if ! grep -Fxq "$SHELL_PATH" /etc/shells; then
+                echo "$SHELL_PATH" | sudo tee -a /etc/shells > /dev/null
+            fi
+            echo -e "${GRA}--> Setting default shell to $TARGET_SHELL...${NC}"
+            sudo chsh -s "$SHELL_PATH" "$USER"
+        fi
+        unset LAST_SELECTION
+    fi
+    echo -e
+    read -rp "${YLW}==> Press Enter to continue...${NC}"
+
+    # TERMINALS
+    prompt_selection "Terminals" "single" \
+        "$ORA" "Alacritty" "alacritty" "Fast, cross-platform, OpenGL terminal" \
+        "$YLW" "Foot" "foot" "Fast, lightweight Wayland terminal" \
+        "$MAG" "Kitty" "kitty" "Modern, hackable, featureful, OpenGL terminal"
+    
+    if [[ -n "$LAST_SELECTION" ]]; then
+        sed -i "s/YOURTERMINAL/$LAST_SELECTION/g" ~/.config/mango/config.conf 2>/dev/null || true
+        unset LAST_SELECTION
+    fi
+
+    # BROWSERS
+    prompt_selection "Browsers" "multi" \
+        "$ORA" "Brave" "brave-bin" "Privacy-focused browser" \
+        "$ORA" "Firefox" "firefox" "Fast, Private & Safe" \
+        "$PUR" "Floorp" "floorp-bin" "Firefox fork focused on performance" \
+        "$CYN" "LibreWolf" "librewolf-bin" "Fork of Firefox focused on privacy" \
+        "$WHT" "Lynx" "lynx" "Text-based web browser" \
+        "$GRA" "Zen Browser" "zen-browser-bin" "Experience tranquillity while browsing"
+
+    # CHAT CLIENTS
+    prompt_selection "Chat Clients" "multi" \
+        "$BLU" "Discord" "discord" "All-in-one voice and text chat" \
+        "$BLU" "Dissent" "dissent-bin" "Discord client written in Go/GTK4" \
+        "$CYN" "Telegram" "telegram-desktop" "Official Telegram Desktop client" \
+        "$MAG" "Vesktop" "vesktop-bin" "The cutest Discord client" \
+        "$CYN" "WebCord" "webcord-bin" "Discord client using the web version"
+
+    # FILE MANAGERS
+    prompt_selection "File Managers" "single" \
+        "$BLU" "Nautilus" "nautilus" "GNOME's file manager" \
+        "$WHT" "Nemo" "nemo" "Cinnamon's file manager" \
+        "$GRA" "nnn" "nnn" "The unorthodox terminal file manager" \
+        "$ORA" "ranger" "ranger" "Vim-inspired terminal file manager" \
+        "$YLW" "yazi" "yazi" "Blazing fast terminal file manager written in Rust"
+
+    if [[ -n "$LAST_SELECTION" ]]; then
+        sed -i "s/YOURFILEMANAGER/$LAST_SELECTION/g" ~/.config/mango/config.conf 2>/dev/null || true
+        unset LAST_SELECTION
+    fi
+
+    # EDITORS
+    prompt_selection "Editors" "multi" \
+        "$PUR" "Emacs" "emacs" "The extensible, self-documenting editor" \
+        "$YLW" "Geany" "geany" "Flyweight IDE" \
+        "$GRN" "Neovim" "neovim" "Vim-fork focused on extensibility" \
+        "$GRA" "Sublime Text" "sublime-text-4" "Sophisticated text editor" \
+        "$GRN" "Vim" "vim" "The ubiquitous text editor" \
+        "$BLU" "VSCodium" "vscodium-bin" "Free/Libre Open Source VSCode"
+        
+    if [[ -n "$LAST_SELECTION" ]]; then
+        sed -i "s/YOUREDITOR/$LAST_SELECTION/g" ~/.config/mango/config.conf 2>/dev/null || true
+        unset LAST_SELECTION
+    fi
+
+    # GRAPHICS
+    prompt_selection "Graphics" "multi" \
+        "$ORA" "Blender" "blender" "3D creation suite for modeling, rigging, and animation" \
+        "$GRA" "GIMP" "gimp" "GNU Image Manipulation Program" \
+        "$MAG" "Krita" "krita" "Digital painting studio"
+
+    # MEDIA
+    prompt_selection "Media" "multi" \
+        "$WHT" "imv" "imv" "Command-line image viewer for Wayland and X11" \
+        "$PUR" "mpv" "mpv" "Free, open source, and cross-platform media player" \
+        "$CYN" "swayimg" "swayimg" "Lightweight image viewer for Wayland" \
+        "$ORA" "VLC" "vlc" "Multi-platform multimedia player and framework"
+
+    # UTILITIES
+    prompt_selection "Utilities" "multi" \
+        "$GRA" "Fastfetch" "fastfetch" "Like neofetch, but much faster" \
+        "$MAG" "fzf" "fzf" "Command-line fuzzy finder" \
+        "$GRA" "htop" "htop" "Interactive process viewer" \
+        "$GRA" "nvtop" "nvtop" "GPUs process monitor for AMD, NVIDIA, and Intel" \
+        "$CYN" "tldr" "tldr" "Simplified and community-driven man pages" \
+        "$MAG" "uwufetch" "uwufetch" "Cute system info fetcher"
+
+    # EMULATORS
+    prompt_selection "Emulators" "multi" \
+        "$GRA" "RetroArch" "retroarch" "Frontend for emulators, game engines and media players." \
+        "$BLU" "PCSX2" "pcsx2" "PlayStation 2 emulator" \
+        "$GRN" "xemu" "xemu-bin" "Emulator for the original Xbox" \
+        "$BLU" "Dolphin" "dolphin-emu-git" "Gamecube & Wii emulator"
+
+    # DISPLAY MANAGER (Ly)
+    prompt_selection "Display Manager" "single" "$PUR" "Ly" "ly" "TUI display manager"
+    local prompt_rc=$?
+
+    if [[ $prompt_rc -eq 0 && -n "$LAST_SELECTION" ]]; then
+        echo -e "${GRA}--> Verifying installation...${NC}"
+        if pacman -Qq ly >/dev/null 2>&1; then
+            enable_service "ly"
+            echo -e
+            read -rp "${YLW}==> Ly setup finished. Press Enter to continue...${NC}"
+        else
+            echo -e "${RED}[ERROR] Ly package not found in database.${NC}"
+            read -rp "${YLW}==> Press Enter to continue...${NC}"
+        fi
+        unset LAST_SELECTION
+    fi
+}
+
+print_outro() {
+    print_banner
+    cat << "EOF"
+    *                  *
+        __                *
+     ,db'    *     *
+    ,d8/       *        *    *
+    888
+    `db\       *     *
+      `o`_                    **
+ *               *   *    _      *
+       *                 / )
+    *    (\__/) *       ( (  *
+  ,-.,-.,)    (.,-.,-.,-.) ).,-.,-.
+ | @|  ={      }= | @|  / / | @|o |
+_j__j__j_)     `-------/ /__j__j__j_
+________(               /___________
+ |  | @| \              || o|O | @|
+ |o |  |,'\       ,   ,'"|  |  |  |
+vV\|/vV|`-'\  ,---\   | \Vv\hjwVv\//v
+           _) )    `. \ /
+          (__/       ) )
+                    (_/
+EOF
+    echo -e "${GRN}System setup complete! Everything is ready.${NC}"
+    
+    # Self-destruct (skip if running via curl where $0 is not a real file)
+    SCRIPT_PATH="$(realpath "$0" 2>/dev/null || echo "")"
+    if [[ -n "$SCRIPT_PATH" && -f "$SCRIPT_PATH" && "$SCRIPT_PATH" != *"/bash" ]]; then
+        SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+        echo -e "${GRA}--> Cleaning up installer...${NC}"
+        rm -f "$SCRIPT_PATH"
+        [ -d "$SCRIPT_DIR" ] && rmdir "$SCRIPT_DIR" 2>/dev/null  # Only removes if empty
+    fi
+
+    echo -e
+    read -rp "Would you like to reboot now? (y/n): " rb
+    
+    if [[ "$rb" == [yY] ]]; then
+        systemctl reboot
+    fi
+}
+
+# --- Execution Flow ---
+
+# Ensure essential build tools exist before doing anything else
+echo -e "${GRA}--> Preparing system (Installing base-devel & git)...${NC}"
+sudo pacman -S --needed --noconfirm base-devel git
+
+detect_aur
+print_banner
+setup_aur_helper
+install_base
+install_custom_repos
+optional_software
+print_outro

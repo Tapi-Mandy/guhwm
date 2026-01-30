@@ -17,7 +17,7 @@
 <div align="center">
   <img width="67%" alt="guhwizard" src="https://github.com/user-attachments/assets/e07a9f84-4c3a-46e0-b586-1a7a88c36db1"/>
   <h3>
-    Installer for <a href="https://github.com/Tapi-Mandy/guhwm/">guhwm</a> in bash; for Arch Linux
+    Advanced TUI Installer for <a href="https://github.com/Tapi-Mandy/guhwm/">guhwm</a> in bash; for Arch Linux
   </h3>
 </div>
 
@@ -35,10 +35,10 @@ curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh 
 > We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a 'minimal' desktop profile to set up your base system, and then installing guhwm
 
 ---
-
-### Screenshots
 > [!WARNING]
 > ### OUTDATED SCREENSHOTS !!!
+
+### Screenshots
 
 <img width="55%" alt="image" src="https://github.com/user-attachments/assets/aef8cb8e-e00f-4c0a-8e7f-6dc01133d6e7"/>
 
