@@ -15,7 +15,7 @@
 ---
 
 <div align="center">
-  <img width="67%" alt="guhwizard" src="https://github.com/user-attachments/assets/e07a9f84-4c3a-46e0-b586-1a7a88c36db1"/>
+  <img width="69%" alt="guhwizard" src="https://github.com/user-attachments/assets/aced0143-2b9d-427f-b7ce-2ea8382ca1ef"/>
   <h3>
     Advanced TUI Installer for <a href="https://github.com/Tapi-Mandy/guhwm/">guhwm</a> in bash; for Arch Linux
   </h3>
