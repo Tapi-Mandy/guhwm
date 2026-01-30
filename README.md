@@ -15,13 +15,14 @@
 ---
 
 <div align="center">
-  <img width="60%" alt="guhwizard" src="https://github.com/user-attachments/assets/e07a9f84-4c3a-46e0-b586-1a7a88c36db1"/>
+  <img width="67%" alt="guhwizard" src="https://github.com/user-attachments/assets/e07a9f84-4c3a-46e0-b586-1a7a88c36db1"/>
   <h3>
     Installer for <a href="https://github.com/Tapi-Mandy/guhwm/">guhwm</a> in bash; for Arch Linux
   </h3>
 </div>
 
-### Curl:
+---
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh | bash
 ```
