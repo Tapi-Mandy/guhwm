@@ -55,7 +55,7 @@ curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh 
 ---
 
 ### Tools/Projects Made Originally For guhwm: <3
-#### - [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
+#### [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
 > Fast & Lightweight Appealing Little GTK3/CLI Screenshot Utility Made In Python.
-#### - [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
+#### [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
 > Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, and a frontend for Matugen & swww.
