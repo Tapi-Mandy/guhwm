@@ -395,8 +395,8 @@ install_custom_repos() {
         echo -e "${GRA}--> Nightlight is ready.${NC}"
     fi
 
-    # 6. Install guhwall
-    echo -e "${GRA}--> Installing guhwall...${NC}"
+    # 6. Install guhwall (Wallpaper Manager)
+    echo -e "${YLW}==> Installing guhwall...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
         (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhwall installed.${NC}"
@@ -406,7 +406,7 @@ install_custom_repos() {
     fi
 
     # 7. Install guhShot (Screenshot utility)
-    echo -e "${GRA}--> Installing guhShot screenshot utility...${NC}"
+    echo -e "${YLW}==> Installing guhShot screenshot utility...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
         (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhShot installed.${NC}"
