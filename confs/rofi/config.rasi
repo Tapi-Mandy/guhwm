@@ -14,7 +14,7 @@ configuration {
 	background: rgba(10,10,10,0);
 	background-alt: rgba(10,10,10,0);
 	foreground: #EEEEEE;
-	selected: #EEEEEE;
+	selected: #D5CAC2;
 	active: #A6E3A1;
 	urgent: #F38BA8;
 	border-colour: var(selected);
