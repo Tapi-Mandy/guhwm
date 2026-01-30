@@ -51,3 +51,11 @@ curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh 
 <img width="55%" alt="image" src="https://github.com/user-attachments/assets/37c51b93-8741-4ea4-924d-b3b08f9d1672"/>
 
 > *guhwm launching Krita*
+
+---
+
+### Tools/Projects Made Originally For guhwm: <3
+#### - [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
+> Fast & Lightweight Appealing Little GTK3/CLI Screenshot Utility Made In Python.
+#### - [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
+> Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, and a frontend for Matugen & swww.
