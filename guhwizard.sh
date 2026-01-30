@@ -139,12 +139,12 @@ print_banner() {
     clear
     echo -e "${YLW}"
     cat << "EOF"
-  ________      .__       __      __.__                         .___
- /  _____/ __ __|  |__   /  \    /  \__|____________ _______  __| _/
-/   \  ___|  |  \  |  \  \   \/\/   /  \___   /\__  \_  __ \/ __ | 
-\    \_\  \  |  /   Y  \  \        /|  |/    /  / __ \|  | \/ /_/ | 
- \______  /____/|___|  /   \__/\  / |__/_____ \(____  /__|  \____ | 
-        \/           \/         \/           \/     \/           \/ 
+                __            _                      __
+   ____ ___  __/ /_ _      __(_)___  ____ __________/ /
+  / __ `/ / / / __ \ | /| / / /_  / / __ `/ ___/ __  / 
+ / /_/ / /_/ / / / / |/ |/ / / / /_/ /_/ / /  / /_/ /  
+ \__, /\__,_/_/ /_/|__/|__/_/ /___/\__,_/_/   \__,_/   
+/____/
 EOF
     echo -e "${NC}"
     echo -e "${YLW}Thank you for trying guhwm! :3${NC}"
@@ -272,8 +272,8 @@ setup_aur_helper() {
     fi
 
     prompt_selection "AUR Helpers" "single" \
-        "$CYN" "yay" "yay-bin" "Yet Another Yogurt, fast and feature-rich (Go)" \
-        "$PUR" "paru" "paru-bin" "Feature-packed helper and pacman wrapper (Rust)" \
+        "$CYN" "yay" "yay-bin" "Yet Another Yogurt, fast and feature-rich, written in Go" \
+        "$PUR" "paru" "paru-bin" "Feature-packed helper and pacman wrapper written in Rust" \
         "$YLW" "aurman" "aurman" "Known for its security and syntax similarities to pacman" \
         "$BLU" "pikaur" "pikaur" "AUR helper with minimal dependencies" \
         "$GRN" "trizen" "trizen" "Lightweight AUR helper written in Perl"
@@ -319,16 +319,15 @@ install_base() {
     echo -e "${YLW}==> Installing Base System Packages...${NC}"
 
     BASE_PKGS=(
+        # --- System Utilities ---
+        "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
+        "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
+        "polkit-gnome" "impala" "bluez" "bluez-utils" "bluetui"
+
         # --- Wayland & WM Core ---
         "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"
         "libdrm" "pixman" "libdisplay-info" "libliftoff" "seatd"
         "hwdata" "xorg-xwayland" "wtype" "wl-clipboard" "mangowc-git"
-
-        # --- System Utilities ---
-        "git" "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
-        "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
-        "polkit-gnome" "impala"
-        "blueman" "bluez" "bluez-utils" "bluetui"
 
         # --- UI Components ---
         "waybar" "rofi" "swaync" "libnotify" "gammastep"
@@ -358,7 +357,7 @@ install_base() {
     systemctl --user enable pipewire pipewire-pulse wireplumber > /dev/null 2>&1
 
     # Enable bluetooth service
-    echo -e "${GRA}--> Enabling bluetooth service...${NC}"
+    echo -e "${GRA}--> Enabling Bluetooth service...${NC}"
     enable_service bluetooth
     sleep 2
 }
@@ -387,27 +386,29 @@ install_custom_repos() {
     if [ -f "$HOME/.config/mango/scripts/default-wallpaper.sh" ]; then
         chmod +x "$HOME/.config/mango/scripts/default-wallpaper.sh"
         echo -e "${GRA}--> Setting default wallpaper...${NC}"
-        bash "$HOME/.config/mango/scripts/default-wallpaper.sh" 2>/dev/null || echo -e "${YLW}[!] Wallpaper script executed (may need WM running)${NC}"
+        bash "$HOME/.config/mango/scripts/default-wallpaper.sh" 2>/dev/null || echo -e "${YLW}[!] Wallpaper script executed${NC}"
     fi
 
     # 5. Make nightlight toggle script executable
     if [ -f "$HOME/.config/mango/scripts/nightlight-toggle.sh" ]; then
         chmod +x "$HOME/.config/mango/scripts/nightlight-toggle.sh"
-        echo -e "${GRA}--> Nightlight toggle ready.${NC}"
+        echo -e "${GRA}--> Nightlight is ready.${NC}"
     fi
 
     # 6. Install guhwall
-    mkdir -p "$TEMP_DIR/guhwall"
-    if ! curl -L https://github.com/Tapi-Mandy/guhwall/tarball/main | tar -xz -C "$TEMP_DIR/guhwall" --strip-components=1; then
-        echo -e "${RED}[!] Failed to download guhwall.${NC}"
+    echo -e "${GRA}--> Installing guhwall...${NC}"
+    if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
+        (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
+        echo -e "${GRN}[SUCCESS] guhwall installed.${NC}"
+    else
+        echo -e "${RED}[!] Failed to clone guhwall repository.${NC}"
         exit 1
     fi
-    (cd "$TEMP_DIR/guhwall" && bash ./install.sh)
 
-    # 7. Install guhShot (Screenshot utility - mandatory)
+    # 7. Install guhShot (Screenshot utility)
     echo -e "${GRA}--> Installing guhShot screenshot utility...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
-        (cd "$TEMP_DIR/guhShot" && bash ./install.sh)
+        (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhShot installed.${NC}"
     else
         echo -e "${RED}[!] Failed to clone guhShot repository.${NC}"
@@ -534,10 +535,13 @@ optional_software() {
 
     # EMULATORS
     prompt_selection "Emulators" "multi" \
-        "$GRA" "RetroArch" "retroarch" "Frontend for emulators, game engines and media players." \
+        "$BLU" "Dolphin" "dolphin-emu-git" "Gamecube & Wii emulator" \
+        "$YLW" "DuckStation" "duckstation-git" "PS1 Emulator aiming for the best accuracy and game support." \
+        "$GRN" "melonDS" "melonds-bin" "DS emulator, sorta" \
         "$BLU" "PCSX2" "pcsx2" "PlayStation 2 emulator" \
-        "$GRN" "xemu" "xemu-bin" "Emulator for the original Xbox" \
-        "$BLU" "Dolphin" "dolphin-emu-git" "Gamecube & Wii emulator"
+        "$GRA" "RetroArch" "retroarch" "Frontend for emulators, game engines and media players." \
+        "$GRN" "ScummVM" "scummvm" "'Virtual machine' for several classic graphical point-and-click adventure games." \
+        "$GRN" "xemu" "xemu-bin" "Emulator for the original Xbox"
 
     # DISPLAY MANAGER (Ly)
     prompt_selection "Display Manager" "single" "$PUR" "Ly" "ly" "TUI display manager"
@@ -587,7 +591,6 @@ EOF
     SCRIPT_PATH="$(realpath "$0" 2>/dev/null || echo "")"
     if [[ -n "$SCRIPT_PATH" && -f "$SCRIPT_PATH" && "$SCRIPT_PATH" != *"/bash" ]]; then
         SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-        echo -e "${GRA}--> Cleaning up installer...${NC}"
         rm -f "$SCRIPT_PATH"
         [ -d "$SCRIPT_DIR" ] && rmdir "$SCRIPT_DIR" 2>/dev/null  # Only removes if empty
     fi
