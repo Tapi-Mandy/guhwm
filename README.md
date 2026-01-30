@@ -24,7 +24,7 @@
 ---
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh)
 ```
 
 - Fully Modular: Pick and choose exactly what gets installed.
