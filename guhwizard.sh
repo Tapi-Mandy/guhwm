@@ -396,7 +396,7 @@ install_custom_repos() {
     fi
 
     # 6. Install guhwall (Wallpaper Manager)
-    echo -e "${YLW}==> Installing guhwall...${NC}"
+    echo -e "${YLW}==> Installing guhwall | Guh?? Set a Wallpaper!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
         (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhwall installed.${NC}"
@@ -406,7 +406,7 @@ install_custom_repos() {
     fi
 
     # 7. Install guhShot (Screenshot utility)
-    echo -e "${YLW}==> Installing guhShot screenshot utility...${NC}"
+    echo -e "${YLW}==> Installing guhShot | Guh?? Take a Screenshot!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
         (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhShot installed.${NC}"
@@ -416,7 +416,7 @@ install_custom_repos() {
     fi
 
     echo -e
-    read -rp "${YLW}==> Configurations, guhwall & guhShot are installed. Press Enter to continue...${NC}"
+    read -rp "${YLW}==> Configurations & guhwall & guhShot are installed. Press Enter to continue...${NC}"
 }
 
 optional_software() {
