@@ -54,7 +54,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwiz
 
 ---
 
-### Keybindings
+### Keybinds
 The default **Modifier** key is `ALT`.
 
 ### Applications
@@ -108,7 +108,7 @@ The default **Modifier** key is `ALT`.
 | `ALT + SHIFT + R` | Reload Configuration |
 | `ALT + SHIFT + Q` | Quit MangoWC |
 
-> You can find and customize these shortcuts in your `~/.config/mango/config.conf` under the **KEY BINDINGS** section.
+> You can find and customize these shortcuts in your `~/.config/mango/config.conf` under the **KEYBINDS** section.
 
 ---
 
