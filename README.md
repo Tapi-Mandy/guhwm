@@ -54,6 +54,64 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwiz
 
 ---
 
+### Keybindings
+The default **Modifier** key is `ALT`.
+
+### Applications
+| Keybind | Action |
+| :--- | :--- |
+| `ALT + A` | Open Launcher (Rofi) |
+| `ALT + SHIFT + Enter` | Open Terminal |
+| `ALT + E` | Open File Manager |
+| `ALT + SHIFT + A` | Toggle Notification Center (SwayNC) |
+| `Print` | Screenshot (Full Screen) |
+| `SHIFT + Print` | Screenshot (Region) |
+| `ALT + Q` | Quit Active Window |
+
+### Navigation & Focus
+| Keybind | Action |
+| :--- | :--- |
+| `ALT + J` / `K` | Cycle Window Focus (Next/Prev) |
+| `ALT + Tab` | Cycle Window Focus |
+| `SUPER + Arrows` | Directional Focus (Left/Right/Up/Down) |
+| `ALT + ,` / `.` | Focus Monitor (Left/Right) |
+
+### Window Manipulation
+| Keybind | Action |
+| :--- | :--- |
+| `ALT + SHIFT + J/K/H/L` | Move Window Position |
+| `ALT + Enter` | Promote Window to Master (Zoom) |
+| `ALT + H` / `L` | Resize Master/Stack |
+| `ALT + Space` | Toggle Floating Mode |
+| `ALT + F` | Toggle Fullscreen |
+| `ALT + I` | Minimize Window |
+| `ALT + SHIFT + I` | Restore Minimized Window |
+| `ALT + S` | Toggle Scratchpad |
+| `ALT + Left Click` | Move Window (Mouse) |
+| `ALT + Right Click` | Resize Window (Mouse) |
+
+### Workspaces
+| Keybind | Action |
+| :--- | :--- |
+| `ALT + [1-9]` | View Workspace |
+| `ALT + SHIFT + [1-9]` | Move Window to Workspace |
+| `ALT + Scroll Up/Down` | Cycle through active Workspaces |
+| `ALT + SHIFT + ,` / `.` | Move Window to Monitor (Left/Right) |
+
+### System & Layout
+| Keybind | Action |
+| :--- | :--- |
+| `CTRL + Space` | Switch Layout |
+| `ALT + SHIFT + G` | Toggle Gaps |
+| `ALT + -` / `+` | Decrease/Increase Gaps |
+| `ALT + SHIFT + E` | Edit Configuration |
+| `ALT + SHIFT + R` | Reload Configuration |
+| `ALT + SHIFT + Q` | Quit MangoWC |
+
+> You can find and customize these shortcuts in your `~/.config/mango/config.conf` under the **KEY BINDINGS** section.
+
+---
+
 ### Tools/Projects Made Originally For guhwm: <3
 #### [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
 > Fast & Lightweight Appealing Little GTK3/CLI Screenshot Utility Made In Python.
