@@ -73,7 +73,7 @@ The default **Modifier** key is `ALT`.
 | :--- | :--- |
 | `ALT + J` / `K` | Cycle Window Focus (Next/Prev) |
 | `ALT + Tab` | Cycle Window Focus |
-| `SUPER + Arrows` | Directional Focus (Left/Right/Up/Down) |
+| `SUPER + H/J/K/L` | Directional Focus |
 | `ALT + ,` / `.` | Focus Monitor (Left/Right) |
 
 ### Window Manipulation
