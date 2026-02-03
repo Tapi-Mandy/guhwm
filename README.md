@@ -116,7 +116,7 @@ The default **Modifier** key is `ALT`.
 #### [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
 > Fast & Lightweight Appealing Little GTK3/CLI Screenshot Utility Made In Python.
 #### [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
-> Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, And a Frontend For swww.
+> Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, And a Frontend For swww And Matugen.
 ### See Also:
 #### [Arch-Legacy-NVIDIA](https://github.com/Tapi-Mandy/Arch-Legacy-NVIDIA) | Automated installer for NVIDIA 580xx Legacy Drivers on Arch Linux
 > Drivers installer for Arch/Artix Linux users with NVIDIA GPUs that are no longer supported by the latest (590+) driver branch.
