@@ -118,6 +118,7 @@ The default **Modifier** key is `ALT`.
 #### [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
 > Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, And a Frontend For swww.
 ### See Also:
+#### [Arch-Legacy-NVIDIA](https://github.com/Tapi-Mandy/Arch-Legacy-NVIDIA) | Automated installer for NVIDIA 580xx Legacy Drivers on Arch Linux
+> Drivers installer for Arch/Artix Linux users with NVIDIA GPUs that are no longer supported by the latest (590+) driver branch.
 #### [ASCII2PNG](https://github.com/Tapi-Mandy/ASCII2PNG) | Convert ASCII art and text to PNG images
 > Built with GTK3 and Python to convert ASCII art and plain text into high-quality PNG images. 
-####
