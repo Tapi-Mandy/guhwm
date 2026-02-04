@@ -322,7 +322,7 @@ install_base() {
         # --- System Utilities ---
         "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
         "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
-        "polkit-gnome" "impala" "bluez" "bluez-utils" "bluetui"
+        "polkit-gnome" "network-manager-applet" "bluez" "bluez-utils" "blueman"
 
         # --- Wayland & WM Core ---
         "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"

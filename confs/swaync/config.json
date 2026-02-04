@@ -71,7 +71,7 @@
                 },
                 {
                     "label": "",
-                    "command": "impala"
+                    "command": "nm-applet"
                 },
                 {
                     "label": "",
