@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Nightlight toggle script for gammastep
+# Nightlight toggle script for wlsunset in SwayNC
 
-if pgrep -x gammastep > /dev/null; then
-    # Gammastep is running, kill it
-    pkill gammastep
-    notify-send -u low "Nightlight" "Disabled" -i weather-clear-night
+FLAG_FILE="$HOME/.cache/nightlight_enabled"
+
+if pgrep -x "wlsunset" > /dev/null; then
+    pkill -x "wlsunset"
+    rm -f "$FLAG_FILE"
 else
-    # Gammastep is not running, start it
-    gammastep &
-    notify-send -u low "Nightlight" "Enabled" -i weather-clear-night
+    wlsunset -s 00:00 -S 23:59 -t 3400 -T 3401 &
+    touch "$FLAG_FILE"
 fi

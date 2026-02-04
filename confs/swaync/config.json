@@ -79,24 +79,26 @@
                 },
                 {
                     "label": "󰤄",
+                    "type": "toggle",
                     "command": "~/.config/mango/scripts/nightlight-toggle.sh",
-                    "type": "toggle"
+                    "update-command": "pgrep -x wlsunset > /dev/null && echo true || echo false",
+                    "interval": 1
                 },
                 {
                     "label": "",
-                    "command": "wtype -M alt -M shift c -m shift -m alt"
+                    "command": "wtype -M alt -M shift -P e -m shift -m alt"
                 },
                 {
-                    "label": "",
-                    "command": "loginctl suspend"
+                    "label": "",
+                    "command": "systemctl suspend"
                 },
                 {
-                    "label": "",
-                    "command": "loginctl reboot"
+                    "label": "",
+                    "command": "systemctl reboot"
                 },
                 {
-                    "label": "",
-                    "command": "loginctl poweroff"
+                    "label": "",
+                    "command": "systemctl poweroff"
                 }
             ]
         }
