@@ -1,0 +1,165 @@
+# : Manager [[[
+
+[manager]
+cwd = { fg = "#8fb4a0" } # Mint/Cyan for the current path
+
+# Tab
+tab_active = { fg = "#1a1817", bg = "#d3c2b4", bold = true }
+tab_inactive = { fg = "#d3c7bd", bg = "#2a2726" }
+tab_width = 1
+
+# Find
+find_keyword = { fg = "#cfc1b2", bold = true, italic = true, underline = true }
+find_position = { fg = "#bda395", bold = true, italic = true }
+
+# Marker (Selecting files)
+marker_copied = { fg = "#9da681", bg = "#9da681" }
+marker_cut = { fg = "#bda395", bg = "#bda395" }
+marker_marked = { fg = "#cfc1b2", bg = "#cfc1b2" }
+marker_selected = { fg = "#d3c2b4", bg = "#d3c2b4" }
+
+# Count
+count_copied = { fg = "#1a1817", bg = "#9da681" }
+count_cut = { fg = "#1a1817", bg = "#bda395" }
+count_selected = { fg = "#1a1817", bg = "#d3c2b4" }
+
+# Border
+border_symbol = "│"
+border_style  = { fg = "#44403e" } # Muted dark border to let translucency shine
+
+# : ]]]
+
+
+# : Status [[[
+
+[status]
+separator_open = ""
+separator_close = ""
+separator_style = { bg = "#2a2726", fg = "#2a2726" }
+
+[mode]
+# Normal Mode (The main pill)
+normal_main = { bg = "#d3c2b4", fg = "#1a1817", bold = true }
+normal_alt  = { bg = "#33302e", fg = "#d3c2b4" }
+
+# Select mode
+select_main = { bg = "#9da681", fg = "#1a1817", bold = true }
+select_alt  = { bg = "#33302e", fg = "#9da681" }
+
+# Unset mode (Command mode)
+unset_main = { bg = "#bda395", fg = "#1a1817", bold = true }
+unset_alt  = { bg = "#33302e", fg = "#bda395" }
+
+# Progress
+progress_label = { fg = "#d3c7bd", bold = true }
+progress_normal = { fg = "#d3c2b4", bg = "#33302e" }
+progress_error = { fg = "#bda395", bg = "#33302e" }
+
+# Permissions (Muted organic colors)
+permissions_t = { fg = "#8fb4a0" }
+permissions_w = { fg = "#bda395" }
+permissions_x = { fg = "#9da681" }
+permissions_r = { fg = "#cfc1b2" }
+permissions_s = { fg = "#7e746d" }
+
+# : ]]]
+
+
+# : Select [[[
+
+[select]
+border = { fg = "#d3c2b4" }
+active = { fg = "#cfc1b2", bold = true }
+inactive = { fg = "#d3c7bd" }
+
+# : ]]]
+
+
+# : Input [[[
+
+[input]
+border = { fg = "#d3c2b4" }
+value = { fg = "#d3c7bd" }
+
+# : ]]]
+
+
+# : Completion [[[
+
+[completion]
+border = { fg = "#d3c2b4", bg = "#1a1817" }
+
+# : ]]]
+
+
+# : Tasks [[[
+
+[tasks]
+border = { fg = "#d3c2b4" }
+title = { fg = "#d3c7bd" }
+hovered = { fg = "#cfc1b2", underline = true }
+
+# : ]]]
+
+
+# : Which [[[
+
+[which]
+cols = 3
+mask = { bg = "#2a2726" }
+cand = { fg = "#d3c2b4" }
+rest = { fg = "#7e746d" }
+desc = { fg = "#d3c7bd" }
+separator = " › "
+separator_style = { fg = "#44403e" }
+
+# : ]]]
+
+
+# : Help [[[
+
+[help]
+on = { fg = "#d3c2b4" }
+run = { fg = "#8fb4a0" }
+footer = { fg = "#1a1817", bg = "#d3c7bd" }
+
+# : ]]]
+
+
+# : Notify [[[
+
+[notify]
+title_info = { fg = "#9da681" }
+title_warn = { fg = "#d3c2b4" }
+title_error = { fg = "#bda395" }
+
+# : ]]]
+
+
+# : File-specific styles [[[
+
+[filetype]
+
+rules = [
+    # Images (Mint)
+    { mime = "image/*", fg = "#8fb4a0" },
+
+    # Media (Tan)
+    { mime = "{audio,video}/*", fg = "#d3c2b4" },
+
+    # Archives (Muted Plum)
+    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#b48ead" },
+
+    # Documents (Sage)
+    { mime = "application/{pdf,doc,rtf}", fg = "#9da681" },
+
+    # Special files
+    { name = "*", is = "orphan", bg = "#bda395", fg = "#1a1817" },
+    { name = "*", is = "exec", fg = "#cfc1b2" },
+
+    # Fallback
+    { name = "*", fg = "#d3c7bd" },
+    { name = "*/", fg = "#d3c2b4", bold = true },
+]
+
+# : ]]]
