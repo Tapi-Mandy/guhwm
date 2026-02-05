@@ -320,17 +320,16 @@ install_base() {
     BASE_PKGS=(
         # --- System Utilities ---
         "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
-        "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
-        "polkit-gnome"
+        "xdg-desktop-portal" "xdg-utils" "xdg-user-dirs" "libxcb" "pcre2"
 
         # --- Network & Bluetooth Manager ---
         "networkmanager" "network-manager-applet"
         "bluez" "bluez-utils" "blueman"
 
-        # --- Wayland & WM Core ---
+        # --- Wayland & WM ---
         "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"
         "libdrm" "pixman" "libdisplay-info" "libliftoff" "seatd"
-        "hwdata" "xorg-xwayland" "wtype" "wl-clipboard" "mangowc-git"
+        "hwdata" "polkit-gnome" "xorg-xwayland" "wtype" "wl-clipboard" "mangowc-git"
 
         # --- UI Components ---
         "waybar" "rofi" "swaync" "libnotify" "gammastep"
