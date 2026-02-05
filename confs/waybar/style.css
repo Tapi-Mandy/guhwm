@@ -1,9 +1,5 @@
 @import "waybar.css";
 
-/* =========================
-   Pixel Material 3 Waybar
-   ========================= */
-
 @define-color bg            @surface_container;
 @define-color bg_high       @surface_container_high;
 @define-color fg            @on_surface;
