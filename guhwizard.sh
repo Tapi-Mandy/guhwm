@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# --- Curl-Ready Mode ---
 # Detect if running via pipe (curl ... | bash) and redirect stdin from /dev/tty
 if [[ ! -t 0 ]]; then
     exec < /dev/tty
@@ -322,7 +321,11 @@ install_base() {
         # --- System Utilities ---
         "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
         "xdg-desktop-portal" "xdg-user-dirs" "libxcb" "pcre2"
-        "polkit-gnome" "network-manager-applet" "bluez" "bluez-utils" "blueman"
+        "polkit-gnome"
+
+        # --- Network & Bluetooth Manager ---
+        "networkmanager" "network-manager-applet"
+        "bluez" "bluez-utils" "blueman"
 
         # --- Wayland & WM Core ---
         "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"
@@ -356,7 +359,11 @@ install_base() {
     echo -e "${GRA}--> Enabling PipeWire user services...${NC}"
     systemctl --user enable pipewire pipewire-pulse wireplumber > /dev/null 2>&1
 
-    # Enable bluetooth service
+    # Enable NetworkManager
+    echo -e "${GRA}--> Enabling NetworkManager...${NC}"
+    sudo systemctl enable --now NetworkManager
+
+    # Enable Bluetooth service
     echo -e "${GRA}--> Enabling Bluetooth service...${NC}"
     enable_service bluetooth
     sleep 2
