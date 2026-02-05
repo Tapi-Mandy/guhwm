@@ -71,7 +71,7 @@
                 },
                 {
                     "label": "",
-                    "command": "nm-applet"
+                    "command": "network-manager"
                 },
                 {
                     "label": "",
