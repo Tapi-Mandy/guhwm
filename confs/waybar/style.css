@@ -25,7 +25,7 @@
 window#waybar {
     background-color: alpha(@bg, 0.95);
     color: @fg;
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 4px 6px;
 }
 
@@ -70,15 +70,38 @@ window#waybar {
 #custom-separator1,
 #custom-separator2 {
     color: @outline;
-    padding: 0 6px;
+    padding: 0 1px;
 }
 
 /* ===== TRAY ===== */
 
+/* Add margin to the tray so it doesn't touch the 'suckless' module */
 #tray {
     background: alpha(@bg_high, 0.6);
     padding: 0 10px;
     border-radius: 12px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+/* Add margin to the suckless text */
+#custom-suckless {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+/* Add margin to the clock */
+#clock {
+    background: alpha(@accent_cont, 0.7);
+    color: @accent_cont_fg;
+    padding: 0 12px;
+    border-radius: 12px;
+    margin-left: 4px;
+}
+
+/* default gap without targeting them one by one: */
+#waybar > box > box > widget > * {
+    margin: 0 1px;
 }
 
 /* ===== CLOCK ===== */

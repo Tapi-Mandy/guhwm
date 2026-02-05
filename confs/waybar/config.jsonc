@@ -2,7 +2,7 @@
     "layer": "top",
     "position": "top",
     "height": 32,
-    "spacing": 0,
+    "spacing": 8, // Change this from 0 to 8 (adds space between all modules)
     "margin": "5 6 5 6",
     "reload_style_on_change": true,
     
@@ -10,10 +10,16 @@
     "modules-center": [],
     "modules-right": ["tray", "custom/suckless", "custom/separator2", "clock"],
 
-    // "custom/logo": {
-    //     "format": "1o",
-    //     "tooltip": false
-    // },
+    // Add this tray block to add space between the icons themselves
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10 
+    },
+
+    "custom/suckless": {
+          "format": "suckless",
+          "tooltip": false
+    },
 
     "ext/workspaces": {
         "disable-scroll": false,
