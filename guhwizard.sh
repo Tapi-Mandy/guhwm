@@ -346,6 +346,8 @@ install_base() {
 
     # Initialize standard user directories
     xdg-user-dirs-update
+    # Remove some default user directories
+    rm -rf Public Templates
 
     # Essential: Ensure user is in groups for Wayland/Hardware access
     setup_user_groups
@@ -526,6 +528,7 @@ optional_software() {
     # MEDIA
     prompt_selection "Media" "multi" \
         "$WHT" "imv" "imv" "Command-line image viewer for Wayland and X11" \
+        "$WHT" "Loupe" "loupe" "Simple and modern image viewer from GNOME" \
         "$PUR" "mpv" "mpv" "Free, open source, and cross-platform media player" \
         "$CYN" "swayimg" "swayimg" "Lightweight image viewer for Wayland" \
         "$ORA" "VLC" "vlc" "Multi-platform multimedia player and framework"
@@ -542,7 +545,7 @@ optional_software() {
     # EMULATORS
     prompt_selection "Emulators" "multi" \
         "$BLU" "Dolphin" "dolphin-emu-git" "Gamecube & Wii emulator" \
-        "$YLW" "DuckStation" "duckstation-git" "PS1 Emulator aiming for the best accuracy and game support." \
+        "$YLW" "DuckStation" "duckstation-git" "PS1 Emulator aiming for accuracy and support" \
         "$GRN" "melonDS" "melonds-bin" "DS emulator, sorta" \
         "$BLU" "PCSX2" "pcsx2" "PlayStation 2 emulator" \
         "$GRA" "RetroArch" "retroarch" "Frontend for emulators, game engines and media players." \
