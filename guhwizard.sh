@@ -266,8 +266,15 @@ setup_aur_helper() {
     echo -e "${GRA}--> Syncing package databases...${NC}"
     sudo pacman -Syu --noconfirm
 
+    # Check if the detected helper actually runs. 
+    # If it fails (like with the libalpm error), clear the variable to force a reinstall.
     if [[ -n "$AUR_HELPER" ]]; then
-        return 0
+        if ! "$AUR_HELPER" --version >/dev/null 2>&1; then
+            echo -e "${ORA}[!] $AUR_HELPER detected but seems broken (library error). Reinstalling...${NC}"
+            AUR_HELPER="" 
+        else
+            return 0
+        fi
     fi
 
     prompt_selection "AUR Helpers" "single" \
