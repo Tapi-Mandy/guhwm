@@ -56,40 +56,30 @@ setup_user_groups() {
 detect_aur() {
     AUR_HELPER=""
     BROKEN_HELPER=""
+    local helpers=("yay" "paru" "aurman" "pikaur" "trizen")
 
-    # Check each helper in order.
-    # If the command exists but --version fails, it's broken.
-    if command -v yay >/dev/null 2>&1; then
-        if yay --version >/dev/null 2>&1; then
-            AUR_HELPER="yay"; AUR_CLR=$CYN
-        else
-            BROKEN_HELPER="yay"
+    for h in "${helpers[@]}"; do
+        if command -v "$h" >/dev/null 2>&1; then
+            if "$h" --version >/dev/null 2>&1; then
+                AUR_HELPER="$h"
+                case "$h" in
+                    yay) AUR_CLR=$CYN ;;
+                    paru) AUR_CLR=$PUR ;;
+                    aurman) AUR_CLR=$YLW ;;
+                    pikaur) AUR_CLR=$BLU ;;
+                    trizen) AUR_CLR=$GRN ;;
+                esac
+                return 0
+            else
+                BROKEN_HELPER="$h"
+                return 0
+            fi
         fi
-    elif command -v paru >/dev/null 2>&1; then
-        if paru --version >/dev/null 2>&1; then
-            AUR_HELPER="paru"; AUR_CLR=$PUR
-        else
-            BROKEN_HELPER="paru"
+        if pacman -Qq | grep -q "^${h}"; then
+            BROKEN_HELPER="$h"
+            return 0
         fi
-    elif command -v aurman >/dev/null 2>&1; then
-        if aurman --version >/dev/null 2>&1; then
-            AUR_HELPER="aurman"; AUR_CLR=$YLW
-        else
-            BROKEN_HELPER="aurman"
-        fi
-    elif command -v pikaur >/dev/null 2>&1; then
-        if pikaur --version >/dev/null 2>&1; then
-            AUR_HELPER="pikaur"; AUR_CLR=$BLU
-        else
-            BROKEN_HELPER="pikaur"
-        fi
-    elif command -v trizen >/dev/null 2>&1; then
-        if trizen --version >/dev/null 2>&1; then
-            AUR_HELPER="trizen"; AUR_CLR=$GRN
-        else
-            BROKEN_HELPER="trizen"
-        fi
-    fi
+    done
 }
 
 # --- Smart Installer ---
@@ -287,15 +277,17 @@ prepare_system() {
     sudo pacman -S --needed --noconfirm base-devel git
 }
 
+# --- Install AUR Helper ---
 setup_aur_helper() {
     echo -e "${GRA}--> Syncing package databases...${NC}"
     sudo pacman -Syu --noconfirm
 
+    # If it works, we leave.
     if [[ -n "$AUR_HELPER" ]]; then
         return 0
     fi
 
-    # --- Broken Helper Message ---
+    # --- Repair Helper Message ---
     if [[ -n "$BROKEN_HELPER" ]]; then
         echo -e "\n${RED}┌─ Broken AUR Helper Detected ───────────────────────────────┐${NC}"
         echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.                               ${RED}│${NC}"
@@ -316,7 +308,6 @@ setup_aur_helper() {
     if [[ -n "$LAST_SELECTION" ]]; then
         AUR_HELPER="$LAST_SELECTION"
         AUR_HELPER_PKG="$LAST_SELECTION"
-
         case "$AUR_HELPER" in
             yay)    AUR_CLR=$CYN ;;
             paru)   AUR_CLR=$PUR ;;
@@ -330,18 +321,16 @@ setup_aur_helper() {
     fi
 
     # --- Conflict Handling ---
-    echo -e "${GRA}--> Cleaning up potential conflicts for $AUR_HELPER...${NC}"
-    # Find all packages starting with the helper name (e.g., paru, paru-bin, paru-debug)
-    # This prevents the "file exists in filesystem" error.
+    echo -e "${GRA}--> Preparing environment for $AUR_HELPER...${NC}"
     local search_pattern="^${AUR_HELPER}"
     local conflicts=$(pacman -Qq | grep -E "${search_pattern}" 2>/dev/null)
 
     if [[ -n "$conflicts" ]]; then
-        echo -e "${GRN}[+] Removing conflicting packages: ${conflicts//$'\n'/ }...${NC}"
+        echo -e "${GRN}[+] Cleaning up existing ${AUR_HELPER} files for a fresh start...${NC}"
         sudo pacman -Rns --noconfirm $conflicts 2>/dev/null || true
     fi
 
-# Pre-install compilers to speed up build and prevent dependency loops
+    # Pre-install compilers
     if [[ "$AUR_HELPER" == "yay" ]]; then
         sudo pacman -S --needed --noconfirm go
     elif [[ "$AUR_HELPER" == "paru" ]]; then
@@ -349,13 +338,9 @@ setup_aur_helper() {
     fi
 
     cd "$TEMP_DIR" || exit
-    if ! git clone "https://aur.archlinux.org/${AUR_HELPER_PKG}.git"; then
-        echo -e "${RED}[!] Failed to clone AUR helper repository.${NC}"
-        exit 1
-    fi
+    git clone "https://aur.archlinux.org/${AUR_HELPER_PKG}.git"
     cd "${AUR_HELPER_PKG}" || exit 1
 
-    # --- Compilation Speed Improvement ---
     export MAKEFLAGS="-j$(nproc)"
     export PKGEXT='.pkg.tar' 
 
