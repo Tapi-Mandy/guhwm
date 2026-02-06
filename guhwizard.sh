@@ -45,26 +45,6 @@ echo "[$(date)]"
 TEMP_DIR=$(mktemp -d -t guhwizard.XXXXXX)
 trap 'kill $SUDO_PID 2>/dev/null; rm -rf "$TEMP_DIR"' EXIT
 
-# --- Network Connectivity Check ---
-check_connection() {
-    echo -e "${GRA}--> Checking network connectivity...${NC}"
-    
-    # 1. Check general internet
-    if ! curl -Is --connect-timeout 5 https://www.google.com > /dev/null; then
-        echo -e "${RED}[!] No internet connection.${NC}"
-        return 1
-    fi
-
-    # 2. Check AUR specifically
-    if ! curl -Is --connect-timeout 5 https://aur.archlinux.org > /dev/null; then
-        echo -e "${RED}[!] Internet is fine, but AUR is currently unreachable.${NC}"
-        return 1
-    fi
-}
-
-check_connection || exit 1
-echo -e "${GRN}[OK] Network and AUR are available.${NC}"
-
 # --- Consolidated User Group Setup ---
 setup_user_groups() {
     local groups="seat,video,audio,render,dbus"
@@ -270,9 +250,33 @@ prompt_selection() {
     return 0
 }
 
+# --- Network Check ---
+check_connection() {
+    # 1. Check general internet
+    if ! curl -Is --connect-timeout 5 https://www.google.com > /dev/null; then
+        echo -e "${RED}[!] No internet connection.${NC}"
+        return 1
+    fi
+
+    # 2. Check AUR specifically
+    if ! curl -Is --connect-timeout 5 https://aur.archlinux.org > /dev/null; then
+        echo -e "${RED}[!] Internet is fine, but AUR is currently unreachable.${NC}"
+        return 1
+    fi
+    return 0
+}
+
+# --- System Preparation ---
 prepare_system() {
     print_banner
     echo -e "${YLW}==> Preparing System...${NC}"
+
+    # Call the network check
+    echo -e "${GRA}--> Verifying connectivity...${NC}"
+    if ! check_connection; then
+        exit 1
+    fi
+    echo -e "${GRN}[OK] Network and AUR are available.${NC}"
 
     # Update Keyring (Crucial for old installs)
     echo -e "${GRA}--> Refreshing Arch Keyring...${NC}"
