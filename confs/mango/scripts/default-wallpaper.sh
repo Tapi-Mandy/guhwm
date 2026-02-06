@@ -22,7 +22,6 @@ fi
 
 # --- Ensure swww daemon is running and ready ---
 if ! pgrep -x swww-daemon > /dev/null; then
-    echo "[default-wallpaper] Starting swww-daemon..."
     swww-daemon &
     DAEMON_PID=$!
     
