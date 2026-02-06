@@ -318,7 +318,7 @@ setup_aur_helper() {
         case "$LAST_SELECTION" in
             yay-bin)   AUR_HELPER="yay" ;;
             paru-bin)  AUR_HELPER="paru" ;;
-            *)         AUR_HELPER="$LAST_SELECTION" ;;
+            *) AUR_HELPER="$LAST_SELECTION" ;;
         esac
         case "$AUR_HELPER" in
             yay)    AUR_CLR=$CYN ;;
@@ -333,15 +333,24 @@ setup_aur_helper() {
     fi
 
     # --- Conflict Handling ---
-    local binary_path=$(command -v "$AUR_HELPER" 2>/dev/null)
-    if [[ -n "$binary_path" ]]; then
-        local installed_pkg=$(pacman -Qqo "$binary_path" 2>/dev/null)
-        if [[ -n "$installed_pkg" && "$installed_pkg" != "$AUR_HELPER_PKG" ]]; then
-            echo -e "${GRA}--> Conflict detected: $installed_pkg provides $AUR_HELPER. Removing...${NC}"
-            sudo pacman -Rns --noconfirm "$installed_pkg"
-        fi
+    echo -e "${GRA}--> Cleaning up potential conflicts for $AUR_HELPER...${NC}"
+    # Find all packages starting with the helper name (e.g., paru, paru-bin, paru-debug)
+    # This prevents the "file exists in filesystem" error.
+    local search_pattern="^${AUR_HELPER}"
+    local conflicts=$(pacman -Qq | grep -E "${search_pattern}" 2>/dev/null)
+
+    if [[ -n "$conflicts" ]]; then
+        echo -e "${GRA}[!] Removing conflicting packages: ${conflicts//$'\n'/ }...${NC}"
+        sudo pacman -Rns --noconfirm $conflicts 2>/dev/null || true
     fi
-    
+
+# Pre-install compilers to speed up build and prevent dependency loops
+    if [[ "$AUR_HELPER" == "yay" ]]; then
+        sudo pacman -S --needed --noconfirm go
+    elif [[ "$AUR_HELPER" == "paru" ]]; then
+        sudo pacman -S --needed --noconfirm rust
+    fi
+
     cd "$TEMP_DIR" || exit
     if ! git clone "https://aur.archlinux.org/${AUR_HELPER_PKG}.git"; then
         echo -e "${RED}[!] Failed to clone AUR helper repository.${NC}"
