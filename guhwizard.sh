@@ -133,7 +133,7 @@ EOF
     echo -e "${YLW}Thank you for trying guhwm! :3${NC}"
 
     if [[ -n "$AUR_HELPER" ]]; then
-        echo -e "${YLW}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
+        echo -e "${YLW}AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
     elif [[ -n "$BROKEN_HELPER" ]]; then
         # If it's broken, show it in Red
         echo -e "${YLW}AUR Helper: ${RED}$BROKEN_HELPER (Needs Repair)${NC}"
