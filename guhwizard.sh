@@ -173,7 +173,7 @@ EOF
     echo -e "${NC}"
     echo -e "${YLW}Thank you for trying guhwm! :3${NC}"
     if [[ -n "$AUR_HELPER" ]]; then
-        echo -e "${YLW}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
+        echo -e "${WHT}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
     fi
     echo ""
 }
