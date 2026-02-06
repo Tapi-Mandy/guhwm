@@ -331,6 +331,17 @@ setup_aur_helper() {
     else
         echo -e "${RED}[ERROR] An AUR helper is required.${NC}"; exit 1
     fi
+
+    # --- Conflict Handling ---
+    # Detect if a different package already provides this helper's binary and remove it
+    local binary_path=$(command -v "$AUR_HELPER" 2>/dev/null)
+    if [[ -n "$binary_path" ]]; then
+        local installed_pkg=$(pacman -Qqo "$binary_path" 2>/dev/null)
+        if [[ -n "$installed_pkg" && "$installed_pkg" != "$AUR_HELPER_PKG" ]]; then
+            echo -e "${GRA}--> Conflict detected: $installed_pkg provides $AUR_HELPER. Removing it...${NC}"
+            sudo pacman -Rns --noconfirm "$installed_pkg"
+        fi
+    fi
     
     cd "$TEMP_DIR" || exit
     if ! git clone "https://aur.archlinux.org/${AUR_HELPER_PKG}.git"; then
