@@ -460,7 +460,7 @@ install_custom_repos() {
     if [ -f "$HOME/.config/mango/scripts/default-wallpaper.sh" ]; then
         chmod +x "$HOME/.config/mango/scripts/default-wallpaper.sh"
         echo -e "${GRA}--> Setting default wallpaper...${NC}"
-        bash "$HOME/.config/mango/scripts/default-wallpaper.sh" 2>/dev/null || echo -e "${YLW}[!] Wallpaper script executed${NC}"
+        bash "$HOME/.config/mango/scripts/default-wallpaper.sh" 2>/dev/null || echo -e "${GRA}--> Wallpaper is ready.${NC}"
     fi
 
     # 5. Make nightlight toggle script executable
@@ -470,6 +470,7 @@ install_custom_repos() {
     fi
 
     # 6. Install guhwall (Wallpaper Manager)
+    echo -e
     echo -e "${YLW}==> Installing guhwall | Guh?? Set a Wallpaper!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
         (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
@@ -480,6 +481,7 @@ install_custom_repos() {
     fi
 
     # 7. Install guhShot (Screenshot utility)
+    echo -e
     echo -e "${YLW}==> Installing guhShot | Guh?? Take a Screenshot!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
         (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
