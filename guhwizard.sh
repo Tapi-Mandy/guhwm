@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Detect if running via pipe (curl ... | bash) and redirect stdin from /dev/tty
+# Detect if running via pipe (curl...) and redirect stdin from /dev/tty
 if [[ ! -t 0 ]]; then
     exec < /dev/tty
 fi
