@@ -438,7 +438,7 @@ install_base() {
 
 install_custom_repos() {
     print_banner
-    echo -e "${YLW}==> Setting up guhwm configurations and guhwall...${NC}"
+    echo -e "${YLW}==> Setting up guhwm...${NC}"
 
     # 1. Clone guhwm
     if ! git clone https://github.com/Tapi-Mandy/guhwm.git "$TEMP_DIR/guhwm"; then
@@ -474,7 +474,7 @@ install_custom_repos() {
     echo -e "${YLW}==> Installing guhwall | Guh?? Set a Wallpaper!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
         (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
-        echo -e "${GRN}[SUCCESS] guhwall installed.${NC}"
+        echo -e "${GRN}[SUCCESS] guhwall is installed.${NC}"
     else
         echo -e "${RED}[!] Failed to clone guhwall repository.${NC}"
         exit 1
@@ -485,14 +485,14 @@ install_custom_repos() {
     echo -e "${YLW}==> Installing guhShot | Guh?? Take a Screenshot!...${NC}"
     if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
         (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
-        echo -e "${GRN}[SUCCESS] guhShot installed.${NC}"
+        echo -e "${GRN}[SUCCESS] guhShot is installed.${NC}"
     else
         echo -e "${RED}[!] Failed to clone guhShot repository.${NC}"
         exit 1
     fi
 
     echo -e
-    read -rp "${YLW}==> Configurations & guhwall & guhShot are installed. Press Enter to continue...${NC}"
+    read -rp "${YLW}==> guhwm & guhwall & guhShot are installed. Press Enter to continue...${NC}"
 }
 
 optional_software() {
