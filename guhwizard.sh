@@ -337,7 +337,7 @@ setup_aur_helper() {
     local conflicts=$(pacman -Qq | grep -E "${search_pattern}" 2>/dev/null)
 
     if [[ -n "$conflicts" ]]; then
-        echo -e "${GRA}[!] Removing conflicting packages: ${conflicts//$'\n'/ }...${NC}"
+        echo -e "${GRN}[+] Removing conflicting packages: ${conflicts//$'\n'/ }...${NC}"
         sudo pacman -Rns --noconfirm $conflicts 2>/dev/null || true
     fi
 
