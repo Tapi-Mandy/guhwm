@@ -266,20 +266,13 @@ setup_aur_helper() {
     echo -e "${GRA}--> Syncing package databases...${NC}"
     sudo pacman -Syu --noconfirm
 
-    # Check if the detected helper actually runs. 
-    # If it fails (like with the libalpm error), clear the variable to force a reinstall.
     if [[ -n "$AUR_HELPER" ]]; then
-        if ! "$AUR_HELPER" --version >/dev/null 2>&1; then
-            echo -e "${ORA}[!] $AUR_HELPER detected but seems broken (library error). Reinstalling...${NC}"
-            AUR_HELPER="" 
-        else
-            return 0
-        fi
+        return 0
     fi
 
     prompt_selection "AUR Helpers" "single" \
         "$CYN" "yay" "yay-bin" "Yet Another Yogurt, fast and feature-rich, written in Go" \
-        "$PUR" "paru" "paru-bin" "Feature-packed helper and pacman wrapper written in Rust" \
+        "$PUR" "paru" "paru" "Feature-packed helper and pacman wrapper written in Rust" \
         "$YLW" "aurman" "aurman" "Known for its security and syntax similarities to pacman" \
         "$BLU" "pikaur" "pikaur" "AUR helper with minimal dependencies" \
         "$GRN" "trizen" "trizen" "Lightweight AUR helper written in Perl"
