@@ -75,21 +75,42 @@ setup_user_groups() {
 # --- AUR Helper Detection ---
 detect_aur() {
     AUR_HELPER=""
-    
-    # Check if the command exists AND if it can actually execute without errors
-    if command -v yay >/dev/null 2>&1 && yay --version >/dev/null 2>&1; then
-        AUR_HELPER="yay"; AUR_CLR=$CYN
-    elif command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
-        AUR_HELPER="paru"; AUR_CLR=$PUR
-    elif command -v aurman >/dev/null 2>&1 && aurman --version >/dev/null 2>&1; then
-        AUR_HELPER="aurman"; AUR_CLR=$YLW
-    elif command -v pikaur >/dev/null 2>&1 && pikaur --version >/dev/null 2>&1; then
-        AUR_HELPER="pikaur"; AUR_CLR=$BLU
-    elif command -v trizen >/dev/null 2>&1 && trizen --version >/dev/null 2>&1; then
-        AUR_HELPER="trizen"; AUR_CLR=$GRN
+    BROKEN_HELPER=""
+
+    # Check each helper in order.
+    # If the command exists but --version fails, it's broken.
+    if command -v yay >/dev/null 2>&1; then
+        if yay --version >/dev/null 2>&1; then
+            AUR_HELPER="yay"; AUR_CLR=$CYN
+        else
+            BROKEN_HELPER="yay"
+        fi
+    elif command -v paru >/dev/null 2>&1; then
+        if paru --version >/dev/null 2>&1; then
+            AUR_HELPER="paru"; AUR_CLR=$PUR
+        else
+            BROKEN_HELPER="paru"
+        fi
+    elif command -v aurman >/dev/null 2>&1; then
+        if aurman --version >/dev/null 2>&1; then
+            AUR_HELPER="aurman"; AUR_CLR=$YLW
+        else
+            BROKEN_HELPER="aurman"
+        fi
+    elif command -v pikaur >/dev/null 2>&1; then
+        if pikaur --version >/dev/null 2>&1; then
+            AUR_HELPER="pikaur"; AUR_CLR=$BLU
+        else
+            BROKEN_HELPER="pikaur"
+        fi
+    elif command -v trizen >/dev/null 2>&1; then
+        if trizen --version >/dev/null 2>&1; then
+            AUR_HELPER="trizen"; AUR_CLR=$GRN
+        else
+            BROKEN_HELPER="trizen"
+        fi
     fi
 }
-
 
 # --- Smart Installer ---
 smart_install() {
@@ -274,8 +295,18 @@ setup_aur_helper() {
         return 0
     fi
 
+    # --- Broken Helper Message ---
+    if [[ -n "$BROKEN_HELPER" ]]; then
+        echo -e "\n${RED}┌─ Broken AUR Helper Detected ──────────────────────────────────┐${NC}"
+        echo -e "${RED}│${NC}  The system found ${RED}$BROKEN_HELPER${NC}, but it's currently failing.         ${RED}│${NC}"
+        echo -e "${RED}│${NC}  This usually happens after a major Pacman update.            ${RED}│${NC}"
+        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.         ${RED}│${NC}"
+        echo -e "${RED}└──────────────────────────────────────────────────────────────┘${NC}\n"
+        sleep 1
+    fi
+
     prompt_selection "AUR Helpers" "single" \
-        "$CYN" "yay" "yay-bin" "Yet Another Yogurt, fast and feature-rich, written in Go" \
+        "$CYN" "yay" "yay" "Yet Another Yogurt, fast and feature-rich, written in Go" \
         "$PUR" "paru" "paru" "Feature-packed helper and pacman wrapper written in Rust" \
         "$YLW" "aurman" "aurman" "Known for its security and syntax similarities to pacman" \
         "$BLU" "pikaur" "pikaur" "AUR helper with minimal dependencies" \
