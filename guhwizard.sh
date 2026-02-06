@@ -5,18 +5,11 @@ if [[ ! -t 0 ]]; then
     exec < /dev/tty
 fi
 
-# --- Colors & Style ---
-YLW=$'\033[1;33m' # Yellow: Primary
-WHT=$'\033[0;37m' # White
-GRA=$'\033[1;30m' # Gray
-ORA=$'\033[0;33m' # Orange
-RED=$'\033[0;31m' # Red
-GRN=$'\033[0;32m' # Green
-MAG=$'\033[1;35m' # Magenta
-PUR=$'\033[0;35m' # Purple
-CYN=$'\033[0;36m' # Cyan
-BLU=$'\033[1;34m' # Blue
-NC=$'\033[0m'     # No Color
+# --- Colors ---
+YLW=$'\033[1;33m'; WHT=$'\033[0;37m'; GRA=$'\033[1;30m'
+RED=$'\033[0;31m'; GRN=$'\033[0;32m'; MAG=$'\033[1;35m'
+PUR=$'\033[0;35m'; CYN=$'\033[0;36m'; BLU=$'\033[1;34m'
+ORA=$'\033[0;33m'; NC=$'\033[0m'
 
 # --- Prevent Root Execution ---
 if [[ $EUID -eq 0 ]]; then
