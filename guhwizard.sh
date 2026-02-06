@@ -115,45 +115,28 @@ detect_aur() {
 # --- Smart Installer ---
 smart_install() {
     local pkgs=("$@")
-    local repo_pkgs_found=()
-    local repo_pkgs_to_install=()
+    local repo_pkgs=()
     local aur_pkgs=()
 
-    # 1. Get a list of which requested packages actually exist in official repositories
-    mapfile -t repo_pkgs_found < <(pacman -Slq | grep -Fxf <(printf "%s\n" "${pkgs[@]}"))
-    
     for pkg in "${pkgs[@]}"; do
-        # Skip 'oh-my-zsh' here because it is handled by the official curl installer
+    # Skip 'oh-my-zsh' here because it is handled by the official curl installer
         [[ "$pkg" == "oh-my-zsh" ]] && continue
-
-        local found=false
-        for r_pkg in "${repo_pkgs_found[@]}"; do
-            if [[ "$pkg" == "$r_pkg" ]]; then
-                found=true
-                repo_pkgs_to_install+=("$pkg")
-                break
-            fi
-        done
         
-        # If not found in repo, assume it is an AUR package
-        if [[ "$found" == false ]]; then
+        # Direct database check
+        if pacman -Si "$pkg" >/dev/null 2>&1; then
+            repo_pkgs+=("$pkg")
+        else
             aur_pkgs+=("$pkg")
         fi
     done
 
-    # 2. Install from Official Repositories
-    if [[ ${#repo_pkgs_to_install[@]} -gt 0 ]]; then
-        echo -e "${GRA}--> Installing from official repositories...${NC}"
-        sudo pacman -S --needed --noconfirm "${repo_pkgs_to_install[@]}"
-    fi
-
-    # 3. Install from AUR
+    [[ ${#repo_pkgs[@]} -gt 0 ]] && sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}"
+    
     if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
         if [[ -n "$AUR_HELPER" ]]; then
-            echo -e "${GRA}--> Installing from AUR: ${aur_pkgs[*]}${NC}"
             "$AUR_HELPER" -S --needed --noconfirm "${aur_pkgs[@]}"
         else
-            echo -e "${RED}[!] AUR helper not found. Skipping AUR packages: ${aur_pkgs[*]}${NC}"
+            echo -e "${RED}[!] AUR helper missing. Skipping: ${aur_pkgs[*]}${NC}"
         fi
     fi
 }
