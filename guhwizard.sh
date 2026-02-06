@@ -314,12 +314,9 @@ setup_aur_helper() {
         "$GRN" "trizen" "trizen" "Lightweight AUR helper written in Perl"
 
     if [[ -n "$LAST_SELECTION" ]]; then
+        AUR_HELPER="$LAST_SELECTION"
         AUR_HELPER_PKG="$LAST_SELECTION"
-        case "$LAST_SELECTION" in
-            yay-bin)   AUR_HELPER="yay" ;;
-            paru-bin)  AUR_HELPER="paru" ;;
-            *) AUR_HELPER="$LAST_SELECTION" ;;
-        esac
+
         case "$AUR_HELPER" in
             yay)    AUR_CLR=$CYN ;;
             paru)   AUR_CLR=$PUR ;;
