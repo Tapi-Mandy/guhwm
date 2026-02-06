@@ -74,18 +74,22 @@ setup_user_groups() {
 
 # --- AUR Helper Detection ---
 detect_aur() {
-    if command -v yay >/dev/null 2>&1; then
+    AUR_HELPER=""
+    
+    # Check if the command exists AND if it can actually execute without errors
+    if command -v yay >/dev/null 2>&1 && yay --version >/dev/null 2>&1; then
         AUR_HELPER="yay"; AUR_CLR=$CYN
-    elif command -v paru >/dev/null 2>&1; then
+    elif command -v paru >/dev/null 2>&1 && paru --version >/dev/null 2>&1; then
         AUR_HELPER="paru"; AUR_CLR=$PUR
-    elif command -v aurman >/dev/null 2>&1; then
+    elif command -v aurman >/dev/null 2>&1 && aurman --version >/dev/null 2>&1; then
         AUR_HELPER="aurman"; AUR_CLR=$YLW
-    elif command -v pikaur >/dev/null 2>&1; then
+    elif command -v pikaur >/dev/null 2>&1 && pikaur --version >/dev/null 2>&1; then
         AUR_HELPER="pikaur"; AUR_CLR=$BLU
-    elif command -v trizen >/dev/null 2>&1; then
+    elif command -v trizen >/dev/null 2>&1 && trizen --version >/dev/null 2>&1; then
         AUR_HELPER="trizen"; AUR_CLR=$GRN
     fi
 }
+
 
 # --- Smart Installer ---
 smart_install() {
@@ -266,15 +270,8 @@ setup_aur_helper() {
     echo -e "${GRA}--> Syncing package databases...${NC}"
     sudo pacman -Syu --noconfirm
 
-    # Check if the detected helper actually runs. 
-    # If it fails (example: libalpm error with paru), clear the variable to force a reinstall.
     if [[ -n "$AUR_HELPER" ]]; then
-        if ! "$AUR_HELPER" --version >/dev/null 2>&1; then
-            echo -e "${RED}[!] $AUR_HELPER detected but seems broken (library error). Reinstalling...${NC}"
-            AUR_HELPER="" 
-        else
-            return 0
-        fi
+        return 0
     fi
 
     prompt_selection "AUR Helpers" "single" \
