@@ -59,9 +59,10 @@ detect_aur() {
     local helpers=("yay" "paru" "aurman" "pikaur" "trizen")
 
     for h in "${helpers[@]}"; do
-        if command -v "$h" >/dev/null 2>&1; then
-            if "$h" --version >/dev/null 2>&1; then
-                AUR_HELPER="$h"
+        if "$h" --version >/dev/null 2>&1; then
+            else
+                BROKEN_HELPER="$h"
+                # Set the color even if it's broken
                 case "$h" in
                     yay) AUR_CLR=$CYN ;;
                     paru) AUR_CLR=$PUR ;;
@@ -70,13 +71,18 @@ detect_aur() {
                     trizen) AUR_CLR=$GRN ;;
                 esac
                 return 0
-            else
-                BROKEN_HELPER="$h"
-                return 0
             fi
         fi
         if pacman -Qq | grep -q "^${h}"; then
             BROKEN_HELPER="$h"
+            # Set color for the ghost helper too
+            case "$h" in
+                yay) AUR_CLR=$CYN ;;
+                paru) AUR_CLR=$PUR ;;
+                aurman) AUR_CLR=$YLW ;;
+                pikaur) AUR_CLR=$BLU ;;
+                trizen) AUR_CLR=$GRN ;;
+            esac
             return 0
         fi
     done
@@ -125,8 +131,12 @@ print_banner() {
 EOF
     echo -e "${NC}"
     echo -e "${YLW}Thank you for trying guhwm! :3${NC}"
+
     if [[ -n "$AUR_HELPER" ]]; then
-        echo -e "${WHT}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
+        echo -e "${YLW}Detected AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
+    elif [[ -n "$BROKEN_HELPER" ]]; then
+        # If it's broken, show it in Red
+        echo -e "${YLW}AUR Helper: ${RED}$BROKEN_HELPER (Needs Repair)${NC}"
     fi
     echo ""
 }
