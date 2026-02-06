@@ -99,7 +99,7 @@ smart_install() {
     local aur_pkgs=()
 
     for pkg in "${pkgs[@]}"; do
-    # Skip 'oh-my-zsh' here because it is handled by the official curl installer
+        # Skip 'oh-my-zsh' here because it is handled by the official curl installer
         [[ "$pkg" == "oh-my-zsh" ]] && continue
         
         # Direct database check
