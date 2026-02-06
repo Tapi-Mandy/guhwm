@@ -32,7 +32,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwiz
 - TTY Native: Styled with a vanilla palette designed to look great in the standard Arch TTY.
 
 > [!TIP]
-> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a 'minimal' desktop profile to set up your base system, and then installing guhwm
+> We recommend using [archinstall](https://wiki.archlinux.org/title/Archinstall) with a `minimal` desktop profile to set up your base system, and then installing guhwm
 
 ---
 > [!WARNING]
@@ -40,15 +40,15 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwiz
 
 ### Screenshots
 
-<img width="65%" alt="image" src="https://github.com/user-attachments/assets/aef8cb8e-e00f-4c0a-8e7f-6dc01133d6e7"/>
+<img width="75%" alt="image" src="https://github.com/user-attachments/assets/aef8cb8e-e00f-4c0a-8e7f-6dc01133d6e7"/>
 
 > *guhwm with Kitty running uwufetch and nyancat*
 <br>
-<img width="65%" alt="image" src="https://github.com/user-attachments/assets/f9925c6f-a40a-4f35-9d10-9c51f88301a0"/>
+<img width="75%" alt="image" src="https://github.com/user-attachments/assets/f9925c6f-a40a-4f35-9d10-9c51f88301a0"/>
 
 > *guhwm with Kitty running asciiquarium & Lynx with stallman.org opened*
 <br>
-<img width="65%" alt="image" src="https://github.com/user-attachments/assets/37c51b93-8741-4ea4-924d-b3b08f9d1672"/>
+<img width="75%" alt="image" src="https://github.com/user-attachments/assets/37c51b93-8741-4ea4-924d-b3b08f9d1672"/>
 
 > *guhwm launching Krita*
 
