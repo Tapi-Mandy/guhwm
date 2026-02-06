@@ -394,11 +394,11 @@ install_base() {
 
         # --- Wayland & WM ---
         "glibc" "wayland" "wayland-protocols" "libinput" "libxkbcommon"
-        "libdrm" "pixman" "libdisplay-info" "libliftoff" "seatd"
-        "hwdata" "polkit-gnome" "xorg-xwayland" "wtype" "wl-clipboard" "mangowc-git"
+        "libdrm" "pixman" "libdisplay-info" "libliftoff" "seatd" "hwdata" "polkit-gnome" 
+        "wtype" "wl-clipboard" "wlsunset" "xorg-xwayland" "mangowc-git"
 
         # --- UI Components ---
-        "waybar" "rofi" "swaync" "libnotify" "gammastep"
+        "waybar" "rofi" "swaync" "libnotify"
 
         # --- Audio Stack ---
         "alsa-utils" "pipewire" "pipewire-pulse" "wireplumber"
@@ -567,6 +567,7 @@ optional_software() {
     prompt_selection "File Managers" "single" \
         "$BLU" "Nautilus" "nautilus" "GNOME's file manager" \
         "$WHT" "Nemo" "nemo" "Cinnamon's file manager" \
+        "$CYA" "Dolphin" "dolphin" "KDE's feature-rich file manager" \
         "$GRA" "nnn" "nnn" "The unorthodox terminal file manager" \
         "$ORA" "ranger" "ranger" "Vim-inspired terminal file manager" \
         "$YLW" "yazi" "yazi" "Blazing fast terminal file manager written in Rust"
@@ -599,7 +600,7 @@ optional_software() {
     # MEDIA
     prompt_selection "Media" "multi" \
         "$WHT" "imv" "imv" "Command-line image viewer for Wayland and X11" \
-        "$WHT" "Loupe" "loupe" "Simple and modern image viewer from GNOME" \
+        "$BLU" "Loupe" "loupe" "Simple and modern image viewer from GNOME" \
         "$PUR" "mpv" "mpv" "Free, open source, and cross-platform media player" \
         "$CYN" "swayimg" "swayimg" "Lightweight image viewer for Wayland" \
         "$ORA" "VLC" "vlc" "Multi-platform multimedia player and framework"
