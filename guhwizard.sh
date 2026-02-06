@@ -298,11 +298,11 @@ setup_aur_helper() {
     # --- Broken Helper Message ---
     if [[ -n "$BROKEN_HELPER" ]]; then
         echo -e "\n${RED}┌─ Broken AUR Helper Detected ───────────────────────────────┐${NC}"
-        echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.                 ${RED}│${NC}"
+        echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.                           ${RED}│${NC}"
         echo -e "${RED}│${NC}  This usually happens after a major Pacman update.         ${RED}│${NC}"
         echo -e "${RED}│${NC}  Building a fresh version will fix the library links.      ${RED}│${NC}"
         echo -e "${RED}└────────────────────────────────────────────────────────────┘${NC}\n"
-        echo -ne "${YLW}==> Press ${GRN}[Enter]${YLW} to open the repair prompt...${NC}"
+        echo -ne "${WHT}==> Press ${GRN}[Enter]${YLW} to open the repair prompt...${NC}"
         read -r
     fi
 
