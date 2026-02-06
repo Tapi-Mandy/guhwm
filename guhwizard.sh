@@ -670,11 +670,14 @@ EOF
 
 # --- Execution Flow ---
 
-# Ensure essential build tools exist before doing anything else
+# 1. Essential build tools MUST come first for makepkg to work
 echo -e "${GRA}--> Preparing system (Installing base-devel & git)...${NC}"
 sudo pacman -S --needed --noconfirm base-devel git
 
+# 2. Now check if we already have a working helper
 detect_aur
+
+# 3. Rest of the wizard
 print_banner
 setup_aur_helper
 install_base
