@@ -332,15 +332,6 @@ setup_aur_helper() {
         echo -e "${RED}[ERROR] An AUR helper is required.${NC}"; exit 1
     fi
 
-    ash
-setup_aur_helper() {
-    echo -e "${GRA}--> Syncing package databases...${NC}"
-    sudo pacman -Syu --noconfirm
-
-    if [[ -n "$AUR_HELPER" ]]; then
-        return 0
-    fi
-
     # --- Conflict Handling ---
     local binary_path=$(command -v "$AUR_HELPER" 2>/dev/null)
     if [[ -n "$binary_path" ]]; then
@@ -358,19 +349,15 @@ setup_aur_helper() {
     fi
     cd "${AUR_HELPER_PKG}" || exit 1
 
-    # --- THE SPEED IMPROVEMENT ---
-    # Use all CPU cores for compilation and skip compression to save time
+    # --- Compilation Speed Improvement ---
     export MAKEFLAGS="-j$(nproc)"
     export PKGEXT='.pkg.tar' 
 
     if ! makepkg -si --noconfirm; then
-        echo -e "${RED}[!] Failed to build AUR helper.${NC}"
-        exit 1
-    fi
-    if ! makepkg -si --noconfirm; then
         echo -e "${RED}[!] Failed to build AUR helper. Please try manually.${NC}"
         exit 1
     fi
+
     cd ~ || exit
     hash -r
     detect_aur
