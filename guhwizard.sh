@@ -300,7 +300,7 @@ setup_aur_helper() {
         echo -e "\n${RED}┌─ Broken AUR Helper Detected ─────────────────────────────────┐${NC}"
         echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.        ${RED}│${NC}"
         echo -e "${RED}│${NC}  This usually happens after a major Pacman update.       ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.     ${RED│${NC}"
+        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.     ${RED}│${NC}"
         echo -e "${RED}└────────────────────────────────────────────────────────────┘${NC}\n"
         echo -ne "${YLW}==> Press ${GRN}[Enter]${YLW} to open the repair prompt...${NC}"
         read -r
@@ -631,15 +631,6 @@ vV\|/vV|`-'\  ,---\   | \Vv\hjwVv\//v
                     (_/
 EOF
     echo -e "${GRN}System setup complete! Everything is ready.${NC}"
-    
-    # Self-destruct (skip if running via curl where $0 is not a real file)
-    SCRIPT_PATH="$(realpath "$0" 2>/dev/null || echo "")"
-    if [[ -n "$SCRIPT_PATH" && -f "$SCRIPT_PATH" && "$SCRIPT_PATH" != *"/bash" ]]; then
-        SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-        rm -f "$SCRIPT_PATH"
-        [ -d "$SCRIPT_DIR" ] && rmdir "$SCRIPT_DIR" 2>/dev/null  # Only removes if empty
-    fi
-
     echo -e
     read -rp "Would you like to reboot now? (y/n): " rb
     
