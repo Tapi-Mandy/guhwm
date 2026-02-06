@@ -59,10 +59,22 @@ detect_aur() {
     local helpers=("yay" "paru" "aurman" "pikaur" "trizen")
 
     for h in "${helpers[@]}"; do
-        if "$h" --version >/dev/null 2>&1; then
+        # 1. Check if the command exists in the system path
+        if command -v "$h" >/dev/null 2>&1; then
+            # 2. Check if the command actually runs correctly
+            if "$h" --version >/dev/null 2>&1; then
+                AUR_HELPER="$h"
+                case "$h" in
+                    yay) AUR_CLR=$CYN ;;
+                    paru) AUR_CLR=$PUR ;;
+                    aurman) AUR_CLR=$YLW ;;
+                    pikaur) AUR_CLR=$BLU ;;
+                    trizen) AUR_CLR=$GRN ;;
+                esac
+                return 0 # Found a working one!
             else
+                # Found it, but it's broken (library error)
                 BROKEN_HELPER="$h"
-                # Set the color even if it's broken
                 case "$h" in
                     yay) AUR_CLR=$CYN ;;
                     paru) AUR_CLR=$PUR ;;
@@ -73,9 +85,10 @@ detect_aur() {
                 return 0
             fi
         fi
+
+        # 3. GHOST CHECK: If command is missing, check if pacman still sees the package
         if pacman -Qq | grep -q "^${h}"; then
             BROKEN_HELPER="$h"
-            # Set color for the ghost helper too
             case "$h" in
                 yay) AUR_CLR=$CYN ;;
                 paru) AUR_CLR=$PUR ;;
@@ -660,7 +673,6 @@ EOF
 }
 
 # --- Execution Flow ---
-
 prepare_system        # Refresh keys, install git/base-devel
 detect_aur            # Check if a helper is already there
 setup_aur_helper      # Repair or Install AUR helper
