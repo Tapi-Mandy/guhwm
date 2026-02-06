@@ -287,6 +287,19 @@ prompt_selection() {
     return 0
 }
 
+prepare_system() {
+    print_banner
+    echo -e "${YLW}==> Preparing System...${NC}"
+
+    # Update Keyring (Crucial for old installs)
+    echo -e "${GRA}--> Refreshing Arch Keyring...${NC}"
+    sudo pacman -Sy archlinux-keyring --noconfirm
+
+    # Essential build tools
+    echo -e "${GRA}--> Installing base-devel and git...${NC}"
+    sudo pacman -S --needed --noconfirm base-devel git
+}
+
 setup_aur_helper() {
     echo -e "${GRA}--> Syncing package databases...${NC}"
     sudo pacman -Syu --noconfirm
@@ -480,6 +493,9 @@ install_custom_repos() {
 }
 
 optional_software() {
+    # Ensure config directory exists before we try to 'sed' files in it
+    mkdir -p "$HOME/.config/mango"
+    
     print_banner
 
     # SHELLS
@@ -657,17 +673,10 @@ EOF
 
 # --- Execution Flow ---
 
-# 1. Essential build tools MUST come first for makepkg to work
-echo -e "${GRA}--> Preparing system (Installing base-devel & git)...${NC}"
-sudo pacman -S --needed --noconfirm base-devel git
-
-# 2. Now check if we already have a working helper
-detect_aur
-
-# 3. Rest of the wizard
-print_banner
-setup_aur_helper
-install_base
-install_custom_repos
-optional_software
-print_outro
+prepare_system        # Refresh keys, install git/base-devel
+detect_aur            # Check if a helper is already there
+setup_aur_helper      # Repair or Install AUR helper
+install_base          # System utils, Wayland, Audio, Fonts
+install_custom_repos  # Clone configs, Wallpapers, guhwall, guhShot
+optional_software     # Shells, Browsers, Apps, and 'sed' tweaks
+print_outro           # Final ASCII and reboot prompt
