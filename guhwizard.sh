@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Detect if running via pipe (curl...) and redirect stdin from /dev/tty
 if [[ ! -t 0 ]]; then
@@ -40,9 +41,12 @@ trap 'kill $SUDO_PID 2>/dev/null; rm -rf "$TEMP_DIR"' EXIT
 
 # --- Consolidated User Group Setup ---
 setup_user_groups() {
-    local groups="seat,video,audio,render,dbus"
-    echo -e "${GRA}--> Adding $USER to groups: $groups${NC}"
-    sudo usermod -aG "$groups" "$USER" 2>/dev/null || true
+    local groups=("seat" "video" "audio" "render" "dbus")
+    for g in "${groups[@]}"; do
+        if getent group "$g" >/dev/null; then
+            sudo usermod -aG "$g" "$USER"
+        fi
+    done
 }
 
 # --- AUR Helper Detection ---
@@ -105,7 +109,7 @@ smart_install() {
         [[ "$pkg" == "oh-my-zsh" ]] && continue
         
         # Direct database check
-        if pacman -Si "$pkg" >/dev/null 2>&1; then
+        if pacman -Sp "$pkg" >/dev/null 2>&1; then
             repo_pkgs+=("$pkg")
         else
             aur_pkgs+=("$pkg")
@@ -310,7 +314,7 @@ setup_aur_helper() {
         echo -e "${RED}│${NC}  This usually happens after a major Pacman update.         ${RED}│${NC}"
         echo -e "${RED}│${NC}  Building a fresh version will fix the library links.      ${RED}│${NC}"
         echo -e "${RED}└────────────────────────────────────────────────────────────┘${NC}\n"
-        echo -ne "${WHT}==> Press ${GRN}[Enter]${WHT} to open the repair prompt...${NC}"
+        echo -ne "${WHT}==> Press ${GRN}[Enter]${WHT} to open the repair prompt... (Select ${RED}$BROKEN_HELPER${NC})${NC}"
         read -r
     fi
 
@@ -434,20 +438,20 @@ install_custom_repos() {
     echo -e "${YLW}==> Setting up guhwm...${NC}"
 
     # 1. Clone guhwm
-    if ! git clone https://github.com/Tapi-Mandy/guhwm.git "$TEMP_DIR/guhwm"; then
+    if ! git clone --depth 1 https://github.com/Tapi-Mandy/guhwm.git "$TEMP_DIR/guhwm"; then
         echo -e "${RED}[!] Failed to clone guhwm repository.${NC}"
         exit 1
     fi
     
-    # 2. Copy all configs
+# 2. Copy all configs
     if [ -d "$TEMP_DIR/guhwm/confs" ]; then
         echo -e "${GRA}--> Deploying configuration files...${NC}"
-        cp -r "$TEMP_DIR/guhwm/confs/"* ~/.config/
+        cp -ra --backup=numbered "$TEMP_DIR/guhwm/confs/." ~/.config/
     fi
 
     # 3. Copy wallpapers
     mkdir -p ~/Wallpapers
-    cp -r "$TEMP_DIR/guhwm/Wallpapers/"* ~/Wallpapers/
+    cp -ra --backup=numbered "$TEMP_DIR/guhwm/Wallpapers/." ~/Wallpapers/
 
     # 4. Make default-wallpaper.sh executable and run it
     if [ -f "$HOME/.config/mango/scripts/default-wallpaper.sh" ]; then
@@ -465,7 +469,7 @@ install_custom_repos() {
     # 6. Install guhwall (Wallpaper Manager)
     echo -e
     echo -e "${YLW}==> Installing guhwall | Guh?? Set a Wallpaper!...${NC}"
-    if git clone https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
+    if git clone --depth 1 https://github.com/Tapi-Mandy/guhwall.git "$TEMP_DIR/guhwall"; then
         (cd "$TEMP_DIR/guhwall" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhwall is installed.${NC}"
     else
@@ -476,7 +480,7 @@ install_custom_repos() {
     # 7. Install guhShot (Screenshot utility)
     echo -e
     echo -e "${YLW}==> Installing guhShot | Guh?? Take a Screenshot!...${NC}"
-    if git clone https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
+    if git clone --depth 1 https://github.com/Tapi-Mandy/guhShot.git "$TEMP_DIR/guhShot"; then
         (cd "$TEMP_DIR/guhShot" && makepkg -si --noconfirm)
         echo -e "${GRN}[SUCCESS] guhShot is installed.${NC}"
     else
@@ -509,19 +513,31 @@ optional_software() {
         if [[ "$LAST_SELECTION" == "oh-my-zsh" ]]; then
             echo -e "${MAG}--> Running official Oh-My-Zsh installer...${NC}"
             sudo pacman -S --needed --noconfirm zsh
+            # Use --unattended so it doesn't break the script flow or switch shells mid-script
             sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
             [ -f "$HOME/.zshrc" ] && sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
         fi
 
-        # Change shell after installation
+        # 1. Refresh path to find the new shell
         hash -r
         SHELL_PATH=$(command -v "$TARGET_SHELL" 2>/dev/null)
+
         if [[ -n "$SHELL_PATH" ]]; then
+            # 2. Only add to /etc/shells if it's not already there (prevents duplicates)
             if ! grep -Fxq "$SHELL_PATH" /etc/shells; then
+                echo -e "${GRA}--> Adding $SHELL_PATH to /etc/shells...${NC}"
                 echo "$SHELL_PATH" | sudo tee -a /etc/shells > /dev/null
             fi
-            echo -e "${GRA}--> Setting default shell to $TARGET_SHELL...${NC}"
-            sudo chsh -s "$SHELL_PATH" "$USER"
+
+            # 3. Only change the shell if it isn't already set to the target
+            # Compare against the actual passwd entry to be sure
+            CURRENT_USER_SHELL=$(getent passwd "$USER" | cut -d: -f7)
+            if [[ "$CURRENT_USER_SHELL" != "$SHELL_PATH" ]]; then
+                echo -e "${GRA}--> Changing default shell to $TARGET_SHELL...${NC}"
+                sudo chsh -s "$SHELL_PATH" "$USER"
+            else
+                echo -e "${GRN}[OK] Shell is already $TARGET_SHELL.${NC}"
+            fi
         fi
         unset LAST_SELECTION
     fi
