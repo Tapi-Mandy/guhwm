@@ -579,7 +579,7 @@ optional_software() {
         "$CYA" "Dolphin" "dolphin" "KDE's feature-rich file manager" \
         "$GRA" "nnn" "nnn" "The unorthodox terminal file manager" \
         "$ORA" "ranger" "ranger" "Vim-inspired terminal file manager" \
-        "$YLW" "yazi" "yazi" "Blazing fast terminal file manager written in Rust"
+        "$YLW" "Yazi" "yazi" "Blazing fast terminal file manager written in Rust"
 
     if [[ -n "$LAST_SELECTION" ]]; then
         sed -i "s/YOURFILEMANAGER/$LAST_SELECTION/g" ~/.config/mango/config.conf 2>/dev/null || true
