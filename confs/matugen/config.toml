@@ -42,7 +42,9 @@ output_path = '~/.config/matugen/papirus-folders/folder-color.txt'
 [templates.waybar]
 input_path = '~/.config/matugen/templates/waybar.css'
 output_path = '~/.config/waybar/waybar.css'
+post_hook = 'pkill -SIGUSR2 waybar'
 
 [templates.swaync]
 input_path = '~/.config/matugen/templates/swaync.css'
 output_path = '~/.config/swaync/swaync.css'
+post_hook = 'swaync-client -rs'
