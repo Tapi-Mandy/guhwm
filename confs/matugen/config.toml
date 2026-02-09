@@ -11,8 +11,8 @@ input_path = '~/.config/matugen/templates/rofi-colors.rasi'
 output_path = '~/.config/rofi/colors.rasi'
 
 [templates.gtk3]
-input_path = "~/.config/matugen/templates/gtk.tmp"
-output_path = "~/.config/gtk-3.0/colors.css"
+input_path = '~/.config/matugen/templates/matugen-gtk.css'
+output_path = '~/.config/gtk-3.0/gtk.css'
 
 [templates.gtk4]
 input_path = "~/.config/matugen/templates/gtk.tmp"
