@@ -309,11 +309,11 @@ setup_aur_helper() {
 
     # --- Repair Helper Message ---
     if [[ -n "$BROKEN_HELPER" ]]; then
-        echo -e "\n${RED}┌─ Broken AUR Helper Detected ───────────────────────────────┐${NC}"
+        echo -e "\n${RED}┌─ Broken AUR Helper Detected ──────────────────────────────┐${NC}"
         echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.                               ${RED}│${NC}"
-        echo -e "${RED}│${NC}  This usually happens after a major Pacman update.         ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.      ${RED}│${NC}"
-        echo -e "${RED}└────────────────────────────────────────────────────────────┘${NC}\n"
+        echo -e "${RED}│${NC}  This usually happens after a major Pacman update.        ${RED}│${NC}"
+        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.     ${RED}│${NC}"
+        echo -e "${RED}└───────────────────────────────────────────────────────────┘${NC}\n"
         echo -ne "${WHT}==> Press ${GRN}[Enter]${WHT} to open the repair prompt... (Select ${RED}$BROKEN_HELPER${NC})${NC}"
         read -r
     fi
@@ -382,7 +382,7 @@ install_base() {
 
     BASE_PKGS=(
         # --- System Utilities ---
-        "meson" "ninja" "tar" "curl" "jq" "zip" "unzip"
+        "meson" "ninja" "tar" "curl" "jq" "p7zip"
         "xdg-desktop-portal" "xdg-utils" "xdg-user-dirs" "libxcb" "pcre2"
 
         # --- Network & Bluetooth Manager ---
