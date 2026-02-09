@@ -52,40 +52,11 @@ setup_user_groups() {
 # --- AUR Helper Detection ---
 detect_aur() {
     AUR_HELPER=""
-    BROKEN_HELPER=""
     local helpers=("yay" "paru" "aurman" "pikaur" "trizen")
 
     for h in "${helpers[@]}"; do
-        # 1. Check if the command exists in the system path
-        if command -v "$h" >/dev/null 2>&1; then
-            # 2. Check if the command actually runs correctly
-            if "$h" --version >/dev/null 2>&1; then
-                AUR_HELPER="$h"
-                case "$h" in
-                    yay) AUR_CLR=$CYN ;;
-                    paru) AUR_CLR=$PUR ;;
-                    aurman) AUR_CLR=$YLW ;;
-                    pikaur) AUR_CLR=$BLU ;;
-                    trizen) AUR_CLR=$GRN ;;
-                esac
-                return 0 # Found a working one!
-            else
-                # Found it, but it's broken (library error)
-                BROKEN_HELPER="$h"
-                case "$h" in
-                    yay) AUR_CLR=$CYN ;;
-                    paru) AUR_CLR=$PUR ;;
-                    aurman) AUR_CLR=$YLW ;;
-                    pikaur) AUR_CLR=$BLU ;;
-                    trizen) AUR_CLR=$GRN ;;
-                esac
-                return 0
-            fi
-        fi
-
-        # 3. GHOST CHECK: If command is missing, check if pacman still sees the package
-        if pacman -Qq | grep -q "^${h}"; then
-            BROKEN_HELPER="$h"
+        if command -v "$h" >/dev/null 2>&1 && "$h" --version >/dev/null 2>&1; then
+            AUR_HELPER="$h"
             case "$h" in
                 yay) AUR_CLR=$CYN ;;
                 paru) AUR_CLR=$PUR ;;
@@ -144,9 +115,6 @@ EOF
 
     if [[ -n "$AUR_HELPER" ]]; then
         echo -e "${YLW}AUR Helper: ${AUR_CLR}$AUR_HELPER${NC}"
-    elif [[ -n "$BROKEN_HELPER" ]]; then
-        # If it's broken, show it in Red
-        echo -e "${YLW}AUR Helper: ${RED}$BROKEN_HELPER (Needs Repair)${NC}"
     fi
     echo ""
 }
@@ -307,16 +275,7 @@ setup_aur_helper() {
         return 0
     fi
 
-    # --- Repair Helper Message ---
-    if [[ -n "$BROKEN_HELPER" ]]; then
-        echo -e "\n${RED}┌─ Broken AUR Helper Detected ──────────────────────────────┐${NC}"
-        echo -e "${RED}│${NC}  ${RED}$BROKEN_HELPER${NC}, is currently failing.                               ${RED}│${NC}"
-        echo -e "${RED}│${NC}  This usually happens after a major Pacman update.        ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Building a fresh version will fix the library links.     ${RED}│${NC}"
-        echo -e "${RED}└───────────────────────────────────────────────────────────┘${NC}\n"
-        echo -ne "${WHT}==> Press ${GRN}[Enter]${WHT} to open the repair prompt... (Select ${RED}$BROKEN_HELPER${NC})${NC}"
-        read -r
-    fi
+
 
     prompt_selection "AUR Helpers" "single" \
         "$CYN" "yay" "yay" "Yet Another Yogurt, fast and feature-rich, written in Go" \
