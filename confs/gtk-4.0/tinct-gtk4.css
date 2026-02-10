@@ -1,0 +1,42 @@
+/* Tinct GTK4 Theme - Generated */
+/* Traditional GTK4 apps (non-libadwaita) */
+/* Theme type: dark */
+
+:root {
+  /* Background colors */
+  --theme-bg-color: #898ddc;
+  --theme-fg-color: #101733;
+  --theme-base-color: #898ddc;
+  --theme-text-color: #101733;
+
+  /* Muted variants */
+  --theme-bg-muted-color: #cecfe3;
+  --theme-fg-muted-color: #000000;
+
+  /* Accent colors */
+  --theme-selected-bg-color: #fcfbfd;
+  --theme-selected-fg-color: white;
+  --theme-accent-color: #fcfbfd;
+
+  /* Border colors */
+  --borders: #5c5e89;
+  --theme-border-color: #5c5e89;
+
+  /* Status colors */
+  --warning-color: #e5e598;
+  --error-color: #e59898;
+  --success-color: #98e598;
+  --info-color: #bcd8f5;
+}
+
+/* Legacy @define-color for older GTK4 apps */
+@define-color theme_bg_color #898ddc;
+@define-color theme_fg_color #101733;
+@define-color theme_base_color #898ddc;
+@define-color theme_text_color #101733;
+@define-color theme_selected_bg_color #fcfbfd;
+@define-color theme_selected_fg_color white;
+@define-color borders #5c5e89;
+@define-color warning_color #e5e598;
+@define-color error_color #e59898;
+@define-color success_color #98e598;
