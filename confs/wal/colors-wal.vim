@@ -1,0 +1,23 @@
+" Special
+let wallpaper  = "/home/lulz/Pictures/wall/Wallpapers/guhwm - Default.jpg"
+let background = "#4a3c33"
+let foreground = "#e5deda"
+let cursor     = "#e5deda"
+
+" Colors
+let color0  = "#4a3c33"
+let color1  = "#B19B8D"
+let color2  = "#BBA597"
+let color3  = "#C2AC9E"
+let color4  = "#CCB6A8"
+let color5  = "#D9C5B6"
+let color6  = "#E1CCBD"
+let color7  = "#e5deda"
+let color8  = "#a09b98"
+let color9  = "#B19B8D"
+let color10 = "#BBA597"
+let color11 = "#C2AC9E"
+let color12 = "#CCB6A8"
+let color13 = "#D9C5B6"
+let color14 = "#E1CCBD"
+let color15 = "#e5deda"

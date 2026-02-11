@@ -1,0 +1,6 @@
+@import url("{cache_dir}/colors.css");
+
+* {
+    background-color: @background;
+    color: @foreground;
+}

@@ -1,0 +1,24 @@
+wallpaper: "/home/lulz/Pictures/wall/Wallpapers/guhwm - Default.jpg"
+
+special:
+    background: "#4a3c33"
+    foreground: "#e5deda"
+    cursor: "#e5deda"
+
+colors:
+    color0: "#4a3c33"
+    color1: "#B19B8D"
+    color2: "#BBA597"
+    color3: "#C2AC9E"
+    color4: "#CCB6A8"
+    color5: "#D9C5B6"
+    color6: "#E1CCBD"
+    color7: "#e5deda"
+    color8: "#a09b98"
+    color9: "#B19B8D"
+    color10: "#BBA597"
+    color11: "#C2AC9E"
+    color12: "#CCB6A8"
+    color13: "#D9C5B6"
+    color14: "#E1CCBD"
+    color15: "#e5deda"
