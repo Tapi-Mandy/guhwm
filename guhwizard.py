@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-guhwizard.py — Python port of guhwizard.sh (idempotent)
-An interactive Arch Linux setup wizard for guhwm (Wayland desktop).
-
-Safe to run multiple times: every step checks if work is already done
-before acting. A state file at ~/.cache/guhwizard.state tracks completed
-phases so re-runs skip finished stages entirely.
-"""
 
 import atexit
 import json
@@ -489,7 +481,7 @@ def setup_aur_helper():
         (CYN, "yay",    "yay",    "Yet Another Yogurt, fast and feature-rich, written in Go"),
         (PUR, "paru",   "paru",   "Feature-packed helper and pacman wrapper written in Rust"),
         (YLW, "aurman", "aurman", "Known for its security and syntax similarities to pacman"),
-        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies"),
+        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies written in Python"),
         (GRN, "trizen", "trizen", "Lightweight AUR helper written in Perl"),
     ]
 
@@ -570,18 +562,23 @@ def install_base():
         # System Utilities
         "meson", "ninja", "tar", "curl", "jq", "bc", "p7zip", "python-pipx",
         "xdg-desktop-portal", "xdg-utils", "xdg-user-dirs", "libxcb", "pcre2",
+
         # Network & Bluetooth Manager
         "networkmanager", "network-manager-applet",
         "bluez", "bluez-utils", "blueman",
+
         # Wayland & WM
         "glibc", "wayland", "wayland-protocols", "libinput", "libxkbcommon",
         "libdrm", "pixman", "libdisplay-info", "libliftoff", "seatd", "hwdata",
         "polkit-gnome",
         "wtype", "wl-clipboard", "wlsunset", "xorg-xwayland", "mangowc-git",
+
         # UI Components
         "waybar", "rofi", "swaync", "libnotify",
+
         # Audio Stack
         "alsa-utils", "pipewire", "pipewire-pulse", "wireplumber",
+
         # Fonts
         "noto-fonts", "noto-fonts-cjk", "noto-fonts-emoji",
         "ttf-jetbrains-mono-nerd", "cantarell-fonts",
@@ -683,7 +680,7 @@ def install_custom_repos():
         nightlight.chmod(0o755)
         print(f"{GRA}--> Nightlight is ready.{NC}")
 
-    # 6. guhwall — skip if already installed
+    # 6. guhwall | Guh?? Wallpapers! — skip if already installed
     print()
     if is_pkg_installed("guhwall"):
         print(f"{GRN}[OK] guhwall is already installed.{NC}")
@@ -716,7 +713,7 @@ def install_custom_repos():
         if str(pipx_bin) not in os.environ.get("PATH", ""):
             os.environ["PATH"] = f"{pipx_bin}:{os.environ.get('PATH', '')}"
 
-    # 7. guhShot — skip if already installed
+    # 7. guhShot | Guh?? Take a Screenshot! — skip if already installed
     print()
     if is_pkg_installed("guhshot"):
         print(f"{GRN}[OK] guhShot is already installed.{NC}")
@@ -815,7 +812,7 @@ def optional_software():
             except Exception:
                 pass
 
-            # Change shell only if different (already idempotent)
+            # Change shell only if different
             result = subprocess.run(
                 ["getent", "passwd", user],
                 capture_output=True, text=True
@@ -867,7 +864,6 @@ def optional_software():
     prompt_selection("File Managers", "single", [
         (BLU, "Nautilus", "nautilus", "GNOME's file manager"),
         (WHT, "Nemo",    "nemo",     "Cinnamon's file manager"),
-        (CYN, "Dolphin", "dolphin",  "KDE's feature-rich file manager"),
         (GRA, "nnn",     "nnn",      "The unorthodox terminal file manager"),
         (ORA, "ranger",  "ranger",   "Vim-inspired terminal file manager"),
         (YLW, "Yazi",    "yazi",     "Blazing fast terminal file manager written in Rust"),
@@ -919,7 +915,7 @@ def optional_software():
 
     # ── EMULATORS ──
     prompt_selection("Emulators", "multi", [
-        (BLU, "Dolphin",     "dolphin-emu-git",  "Gamecube & Wii emulator"),
+        (BLU, "Dolphin",     "dolphin-emu-git",   "Gamecube & Wii emulator"),
         (YLW, "DuckStation", "duckstation-git",   "PS1 Emulator aiming for accuracy and support"),
         (GRN, "melonDS",     "melonds-bin",       "DS emulator, sorta"),
         (BLU, "PCSX2",       "pcsx2",             "PlayStation 2 emulator"),
