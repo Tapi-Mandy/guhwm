@@ -568,7 +568,7 @@ def install_base():
 
     base_pkgs = [
         # System Utilities
-        "meson", "ninja", "tar", "curl", "jq", "p7zip",
+        "meson", "ninja", "tar", "curl", "jq", "bc", "p7zip", "python-pipx",
         "xdg-desktop-portal", "xdg-utils", "xdg-user-dirs", "libxcb", "pcre2",
         # Network & Bluetooth Manager
         "networkmanager", "network-manager-applet",
@@ -700,6 +700,21 @@ def install_custom_repos():
         else:
             print(f"{RED}[!] Failed to clone guhwall repository.{NC}")
             sys.exit(1)
+
+    # 6b. Install pywal16 via pipx
+    print()
+    result = subprocess.run(
+        ["pipx", "list"], capture_output=True, text=True
+    )
+    if result.returncode == 0 and "pywal16" in result.stdout:
+        print(f"{GRN}[OK] pywal16 is already installed via pipx.{NC}")
+    else:
+        print(f"{YLW}==> Installing pywal16 via pipx...{NC}")
+        subprocess.run(["pipx", "install", "pywal16"])
+        # make sure pipx bin dir is on PATH for this session
+        pipx_bin = Path.home() / ".local" / "bin"
+        if str(pipx_bin) not in os.environ.get("PATH", ""):
+            os.environ["PATH"] = f"{pipx_bin}:{os.environ.get('PATH', '')}"
 
     # 7. guhShot — skip if already installed
     print()
