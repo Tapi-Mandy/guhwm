@@ -1,0 +1,144 @@
+# >>> alacritty.toml
+
+[window]
+padding = { x = 17, y = 17 }
+dynamic_padding = false
+opacity = 0.80
+title = "Alacritty"
+
+[scrolling]
+history = 10000
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+size = 12.0
+builtin_box_drawing = true
+
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+thickness = 0.15
+
+[colors.primary]
+background = "#1a1817"
+foreground = "#d3c7bd"
+
+[colors.selection]
+text = "#1a1817"
+background = "#d3c7bd"
+
+[colors.cursor]
+text = "#1a1817"
+cursor = "#d3c7bd"
+
+[colors.normal]
+black   = "#1f1c1b"
+red     = "#b87d7d"
+green   = "#9da681"
+yellow  = "#e8d5b5"
+blue    = "#d3c2b4"
+magenta = "#b48ead"
+cyan    = "#8fb4a0"
+white   = "#d3c7bd"
+
+[colors.bright]
+black   = "#504945"
+red     = "#d18e8e"
+green   = "#b4bd99"
+yellow  = "#e9cc9d"
+blue    = "#e8d7c8"
+magenta = "#c59fbe"
+cyan    = "#a0c5b1"
+white   = "#e8dfcc"
+
+[hints]
+alphabet = "sadfjklewcmpgh"
+
+[[keyboard.bindings]]
+key = "PageUp"
+action = "ScrollPageUp"
+
+[[keyboard.bindings]]
+key = "PageDown"
+action = "ScrollPageDown"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "F"
+mods = "Control"
+action = "SearchForward"
+
+# Font size controls
+[[keyboard.bindings]]
+key = "Equals"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Plus"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "NumpadAdd"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "NumpadSubtract"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "Numpad0"
+mods = "Control"
+action = "ResetFontSize"
+
+# Search Bindings (Active only when searching)
+[[keyboard.bindings]]
+key = "N"
+mods = "Control"
+mode = "Search"
+action = "SearchNext"
+
+[[keyboard.bindings]]
+key = "G"
+mods = "Control"
+mode = "Search"
+action = "SearchNext"
+
+[[keyboard.bindings]]
+key = "P"
+mods = "Control"
+mode = "Search"
+action = "SearchPrevious"
+
+[[keyboard.bindings]]
+key = "G"
+mods = "Control|Shift"
+mode = "Search"
+action = "SearchPrevious"
+
+# Word delete binding
+[[keyboard.bindings]]
+key = "Back"
+mods = "Control"
+chars = "\u0017"
