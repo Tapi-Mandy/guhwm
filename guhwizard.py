@@ -560,7 +560,7 @@ def install_base():
 
     base_pkgs = [
         # System Utilities
-        "meson", "ninja", "tar", "curl", "jq", "bc", "p7zip", "python-pipx",
+        "meson", "ninja", "tar", "curl", "jq", "bc", "7zip", "python-pipx",
         "xdg-desktop-portal", "xdg-utils", "xdg-user-dirs", "libxcb", "pcre2",
 
         # Network & Bluetooth Manager
