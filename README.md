@@ -17,14 +17,14 @@
 <div align="center">
   <img width="69%" alt="guhwizard" src="https://github.com/user-attachments/assets/aced0143-2b9d-427f-b7ce-2ea8382ca1ef"/>
   <h3>
-    Advanced TUI Installer for <a href="https://github.com/Tapi-Mandy/guhwm/">guhwm</a> in bash; for Arch Linux
+    Advanced TUI Installer for guhwm in Python; for Arch Linux
   </h3>
 </div>
 
 ---
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.py)
 ```
 
 - Fully Modular: Pick and choose exactly what gets installed.
@@ -116,7 +116,7 @@ The default **Modifier** key is `ALT`.
 #### [guhShot](https://github.com/Tapi-Mandy/guhShot) | Guh?? Take a Screenshot!
 > Fast & Lightweight Appealing Little GTK3/CLI Screenshot Utility Made In Python.
 #### [guhwall](https://github.com/Tapi-Mandy/guhwall) | Guh?? Set a Wallpaper!
-> Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, And a Frontend For swww And Matugen.
+> Fast & Lightweight Gorgeous GTK3 Wallpaper Manager Made In Python, And a Frontend For swww And Pywal16.
 ### See Also:
 #### [Arch-Legacy-NVIDIA](https://github.com/Tapi-Mandy/Arch-Legacy-NVIDIA) | Automated installer for NVIDIA 580xx Legacy Drivers on Arch Linux
 > Drivers installer for Arch/Artix Linux users with NVIDIA GPUs that are no longer supported by the latest (590+) driver branch.
