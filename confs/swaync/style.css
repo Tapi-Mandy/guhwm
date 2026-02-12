@@ -1,29 +1,15 @@
-@import "swaync.css";
+@import url('../../.cache/wal/colors-waybar.css');
+@define-color mpris-album-art-overlay alpha(@background, 0.55);
+@define-color mpris-button-hover alpha(@background, 0.50);
+@define-color text @color15;
+@define-color bg @background;
+@define-color bg-hover alpha(@background,0);
+@define-color mycolor @color9;
+@define-color border-color rgba(0,0,0,0);
 
-@define-color bg               @surface_container;
-@define-color bg_high          @surface_container_high;
-@define-color fg               @on_surface;
-@define-color fg_muted         @on_surface_variant;
-
-@define-color accent           @primary;
-@define-color accent_fg        @on_primary;
-@define-color accent_cont      @primary_container;
-@define-color accent_cont_fg   @on_primary_container;
-
-@define-color error_bg         @error_container;
-@define-color error_fg         @on_error_container;
-
-/* ===== Animations ===== */
-
-@keyframes slideFade {
-    from {
-        opacity: 0;
-        transform: translateY(8px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+@keyframes fadeIn{
+    0% { padding-left:20; margin-left:50; margin-right:50; }
+    100% { padding:0; margin:0; }
 }
 
 * {
@@ -31,120 +17,206 @@
     border: none;
 }
 
-/* ===== NOTIFICATIONS ===== */
+/* --- Control Center Window --- */
+.control-center {
+    background: @bg;
+    color: @text;
+    border-radius: 20px;
+    border: 1px solid alpha(@text, 0.1);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, .65);
+    min-height: 800px;
+}
 
+/* --- Notifications --- */
 .notification {
-    background: alpha(@bg, 0.96);
-    color: @fg;
-    border-radius: 22px;
-    animation: slideFade 180ms cubic-bezier(.2,0,0,1);
+    background: @bg;
+    border-radius: 16px;
+    margin: 8px;
+    border: 1px solid alpha(@text, 0.2); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .control-center .notification-row .notification-background .notification {
-    background: alpha(@accent_cont, 0.35);
+    margin-top: 6px;
+    background: alpha(@text, 0.05); /* Keeps a slight distinction in the list */
 }
-
-/* Hover */
-.notification widget:hover {
-    background: alpha(@accent_cont, 0.25);
-}
-
-/* ===== TEXT ===== */
 
 .notification-content {
-    padding: 8px;
+    padding: 10px;
 }
 
 .notification-content .summary {
-    font-family: "JetBrains Mono NF";
+    font-family: 'JetBrains Mono NF';
     font-size: 14px;
-    font-weight: 700;
-    color: @fg;
+    font-weight: 800;
+    color: @mycolor;
 }
 
 .notification-content .body {
-    font-family: "Roboto";
+    font-family: 'Roboto';
     font-size: 0.9rem;
-    color: @fg_muted;
-    padding-bottom: 16px;
+    font-weight: 400;
+    color: alpha(@text, 0.8);
+    margin-top: 4px;
 }
 
-/* ===== CRITICAL ===== */
-
-.notification.critical .notification-content {
-    background: @error_bg;
-    color: @error_fg;
+/* --- Close Button --- */
+.control-center .notification-row .close-button,
+.floating-notifications.background .close-button {
+    all: unset;
+    color: @text;
+    background: alpha(@text, 0.08);
+    border-radius: 50%;
+    margin-top: 12px;
+    margin-right: 15px;
+    min-width: 24px;
+    min-height: 24px;
+    transition: all 0.2s ease;
 }
 
-/* ===== CONTROL CENTER ===== */
-
-.control-center {
-    background: alpha(@bg, 0.96);
-    border-radius: 26px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+.control-center .notification-row .close-button:hover {
+    background: #ff5555;
+    color: white;
 }
 
-/* ===== TITLES ===== */
+/* --- Hide Scrollbar --- */
+.control-center scrolledwindow scrollbar {
+    background: transparent;
+    opacity: 0;
+}
 
+.control-center scrolledwindow scrollbar trough {
+    background: transparent;
+}
+
+.control-center scrolledwindow scrollbar slider {
+    background: transparent;
+}
+
+/* --- MPRIS (Music Player) --- */
+.widget-mpris {
+    padding: 8px;
+}
+
+.widget-mpris .widget-mpris-player {
+    padding: 12px;
+    margin: 10px;
+    background-color: alpha(@text, 0.05);
+    border-radius: 20px;
+}
+
+.widget-mpris .widget-mpris-player .widget-mpris-album-art {
+    border-radius: 12px;
+}
+
+/* Simple Icon Buttons */
+.widget-mpris .widget-mpris-player button {
+    all: unset;
+    color: @text;
+    font-size: 20px;
+    padding: 10px;
+    margin: 0 5px;
+    transition: all 0.2s ease;
+}
+
+.widget-mpris .widget-mpris-player button:hover {
+    color: @mycolor; /* Icon just changes color */
+    transform: scale(1.1);
+}
+
+.widget-mpris .widget-mpris-player .widget-mpris-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* --- Buttons Grid --- */
+.widget-buttons-grid {
+    padding: 8px;
+    margin: 10px;
+    border-radius: 12px;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button {
+    background: alpha(@text, 0.08);
+    border-radius: 14px;
+    margin: 4px;
+    transition: all 160ms ease;
+    color: @text;
+}
+
+/* Alignment fix for the Wifi icon */
+.widget-buttons-grid > flowbox > flowboxchild:nth-child(3) button label {
+    margin-left: -6px; /* Adjust this number for just this icon */
+    margin-top: 1px;
+}
+
+/* Alignment fix for the Lock icon */
+.widget-buttons-grid > flowbox > flowboxchild:nth-child(6) button label {
+    margin-left: -2px; 
+}
+
+/* Alignment fix for the Poweroff icon */
+.widget-buttons-grid > flowbox > flowboxchild:nth-child(8) button label {
+    margin-left: -2px; 
+}
+
+/* Size of the Volume icon */
+.widget-volume > box > label {
+    font-size: 23px;
+    margin-top: 2px;
+    margin-left: 5px;
+    margin-right: -8px;
+}
+
+/* Hover state when the button is OFF */
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+    background: alpha(@text, 0.15);
+}
+
+/* The "Active/On" state */
+.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked {
+    background: @mycolor;
+    color: @bg;
+}
+
+/* Hover state when the button is ON */
+.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked:hover {
+    background: alpha(@mycolor, 0.8);
+}
+}
+
+/* --- Sliders --- */
+trough {
+    border-radius: 20px;
+    background: alpha(@text, 0.1);
+    min-height: 10px;
+}
+
+trough highlight {
+    background: @mycolor;
+    border-radius: 20px;
+}
+
+/* --- Notifications Header --- */
 .widget-title {
-    color: @fg;
-    padding: 20px;
+    padding: 20px 20px 1px 20px;
+    margin-bottom: -10px;
+    color: @mycolor;
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 
 .widget-title > button {
-    background: alpha(@accent_cont, 0.7);
-    color: @accent_cont_fg;
-    border-radius: 16px;
-    padding: 4px 12px;
-    transition: all 160ms ease;
+    background: alpha(@text, 0.1);
+    border-radius: 12px;
+    padding: 5px 15px;
+    color: @text;
 }
 
-.widget-title > button:hover {
-    background: @accent_cont;
-}
-
-/* ===== MPRIS ===== */
-
-.widget-mpris-player {
-    background: alpha(@bg_high, 0.7);
-    border-radius: 24px;
-    padding: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.5);
-}
-
-.widget-mpris-player button {
-    border-radius: 14px;
-    transition: all 160ms ease;
-}
-
-.widget-mpris-player button:hover {
-    background: alpha(@accent_cont, 0.5);
-}
-
-/* ===== QUICK TOGGLES ===== */
-
-.widget-buttons-grid > flowbox > flowboxchild > button {
-    background: alpha(@bg, 0.85);
-    border-radius: 14px;
-    transition: all 160ms ease;
-}
-
-.widget-buttons-grid > flowbox > flowboxchild > button:hover {
-    background: @bg_high;
-}
-
-.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked {
-    background: @accent;
-}
-
-.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked label {
-    color: @accent_fg;
-}
-
-/* ===== SLIDERS ===== */
-
-trough highlight {
-    background: @accent;
-    border-radius: 20px;
-    box-shadow: 0 0 6px alpha(@accent, 0.6);
+/* --- Volume slider --- */
+.widget-volume, .widget-backlight {
+    background-color: alpha(@text, 0.03);
+    padding: 8px;
+    margin: 5px 15px;
+    border-radius: 12px;
 }

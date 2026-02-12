@@ -1,114 +1,94 @@
-@import "waybar.css";
-
-@define-color bg            @surface_container;
-@define-color bg_high       @surface_container_high;
-@define-color fg            @on_surface;
-@define-color fg_muted      @on_surface_variant;
-
-@define-color accent        @primary;
-@define-color accent_fg     @on_primary;
-@define-color accent_cont   @primary_container;
-@define-color accent_cont_fg @on_primary_container;
-
-@define-color outline       @outline;
-
+@import "../../.cache/wal/colors-waybar.css";
+/* @define-color main alpha(@color0, 0.7); */
+@define-color main @color0;
 * {
+
     font-family: "JetBrainsMono Nerd Font";
     font-weight: 700;
     font-size: 14px;
-    border: none;
     min-height: 0;
+    border: none;
+    border-radius: 0px;
 }
-
-/* ===== BAR ===== */
 
 window#waybar {
-    background-color: alpha(@bg, 0.95);
-    color: @fg;
-    border-radius: 12px;
-    padding: 4px 6px;
+    background-color: alpha(@main, 0.99);
+    color: #b8b8b8;
+    border-radius: 10px;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); */
+    /* margin: 5px 10px; */
+    
 }
-
-/* ===== LOGO ===== */
 
 #custom-logo {
-    background-color: @accent;
-    color: @accent_fg;
-    padding: 0 12px;
-    border-radius: 12px;
+    background-color: #d08770;
+    color: #1a1a1a;
+    padding: 0 8px;
+    font-weight: bold;
 }
 
-/* ===== WORKSPACES ===== */
+#tags {
+    /* color: @color6; */
+    background-color: transparent;
+    margin-left: 0px;
+    border-radius: 4px;
+}
 
 #tags button {
-    background: transparent;
-    color: @fg_muted;
-    padding: 0 10px;
-    border-radius: 10px;
-    transition: all 160ms ease;
-}
-
-#tags button:hover {
-    background: alpha(@accent_cont, 0.4);
-    color: @accent_cont_fg;
+    padding: 0 6px;
+    background-color: transparent;
+    color: @color6;
+    border-radius: 0;
+    min-width: 12px;
 }
 
 #tags button.focused {
-    background: @accent_cont;
-    color: @accent_cont_fg;
+    background-color: @color6;
+    color: @color0;
+    /* font-weight: 900; */
 }
 
-/* ===== WINDOW TITLE ===== */
+#tags button:first-child {
+   border-radius: 10px 0 0 10px;
+   margin-left: 0;
+}
+/* #tags { */
+/*   background-color: transparent; */
+/* } */
 
 #window {
-    margin-left: 10px;
-    color: @accent;
+  margin-left: 10px;
+  color: @color6;
 }
-
-/* ===== SEPARATORS ===== */
+/* #workspaces button:hover { */
+/*     background-color: transparent; */
+/*     color: @color6; */
+/* } */
 
 #custom-separator1,
 #custom-separator2 {
-    color: @outline;
-    padding: 0 1px;
+    color: @color6;
+    padding: 0 5px;
 }
 
-/* ===== TRAY ===== */
-
-/* Add margin to the tray so it doesn't touch the 'suckless' module */
+#custom-guhwm {
+    color: @color6;
+    padding: 0 5px;
+}
 #tray {
-    background: alpha(@bg_high, 0.6);
-    padding: 0 10px;
-    border-radius: 12px;
-    margin-left: 4px;
-    margin-right: 4px;
+    background-color: transparent;
+    padding: 0 8px;
 }
 
-/* Add margin to the suckless text */
-#custom-suckless {
-    margin-left: 8px;
-    margin-right: 8px;
+#tray > .passive {
+    -gtk-icon-effect: dim;
 }
 
-/* Add margin to the clock */
-#clock {
-    background: alpha(@accent_cont, 0.7);
-    color: @accent_cont_fg;
-    padding: 0 12px;
-    border-radius: 12px;
-    margin-left: 4px;
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
 }
-
-/* default gap without targeting them one by one: */
-#waybar > box > box > widget > * {
-    margin: 0 1px;
-}
-
-/* ===== CLOCK ===== */
 
 #clock {
-    background: alpha(@accent_cont, 0.7);
-    color: @accent_cont_fg;
-    padding: 0 12px;
-    border-radius: 12px;
+    color: @color6;
+    padding: 0 12px 0 4px;
 }

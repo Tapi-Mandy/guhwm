@@ -7,17 +7,15 @@
     "layer-shell": true,
     "cssPriority": "user",
     "control-center-width": 350,
-    "control-center-margin-top": 12,
+    "control-center-margin-top": 6.9,
     "control-center-margin-bottom": 8,
-    "control-center-margin-right": 16,
+    "control-center-margin-right": 8,
     "control-center-margin-left": 8,
-    "notification-window-margin-top": 12,
-    "notification-window-margin-right": 16,
     "notification-2fa-action": true,
     "notification-inline-replies": true,
     "notification-window-width": 350,
     "notification-icon-size": 60,
-    "notification-body-image-height": 180,
+    "notification-body-image-height":  180,
     "notification-body-image-width": 180,
     "timeout": 5,
     "timeout-low": 6,
@@ -39,14 +37,15 @@
     ],
     "widget-config": {
         "title": {
-            "text": "Notification Center",
+            "text": "Notifications",
             "clear-all-button": true,
             "button-text": "󰆴"
         },
         "label": {
-            "max-lines": 1,
+            "max-lines":1,
             "text": "Notification Center!"
         },
+
         "mpris": {
             "image-size": 80,
             "image-radius": 0
@@ -83,10 +82,6 @@
                     "command": "~/.config/mango/scripts/nightlight-toggle.sh",
                     "update-command": "pgrep -x wlsunset > /dev/null && echo true || echo false",
                     "interval": 1
-                },
-                {
-                    "label": "",
-                    "command": "wtype -M alt -M shift -P e -m shift -m alt"
                 },
                 {
                     "label": "",

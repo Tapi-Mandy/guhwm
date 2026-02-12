@@ -45,12 +45,12 @@ configuration {
 
 window {
 	transparency: "real";
-	location: center;
-	anchor: center;
+	location: south;
+	anchor: south;
 	fullscreen: false;
 	width: 500px;
 	x-offset: 0px;
-	y-offset: 0px;
+	y-offset: -32px;
 	enabled: true;
 	margin: 0px;
 	padding: 0px;

@@ -1,28 +1,36 @@
+[opener]
 # List of text editors Yazi would know to use.
 #.. In a priority order.
-[opener]
 edit = [
     { run = 'if command -v nvim >/dev/null; then nvim "$@"; elif command -v emacs >/dev/null; then emacs -nw "$@"; elif command -v fresh >/dev/null; then fresh "$@"; elif command -v vim >/dev/null; then vim "$@"; elif command -v vi >/dev/null; then vi "$@"; else nano "$@"; fi', block = true, desc = "Editors" },
+]
+# 7-Zip Extraction
+extract = [
+    { run = '7z x "$@"', desc = "Extract here", for = "unix" },
 ]
 
 [open]
 rules = [
-    # 1. Broad Text Match (matches most basic text files)
+    # Archive Rules
+    { mime = "application/{zip,x-7z-compressed,x-rar,x-tar,x-bzip2,x-gzip,x-xz}", use = ["extract", "reveal"] },
+    { name = "*.{zip,7z,rar,tar,gz,xz,bz2}", use = ["extract", "reveal"] },
+
+    # Basic Text Files
     { mime = "text/*", use = "edit" },
 
-    # 2. Programming & Scripting Languages (Common extensions)
+    # Programming & Scripting Languages
     { name = "*.{sh,bash,zsh,lua,py,pyi,js,mjs,ts,tsx,jsx,c,cpp,h,hpp,rs,go,rb,php,pl,pm,sql,java,kt,dart,swift,zig}", use = "edit" },
 
-    # 3. Configuration & Data Formats
+    # Configuration & Data Formats
     { name = "*.{json,jsonc,yaml,yml,toml,ini,conf,xml,env,rc,local,desktop,service,config}", use = "edit" },
 
-    # 4. Web & Documentation
+    # Web & Documentation
     { name = "*.{md,markdown,html,css,scss,less,csv,txt,org,adoc,tex}", use = "edit" },
 
-    # 5. Handle cases where MIME might be application/ but it's still text
+    # Cases where MIME might be application/ but it's still text
     { mime = "application/{json,javascript,x-sh,x-bash,x-perl,x-python,xml}", use = "edit" },
 
-    # 6. Dotfiles (files starting with . like .bashrc, .zshrc)
+    # Dotfiles (files starting with . like .bashrc, .zshrc)
     { name = ".*rc", use = "edit" },
     { name = ".env*", use = "edit" },
 ]
