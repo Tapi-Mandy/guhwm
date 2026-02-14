@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""
+guhwizard.py — Python port of guhwizard.sh (idempotent)
+An interactive Arch Linux setup wizard for guhwm (Wayland desktop).
+
+Safe to run multiple times: every step checks if work is already done
+before acting. A state file at ~/.cache/guhwizard.state tracks completed
+phases so re-runs skip finished stages entirely.
+"""
 
 import atexit
 import json
@@ -229,8 +237,8 @@ def detect_aur():
     global AUR_HELPER, AUR_CLR
 
     helpers = {
-        "yay": CYN, "paru": PUR, "aurman": YLW,
-        "pikaur": BLU, "trizen": GRN,
+        "yay": CYN, "paru": PUR,
+        "pikaur": BLU,
     }
 
     for h, clr in helpers.items():
@@ -480,9 +488,7 @@ def setup_aur_helper():
     aur_options = [
         (CYN, "yay",    "yay",    "Yet Another Yogurt, fast and feature-rich, written in Go"),
         (PUR, "paru",   "paru",   "Feature-packed helper and pacman wrapper written in Rust"),
-        (YLW, "aurman", "aurman", "Known for its security and syntax similarities to pacman"),
-        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies written in Python"),
-        (GRN, "trizen", "trizen", "Lightweight AUR helper written in Perl"),
+        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies"),
     ]
 
     selected, pkgs = prompt_selection("AUR Helpers", "single", aur_options)
@@ -490,7 +496,7 @@ def setup_aur_helper():
     if LAST_SELECTION:
         AUR_HELPER = LAST_SELECTION
         aur_helper_pkg = LAST_SELECTION
-        color_map = {"yay": CYN, "paru": PUR, "aurman": YLW, "pikaur": BLU, "trizen": GRN}
+        color_map = {"yay": CYN, "paru": PUR, "pikaur": BLU}
         AUR_CLR = color_map.get(AUR_HELPER, NC)
         LAST_SELECTION = ""
     else:
@@ -560,25 +566,20 @@ def install_base():
 
     base_pkgs = [
         # System Utilities
-        "meson", "ninja", "tar", "curl", "jq", "bc", "7zip", "python-pipx",
+        "meson", "ninja", "tar", "curl", "jq", "bc", "p7zip", "python-pipx",
         "xdg-desktop-portal", "xdg-utils", "xdg-user-dirs", "libxcb", "pcre2",
-
         # Network & Bluetooth Manager
         "networkmanager", "network-manager-applet",
         "bluez", "bluez-utils", "blueman",
-
         # Wayland & WM
         "glibc", "wayland", "wayland-protocols", "libinput", "libxkbcommon",
         "libdrm", "pixman", "libdisplay-info", "libliftoff", "seatd", "hwdata",
         "polkit-gnome",
         "wtype", "wl-clipboard", "wlsunset", "xorg-xwayland", "mangowc-git",
-
         # UI Components
-        "waybar", "rofi", "swaync", "libnotify",
-
+        "waybar", "rofi", "swaync", "libnotify", "adw-gtk-theme",
         # Audio Stack
         "alsa-utils", "pipewire", "pipewire-pulse", "wireplumber",
-
         # Fonts
         "noto-fonts", "noto-fonts-cjk", "noto-fonts-emoji",
         "ttf-jetbrains-mono-nerd", "cantarell-fonts",
@@ -680,7 +681,7 @@ def install_custom_repos():
         nightlight.chmod(0o755)
         print(f"{GRA}--> Nightlight is ready.{NC}")
 
-    # 6. guhwall | Guh?? Wallpapers! — skip if already installed
+    # 6. guhwall — skip if already installed
     print()
     if is_pkg_installed("guhwall"):
         print(f"{GRN}[OK] guhwall is already installed.{NC}")
@@ -713,7 +714,7 @@ def install_custom_repos():
         if str(pipx_bin) not in os.environ.get("PATH", ""):
             os.environ["PATH"] = f"{pipx_bin}:{os.environ.get('PATH', '')}"
 
-    # 7. guhShot | Guh?? Take a Screenshot! — skip if already installed
+    # 7. guhShot — skip if already installed
     print()
     if is_pkg_installed("guhshot"):
         print(f"{GRN}[OK] guhShot is already installed.{NC}")
@@ -812,7 +813,7 @@ def optional_software():
             except Exception:
                 pass
 
-            # Change shell only if different
+            # Change shell only if different (already idempotent)
             result = subprocess.run(
                 ["getent", "passwd", user],
                 capture_output=True, text=True
@@ -861,16 +862,23 @@ def optional_software():
     ])
 
     # ── FILE MANAGERS ──
+    gui_file_managers = {"nautilus", "nemo", "dolphin"}
     prompt_selection("File Managers", "single", [
         (BLU, "Nautilus", "nautilus", "GNOME's file manager"),
         (WHT, "Nemo",    "nemo",     "Cinnamon's file manager"),
+        (CYN, "Dolphin", "dolphin",  "KDE's feature-rich file manager"),
         (GRA, "nnn",     "nnn",      "The unorthodox terminal file manager"),
         (ORA, "ranger",  "ranger",   "Vim-inspired terminal file manager"),
         (YLW, "Yazi",    "yazi",     "Blazing fast terminal file manager written in Rust"),
     ])
 
     if LAST_SELECTION:
-        sed_config("YOURFILEMANAGER", LAST_SELECTION)
+        if LAST_SELECTION in gui_file_managers:
+            # GUI file managers don't need a terminal wrapper
+            sed_config("YOURTERMINAL -e YOURFILEMANAGER", LAST_SELECTION)
+        else:
+            # TUI file managers need to run inside a terminal
+            sed_config("YOURFILEMANAGER", LAST_SELECTION)
         LAST_SELECTION = ""
 
     # ── EDITORS ──
@@ -896,11 +904,29 @@ def optional_software():
 
     # ── MEDIA ──
     prompt_selection("Media", "multi", [
-        (WHT, "imv",     "imv",     "Command-line image viewer for Wayland and X11"),
-        (BLU, "Loupe",   "loupe",   "Simple and modern image viewer from GNOME"),
-        (PUR, "mpv",     "mpv",     "Free, open source, and cross-platform media player"),
-        (CYN, "swayimg", "swayimg", "Lightweight image viewer for Wayland"),
-        (ORA, "VLC",     "vlc",     "Multi-platform multimedia player and framework"),
+        (WHT, "imv",        "imv",        "Command-line image viewer for Wayland and X11"),
+        (BLU, "Loupe",      "loupe",      "Simple and modern image viewer from GNOME"),
+        (PUR, "mpv",        "mpv",        "Free, open source, and cross-platform media player"),
+        (RED, "OBS Studio", "obs-studio", "Free, open-source live streaming and recording"),
+        (CYN, "swayimg",    "swayimg",    "Lightweight image viewer for Wayland"),
+        (ORA, "VLC",        "vlc",        "Multi-platform multimedia player and framework"),
+    ])
+
+    # ── PDF READERS ──
+    prompt_selection("PDF Readers", "multi", [
+        (GRN, "Evince",  "evince",  "GNOME document viewer"),
+        (PUR, "MuPDF",   "mupdf",   "Lightweight PDF and XPS viewer"),
+        (BLU, "Okular",  "okular",  "KDE document viewer"),
+        (ORA, "Xreader", "xreader", "Document viewer based on Evince"),
+        (GRA, "Zathura", "zathura", "Minimalist document viewer"),
+    ])
+
+    # ── OFFICE SUITES ──
+    prompt_selection("Office Suites", "multi", [
+        (MAG, "Calligra",         "calligra",          "KDE office suite"),
+        (BLU, "LibreOffice Fresh", "libreoffice-fresh", "Latest LibreOffice release"),
+        (GRN, "LibreOffice Still", "libreoffice-still", "Stable LibreOffice release"),
+        (ORA, "OnlyOffice",       "onlyoffice-bin",    "OnlyOffice Desktop Editors"),
     ])
 
     # ── UTILITIES ──
@@ -915,7 +941,7 @@ def optional_software():
 
     # ── EMULATORS ──
     prompt_selection("Emulators", "multi", [
-        (BLU, "Dolphin",     "dolphin-emu-git",   "Gamecube & Wii emulator"),
+        (BLU, "Dolphin",     "dolphin-emu-git",  "Gamecube & Wii emulator"),
         (YLW, "DuckStation", "duckstation-git",   "PS1 Emulator aiming for accuracy and support"),
         (GRN, "melonDS",     "melonds-bin",       "DS emulator, sorta"),
         (BLU, "PCSX2",       "pcsx2",             "PlayStation 2 emulator"),
