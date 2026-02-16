@@ -896,7 +896,7 @@ def optional_software():
     prompt_selection("Graphics", "multi", [
         (ORA, "Blender", "blender", "3D creation suite for modeling, rigging, and animation"),
         (GRA, "GIMP",    "gimp",    "GNU Image Manipulation Program"),
-        (MAG, "Krita",   "krita",   "Digital painting studio"),
+        (MAG, "Krita",   "krita",   "Professional digital painting for everyone"),
     ])
 
     # ── MEDIA ──
