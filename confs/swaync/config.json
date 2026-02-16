@@ -44,7 +44,6 @@
             "max-lines":1,
             "text": "Notification Center!"
         },
-
         "mpris": {
             "image-size": 80,
             "image-radius": 0
