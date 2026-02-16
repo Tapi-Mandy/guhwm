@@ -599,6 +599,7 @@ def install_base():
     input(f"{YLW}==> Base packages are installed. Press Enter to continue...{NC}")
 
     enable_service("seatd")
+    print()
 
     # ── PipeWire user services (skip if already enabled) ──
     pw_units = ["pipewire", "pipewire-pulse", "wireplumber"]
