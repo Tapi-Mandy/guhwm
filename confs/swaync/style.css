@@ -38,7 +38,7 @@
 
 .control-center .notification-row .notification-background .notification {
     margin-top: 6px;
-    background: alpha(@text, 0.05); /* Keeps a slight distinction in the list */
+    background: alpha(@text, 0.05);
 }
 
 .notification-content {
@@ -120,7 +120,7 @@
 }
 
 .widget-mpris .widget-mpris-player button:hover {
-    color: @mycolor; /* Icon just changes color */
+    color: @mycolor;
     transform: scale(1.1);
 }
 
@@ -134,6 +134,16 @@
     padding: 8px;
     margin: 10px;
     border-radius: 12px;
+}
+
+.widget-buttons-grid flowboxchild {
+    background: none;
+    box-shadow: none;
+}
+
+.widget-buttons-grid flowboxchild:hover,
+.widget-buttons-grid flowboxchild:selected {
+    background: none;
 }
 
 .widget-buttons-grid > flowbox > flowboxchild > button {
@@ -183,7 +193,6 @@
 .widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked:hover {
     background: alpha(@mycolor, 0.8);
 }
-}
 
 /* --- Sliders --- */
 trough {
@@ -195,6 +204,14 @@ trough {
 trough highlight {
     background: @mycolor;
     border-radius: 20px;
+}
+
+/* --- Volume slider --- */
+.widget-volume {
+    background-color: alpha(@text, 0.03);
+    padding: 8px;
+    margin: 5px 15px;
+    border-radius: 12px;
 }
 
 /* --- Notifications Header --- */
@@ -211,12 +228,4 @@ trough highlight {
     border-radius: 12px;
     padding: 5px 15px;
     color: @text;
-}
-
-/* --- Volume slider --- */
-.widget-volume {
-    background-color: alpha(@text, 0.03);
-    padding: 8px;
-    margin: 5px 15px;
-    border-radius: 12px;
 }
