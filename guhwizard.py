@@ -911,8 +911,8 @@ def optional_software():
 
     # ── PDF READERS ──
     prompt_selection("PDF Readers", "multi", [
-        (GRN, "Evince",  "evince",  "GNOME document viewer"),
-        (PUR, "MuPDF",   "mupdf",   "Lightweight PDF and XPS viewer"),
+        (WHT, "Evince",  "evince",  "GNOME document viewer"),
+        (ORA, "MuPDF",   "mupdf",   "Lightweight PDF and XPS viewer"),
         (GRA, "Zathura", "zathura", "Minimalist document viewer"),
     ])
 
@@ -920,7 +920,7 @@ def optional_software():
     prompt_selection("Office Suites", "multi", [
         (BLU, "LibreOffice Fresh", "libreoffice-fresh", "Latest LibreOffice release"),
         (GRN, "LibreOffice Still", "libreoffice-still", "Stable LibreOffice release"),
-        (ORA, "OpenOffice",        "openoffice-bin ",   "Free and Open Productivity Suite"),
+        (BLU, "OpenOffice",        "openoffice-bin",   "Free and Open Productivity Suite"),
     ])
 
     # ── UTILITIES ──
