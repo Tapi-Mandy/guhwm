@@ -23,8 +23,8 @@
 
 ---
 
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.py)
+```python3
+python3 <(curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhwm/main/guhwizard.py)
 ```
 
 - Fully Modular: Pick and choose exactly what gets installed.
