@@ -206,7 +206,7 @@ trough highlight {
     border-radius: 20px;
 }
 
-/* --- Volume slider --- */
+/* Volume Slider */
 .widget-volume {
     background-color: alpha(@text, 0.03);
     padding: 8px;
