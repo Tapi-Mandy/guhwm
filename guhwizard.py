@@ -1,13 +1,4 @@
 #!/usr/bin/env python3
-"""
-guhwizard.py — Python port of guhwizard.sh (idempotent)
-An interactive Arch Linux setup wizard for guhwm (Wayland desktop).
-
-Safe to run multiple times: every step checks if work is already done
-before acting. A state file at ~/.cache/guhwizard.state tracks completed
-phases so re-runs skip finished stages entirely.
-"""
-
 import atexit
 import json
 import logging
@@ -488,7 +479,7 @@ def setup_aur_helper():
     aur_options = [
         (CYN, "yay",    "yay",    "Yet Another Yogurt, fast and feature-rich, written in Go"),
         (PUR, "paru",   "paru",   "Feature-packed helper and pacman wrapper written in Rust"),
-        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies"),
+        (BLU, "pikaur", "pikaur", "AUR helper with minimal dependencies written in Python"),
     ]
 
     selected, pkgs = prompt_selection("AUR Helpers", "single", aur_options)
@@ -566,20 +557,25 @@ def install_base():
 
     base_pkgs = [
         # System Utilities
-        "meson", "ninja", "tar", "curl", "jq", "bc", "p7zip", "python-pipx",
+        "meson", "ninja", "tar", "curl", "jq", "bc", "7zip", "python-pipx",
         "xdg-desktop-portal", "xdg-utils", "xdg-user-dirs", "libxcb", "pcre2",
+        
         # Network & Bluetooth Manager
         "networkmanager", "network-manager-applet",
         "bluez", "bluez-utils", "blueman",
+        
         # Wayland & WM
         "glibc", "wayland", "wayland-protocols", "libinput", "libxkbcommon",
         "libdrm", "pixman", "libdisplay-info", "libliftoff", "seatd", "hwdata",
         "polkit-gnome",
-        "wtype", "wl-clipboard", "wlsunset", "xorg-xwayland", "mangowc-git",
+        "wl-clipboard", "wlsunset", "xorg-xwayland", "mangowc-git",
+        
         # UI Components
         "waybar", "rofi", "swaync", "libnotify", "adw-gtk-theme",
+        
         # Audio Stack
         "alsa-utils", "pipewire", "pipewire-pulse", "wireplumber",
+        
         # Fonts
         "noto-fonts", "noto-fonts-cjk", "noto-fonts-emoji",
         "ttf-jetbrains-mono-nerd", "cantarell-fonts",
@@ -833,9 +829,10 @@ def optional_software():
 
     # ── TERMINALS ──
     prompt_selection("Terminals", "single", [
-        (ORA, "Alacritty", "alacritty", "Fast, cross-platform, OpenGL terminal"),
+        (ORA, "Alacritty", "alacritty", "Cross-platform, OpenGL terminal"),
         (YLW, "Foot",      "foot",      "Fast, lightweight Wayland terminal"),
-        (MAG, "Kitty",     "kitty",     "Modern, hackable, featureful, OpenGL terminal"),
+        (BLU, "Ghostty",   "ghostty",   "Bleeding edge. Modern, fast, and feature-rich"),
+        (MAG, "Kitty",     "kitty",     "For people who live inside the terminal"),
     ])
 
     if LAST_SELECTION:
@@ -866,7 +863,6 @@ def optional_software():
     prompt_selection("File Managers", "single", [
         (BLU, "Nautilus", "nautilus", "GNOME's file manager"),
         (WHT, "Nemo",    "nemo",     "Cinnamon's file manager"),
-        (CYN, "Dolphin", "dolphin",  "KDE's feature-rich file manager"),
         (GRA, "nnn",     "nnn",      "The unorthodox terminal file manager"),
         (ORA, "ranger",  "ranger",   "Vim-inspired terminal file manager"),
         (YLW, "Yazi",    "yazi",     "Blazing fast terminal file manager written in Rust"),
@@ -916,17 +912,14 @@ def optional_software():
     prompt_selection("PDF Readers", "multi", [
         (GRN, "Evince",  "evince",  "GNOME document viewer"),
         (PUR, "MuPDF",   "mupdf",   "Lightweight PDF and XPS viewer"),
-        (BLU, "Okular",  "okular",  "KDE document viewer"),
-        (ORA, "Xreader", "xreader", "Document viewer based on Evince"),
         (GRA, "Zathura", "zathura", "Minimalist document viewer"),
     ])
 
     # ── OFFICE SUITES ──
     prompt_selection("Office Suites", "multi", [
-        (MAG, "Calligra",         "calligra",          "KDE office suite"),
         (BLU, "LibreOffice Fresh", "libreoffice-fresh", "Latest LibreOffice release"),
         (GRN, "LibreOffice Still", "libreoffice-still", "Stable LibreOffice release"),
-        (ORA, "OnlyOffice",       "onlyoffice-bin",    "OnlyOffice Desktop Editors"),
+        (ORA, "OpenOffice",        "openoffice-bin ",   "Free and Open Productivity Suite"),
     ])
 
     # ── UTILITIES ──
@@ -936,12 +929,12 @@ def optional_software():
         (GRA, "htop",      "htop",      "Interactive process viewer"),
         (GRA, "nvtop",     "nvtop",     "GPUs process monitor for AMD, NVIDIA, and Intel"),
         (CYN, "tldr",      "tldr",      "Simplified and community-driven man pages"),
-        (MAG, "uwufetch",  "uwufetch",  "Cute system info fetcher"),
+        (MAG, "uwufetch",  "uwufetch",  "Cutest system info fetcher"),
     ])
 
     # ── EMULATORS ──
     prompt_selection("Emulators", "multi", [
-        (BLU, "Dolphin",     "dolphin-emu-git",  "Gamecube & Wii emulator"),
+        (BLU, "Dolphin",     "dolphin-emu-git",   "Gamecube & Wii emulator"),
         (YLW, "DuckStation", "duckstation-git",   "PS1 Emulator aiming for accuracy and support"),
         (GRN, "melonDS",     "melonds-bin",       "DS emulator, sorta"),
         (BLU, "PCSX2",       "pcsx2",             "PlayStation 2 emulator"),
