@@ -154,9 +154,15 @@
     color: @text;
 }
 
+/* Alignment fix for the Volume icon */
+.widget-buttons-grid > flowbox > flowboxchild:nth-child(1) button label {
+    margin-left: -3px;
+    margin-top: 1px;
+}
+
 /* Alignment fix for the Wifi icon */
 .widget-buttons-grid > flowbox > flowboxchild:nth-child(3) button label {
-    margin-left: -6px; /* Adjust this number for just this icon */
+    margin-left: -6px;
     margin-top: 1px;
 }
 
@@ -170,7 +176,7 @@
     margin-left: -2px; 
 }
 
-/* Size of the Volume icon */
+/* Size of the Volume Slider icon */
 .widget-volume > box > label {
     font-size: 23px;
     margin-top: 2px;
