@@ -45,7 +45,7 @@
             "text": "Notification Center!"
         },
         "mpris": {
-            "image-size": 80,
+            "image-size": 90,
             "image-radius": 0
         },
         "volume": {
