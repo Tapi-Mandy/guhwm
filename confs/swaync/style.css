@@ -214,7 +214,7 @@ trough highlight {
 }
 
 /* --- Volume slider --- */
-.widget-volume, .widget-backlight {
+.widget-volume {
     background-color: alpha(@text, 0.03);
     padding: 8px;
     margin: 5px 15px;
