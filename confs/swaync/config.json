@@ -32,7 +32,6 @@
         "title",
         "notifications",
         "volume",
-        "backlight",
         "buttons-grid"
     ],
     "widget-config": {
@@ -52,9 +51,6 @@
         },
         "volume": {
             "label": "󰕾 "
-        },
-        "backlight": {
-            "label": "󰃟 "
         },
         "buttons-grid": {
             "actions": [
