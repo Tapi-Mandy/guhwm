@@ -109,7 +109,7 @@
     border-radius: 12px;
 }
 
-/* Simple Icon Buttons */
+/* Player Buttons */
 .widget-mpris .widget-mpris-player button {
     all: unset;
     color: @text;
@@ -127,6 +127,12 @@
 .widget-mpris .widget-mpris-player .widget-mpris-title {
     font-weight: bold;
     font-size: 1.1rem;
+}
+
+/* Space between the player info and the button row */
+.widget-mpris .widget-mpris-player > box > box:last-child {
+    margin-top: 10px;
+    margin-bottom: 0px;
 }
 
 /* --- Buttons Grid --- */
